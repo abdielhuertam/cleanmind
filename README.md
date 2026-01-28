@@ -27,3 +27,26 @@ The initial goal is to release an MVP (Minimum Viable Product) for **iOS and And
 ---
 
 ## Repository Structure
+
+cleanmind/
+├── README.md
+├── docs/
+│   ├── CleanMind_MVP_v1.0.md
+│   ├── Product_Flow.md
+│   ├── Business_Rules.md
+│   └── Legal_Checklist.md
+
+---
+
+## Documentation
+
+All product decisions and specifications are documented in the `/docs` folder.
+
+The main reference document is:
+- **docs/CleanMind_MVP_v1.0.md**
+
+---
+
+## License
+
+License to be defined.
