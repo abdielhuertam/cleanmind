@@ -1,267 +1,81 @@
-# CleanMind — Product Flow (MVP)
+# CleanMind — Product Flow
 
-This document defines the user-facing behavior of CleanMind for the MVP.
-It describes what the user sees, what actions are available, and how the app behaves in each state.
-This document is the operational source of truth for UI and product behavior.
+## 1. Post-Registration State
 
----
+After completing registration, CleanMind does NOT activate protection automatically.
 
-## 1. Core Mental Model
-
-- The default state of CleanMind is **PROTECTION ON**.
-- Content blocking is considered permanent by default.
-- Users do NOT freely enable or disable blocking.
-- Users may only request **temporary UNLOCKS** under defined rules.
-- When an unlock expires, protection is automatically re-enabled.
-
-The app is designed to create intentional friction and accountability, not convenience.
+- Protection status: OFF
+- The device is not protected yet
+- The user is informed clearly of this state
+- Primary action available:
+  **Activate Protection**
 
 ---
 
-## 2. Global App States (High Level)
+## 2. Protection Activation
 
-CleanMind can be in one of the following global states at any time:
+When the user activates protection:
 
-1. Protection ON (Normal State)
-2. Temporary Unlock Active
-3. VPN / Protection OFF (Error State)
-4. Unlock Expired (Transition State)
-5. Backend Unavailable (Restricted State)
+- VPN/DNS blocking is enabled
+- This becomes the default operating state
+- Protection cannot be freely disabled
 
-Only one global state may be active at a time.
-
----
-
-## 3. Home Screen — Default Entry Point
-
-The Home Screen is the main and primary screen of the app.
-All critical user actions start from this screen.
-
-The Home Screen always displays:
-- Current protection status
-- Remaining unlock time (if applicable)
-- Primary action button (contextual)
-- Secondary information and guidance text
+The user is informed that:
+- Protection is meant to stay ON
+- Temporary unlocks are intentional and limited
+- Uninstalling the app interrupts protection and may notify accountability contacts
 
 ---
 
-## 4. Home Screen States
+## 3. Normal Protected State
 
-### 4.1 State: Protection ON (Normal)
+With protection active:
 
-**Description**
-- VPN is active
-- Blocking is active
-- No unlock is currently running
-
-**Visual Indicators**
-- Status label: “Protection ON”
-- Status color: Green
-- Short explanation text reinforcing protection
-
-**Primary Action**
-- Button: “Request Temporary Unlock”
-
-**Secondary Information**
-- Brief reminder about accountability and limits
-- Link to view progress / medals (read-only)
-
-**User Restrictions**
-- User cannot disable protection directly
-- User cannot access blocked content
+- Blocked content cannot be accessed
+- The user may request a temporary unlock
+- There is no permanent “off” switch
 
 ---
 
-### 4.2 State: Temporary Unlock Active
+## 4. Temporary Unlock Flow
 
-**Description**
-- A temporary unlock has been granted
-- Blocking is temporarily disabled
-- A countdown timer is running
+Users may temporarily disable protection using:
 
-**Visual Indicators**
-- Status label: “Temporary Unlock Active”
-- Remaining time displayed (HH:MM)
-- Status color: Amber / Orange
+- Timed text copy (30 seconds)
+- Accountability code (via external messaging)
+- Automatic unlock
 
-**Primary Action**
-- No action to extend or cancel the unlock
-- Unlock runs until expiration
-
-**Secondary Information**
-- Message reminding user that protection will resume automatically
-- Optional notice if accountability partner was notified
-
-**User Restrictions**
-- User cannot extend unlock duration
-- User cannot cancel unlock early
-- User cannot request another unlock
+Unlocks are always time-limited.
+When the timer ends, protection is restored automatically.
 
 ---
 
-### 4.3 State: Unlock Expired (Transition)
+## 5. Free vs Pro Behavior
 
-**Description**
-- Unlock duration has ended
-- Protection is being re-enabled automatically
+### Free Plan
+- 1 manual unlock per day
+- Fixed unlock duration (up to 8 hours)
+- 1 accountability contact
 
-**Visual Indicators**
-- Temporary message: “Protection Restored”
-- Short confirmation animation or message
-
-**Behavior**
-- Automatically transitions to “Protection ON”
-- No user interaction required
+### Pro Plan
+- Unlimited manual unlocks
+- User-defined unlock duration
+- Up to 5 contacts or 1 group
 
 ---
 
-### 4.4 State: VPN / Protection OFF (Error)
+## 6. Protection Interruption
 
-**Description**
-- VPN or DNS protection is not active
-- Blocking is not enforced
+If CleanMind is uninstalled or VPN/DNS is disabled unexpectedly:
 
-**Visual Indicators**
-- Status label: “Protection OFF”
-- Status color: Red
-- Clear warning message
-
-**Primary Action**
-- Button: “Enable Protection”
-
-**Secondary Information**
-- Explanation that VPN is required for CleanMind to work
-- Reassurance about privacy (no traffic inspection)
-
-**User Restrictions**
-- App functionality is limited
-- Unlock actions are disabled until protection is restored
+- Protection is interrupted
+- The event is not silent
+- The user may be notified
+- Accountability contacts may be notified if configured
 
 ---
 
-### 4.5 State: Backend Unavailable (Restricted)
+## 7. Minors
 
-**Description**
-- Backend cannot be reached
-- Local protection rules remain active
-
-**Visual Indicators**
-- Non-blocking warning message
-- Protection status remains visible
-
-**Behavior**
-- Active unlocks continue if already granted
-- New unlock requests are disabled
-
-**User Restrictions**
-- Cannot request new unlocks
-- Cannot change plan-related settings
-
----
-
-## 5. Unlock Request Flow
-
-When the user taps “Request Temporary Unlock” from the Home Screen:
-
-1. App presents available unlock methods:
-   - Timed Text Copy
-   - Accountability Code
-   - Automatic Unlock (up to 8 hours)
-
-2. User selects one method
-3. App validates availability (plan limits, daily limits)
-4. Backend validates the request
-5. If approved:
-   - Unlock begins
-   - Timer starts
-   - Notifications are sent as configured
-6. If denied:
-   - Clear explanation is shown
-   - No retry loopholes are presented
-
----
-
-## 6. Automatic Unlock Flow
-
-- User selects duration (up to 8 hours)
-- Duration cannot exceed maximum allowed
-- Once started:
-  - Unlock cannot be extended
-  - Unlock cannot be canceled
-- On expiration:
-  - Protection is restored automatically
-  - User is notified
-  - Accountability partner is notified if enabled
-
----
-
-## 7. Manual Unlock Flow
-
-### 7.1 Timed Text Copy
-
-- A motivational phrase is shown
-- User must copy the text correctly within 30 seconds
-- Failure results in unlock denial
-- Success triggers unlock approval
-
----
-
-### 7.2 Accountability Code
-
-- User requests unlock code
-- Code is sent externally (e.g., WhatsApp)
-- Accountability partner receives:
-  - Domain category (porn / social media)
-  - Domain name (if applicable)
-- User enters code to complete unlock
-
----
-
-## 8. User Constraints (Intentional Friction)
-
-Users CANNOT:
-- Disable protection permanently
-- Extend unlock duration
-- Cancel an unlock early
-- Bypass unlock limits
-- Access blocked content without an unlock
-
-These constraints are intentional and central to the product philosophy.
-
----
-
-## 9. Notifications Behavior
-
-Notifications may be sent for:
-- Unlock granted
-- Unlock expired
-- Achievement milestones
-
-Notification preferences are configurable, but critical alerts cannot be fully disabled.
-
----
-
-## 10. Plan Awareness (Free vs Pro)
-
-The Home Screen may display:
-- Current plan (Free / Pro)
-- Brief explanations when limits are reached
-
-The app must never mislead users about available features.
-
----
-
-## 11. Privacy & Transparency Requirements
-
-At all times, the app must:
-- Clearly indicate protection status
-- Clearly disclose VPN usage
-- Avoid deceptive UX patterns
-- Avoid shame-based language
-
----
-
-## 12. Versioning
-
-- Document version: v1.0
-- Any product flow changes require a new version
+For minors, CleanMind works as a complementary layer
+alongside OS-level parental controls (Screen Time / Family Link).

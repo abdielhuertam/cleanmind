@@ -154,3 +154,21 @@ Medals are permanent and visible in the user profile.
 - This document: v1.0
 - Changes must create a new version:
   - v1.1, v1.2, etc.
+
+## Protection Activation & Uninstall Policy
+
+CleanMind does not activate device protection automatically after installation.
+Users must explicitly activate protection after onboarding.
+
+Once protection is activated:
+- Protection remains ON by default
+- Users cannot freely disable protection
+- Temporary unlocks require intentional friction
+
+Uninstalling the app or disabling VPN/DNS:
+- Interrupts protection
+- May trigger notifications to accountability contacts
+- Is treated as a protection interruption event
+
+CleanMind does not claim to be uninstall-proof.
+Its goal is to prevent impulsive, hidden, or consequence-free disabling.

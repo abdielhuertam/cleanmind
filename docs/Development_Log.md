@@ -31,3 +31,19 @@ It is used to resume work consistently between sessions.
 ### Next Planned Block
 - Simulate Free vs Pro rules locally
 - Restrict unlock behavior based on plan
+
+## Session Closure
+
+- Global protection state implemented
+- Temporary unlock flow working correctly
+- Development mode allows rapid testing
+- Product decisions finalized:
+  - Protection must be explicitly activated
+  - App uninstallation is treated as protection interruption
+  - Accountability and visibility are core deterrents
+
+## Next Planned Block
+
+- Implement Protection Inactive state (pre-activation)
+- Add "Activate Protection" onboarding screen
+- UX for protection interruption messaging

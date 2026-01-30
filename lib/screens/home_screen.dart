@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state/protection_state.dart';
+import '../state/plan_state.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -135,7 +136,8 @@ class _PrimaryActionButton extends StatelessWidget {
       case ProtectionStatus.protectionOn:
         return ElevatedButton(
           onPressed: () {
-            protectionState.requestTemporaryUnlock();
+            final isPro = context.read<PlanState>().isPro;
+            protectionState.requestTemporaryUnlock(isProUser: isPro);
           },
           child: const Text('Request Temporary Unlock'),
         );

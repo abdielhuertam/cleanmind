@@ -133,3 +133,17 @@ Counters do not reset when VPN is temporarily disconnected unintentionally.
 
 - This document: v1.0
 - Any rule changes require a new version.
+
+## Protection Interruption Rules
+
+- Protection is activated explicitly by the user.
+- Once active, protection cannot be freely disabled.
+- Temporary unlocks are the only supported method to disable blocking.
+
+If protection is interrupted unexpectedly (VPN off, app uninstall):
+- The interruption may be logged
+- The user may be notified
+- Accountability partners may be notified if configured
+
+For minors, CleanMind operates as a complementary layer to OS-level parental controls.
+

@@ -69,11 +69,15 @@ CleanMind must clearly disclose:
 - That the VPN is used exclusively for content blocking
 - That no traffic is inspected or logged
 - That no user browsing activity is monitored
+- CleanMind does not prevent app uninstallation.
+- Users are informed that uninstalling the app disables protection and may trigger notifications.
+
 
 This disclosure must appear:
 - In the App Store listing
 - In the Privacy Policy
 - In the in-app onboarding
+
 
 ---
 
@@ -187,3 +191,4 @@ Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
   - Data handling changes
   - New features added
   - App Store policies change
+
