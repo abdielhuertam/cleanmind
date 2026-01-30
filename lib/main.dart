@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'state/protection_state.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const CleanMindApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProtectionState()),
+      ],
+      child: const CleanMindApp(),
+    ),
+  );
 }
 
 class CleanMindApp extends StatelessWidget {
