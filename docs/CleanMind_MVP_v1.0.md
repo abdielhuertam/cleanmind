@@ -2,173 +2,80 @@
 
 ## 1. Product Overview
 
-**CleanMind** is a mobile application designed to help users reduce and control access to pornographic content and distracting social media platforms through intentional friction, accountability, and digital detox principles.
-
-The app operates using VPN/DNS-based content blocking and is available on **iOS and Android**.
-
-Official domain (tentative):  
-**cleanmindblocker.com**
+CleanMind is a mobile application designed to help users intentionally reduce access to pornographic content and distracting platforms through friction, accountability, and conscious decision-making.
 
 ---
 
-## 2. Target Users
+## 2. Core Principles
 
-- Adults seeking digital detox
-- Young adults
-- Parents who want to install the app on their children’s devices
-- Users who value accountability over punishment
-
-The app is neutral in tone (non-religious), but may include occasional motivational quotes from various authors, including Christian authors, without explicit religious labeling.
-
----
-
-## 3. Core Principles
-
-- No shame-based UX
 - Friction over force
 - Accountability over punishment
-- Progress over perfection
-- Privacy-first approach
+- Visibility over secrecy
+- No shame-based UX
 
 ---
 
-## 4. Platforms
+## 3. Platforms
 
-- iOS (phones only for MVP)
-- Android (phones only for MVP)
-- Tablets/iPads are **out of scope** for MVP
+- iOS (phones only)
+- Android (phones only)
 
----
-
-## 5. Authentication
-
-MVP includes user registration using:
-- Sign in with Apple
-- Sign in with Google
-- Verified email address required
+Tablets and web access are out of scope for the MVP.
 
 ---
 
-## 6. Core Features (MVP)
+## 4. Core Features
 
-### 6.1 Content Blocking
-- VPN/DNS-based blocking
-- Pornographic content blocking (global database)
-- Social media blocking
-
-### 6.2 Unlock Methods
-Users may unlock blocked content using:
-
-1. **Timed Text Copy**
-   - Random motivational phrase
-   - Must be copied correctly within 30 seconds
-
-2. **Accountability Code**
-   - Unlock code sent via WhatsApp
-   - Friend receives:
-     - Domain name
-     - Content category (porn or social media)
-
-3. **Automatic Unlock**
-   - Temporary unlock for up to 8 hours
-   - Notifications sent to user
-   - Optional notification to accountability partner
+- VPN/DNS-based content blocking
+- Temporary unlocks
+- Controlled total protection deactivation
+- Accountability notifications
 
 ---
 
-## 7. Progress Tracking
+## 5. Protection Model
 
-- Days without porn
-- Days without social media
-- Separate counters per category
-- Counters reset when content is unlocked
-
----
-
-## 8. Medals (Achievements)
-
-MVP medals:
-- 1 day
-- 7 days
-- 30 days
-- 6 months
-- 1 year
-
-Medals are permanent and visible in the user profile.
+- Protection is NOT enabled automatically
+- The user must explicitly activate protection
+- Protection remains ON unless intentionally disabled
 
 ---
 
-## 9. Free vs Pro Plans
+## 6. Deactivation Philosophy
 
-### Free Plan
-- Porn blocking: unlimited time
-- Social media blocking: 1 platform
-- Custom blocked sites: up to 5
-- Accountability partners: 1
-- Manual unlocks: 1 per day
-- Medals: limited
-- Automatic unlock: up to 8 hours
+CleanMind allows full deactivation only through intentional effort.
 
-### Pro Plan (Monthly / Annual)
-- Unlimited social media blocking
-- Unlimited custom sites
-- Up to 5 accountability partners OR WhatsApp group
-- Unlimited manual unlocks
-- Full statistics (weekly, monthly, yearly)
-- All medals
-- Advanced motivational messages
+Deactivation:
+- Is explicit
+- Requires friction
+- Is visible
+- Notifies a friend or parent
+- Does not auto-reactivate
 
 ---
 
-## 10. Payments
+## 7. Free vs Pro
 
-- Subscriptions handled exclusively via:
-  - Apple App Store
-  - Google Play Store
-- No external payment gateways
-- Refunds handled by respective stores
+Free Plan:
+- Limited temporary unlocks
+- Fixed 8-hour waiting period for total deactivation
+
+Pro Plan:
+- Unlimited temporary unlocks
+- User-defined waiting period for total deactivation
 
 ---
 
-## 11. Privacy & Legal (MVP)
+## 8. Privacy & Legal
 
-- No content inspection by humans
-- No reading of personal messages
+- No browsing history inspection
+- No access to messages or conversations
 - No selling of user data
-- Privacy Policy and Terms required before launch
 
 ---
 
-## 12. Out of Scope (Post-MVP)
+## 9. Out of Scope (Post-MVP)
 
-- Tablet/iPad support
-- Advanced analytics dashboards
-- User level system (Rookie/Pro/etc.)
-- Web control panel
-- Parental multi-profile accounts
-
----
-
-## 13. Versioning
-
-- This document: v1.0
-- Changes must create a new version:
-  - v1.1, v1.2, etc.
-
-## Protection Activation & Uninstall Policy
-
-CleanMind does not activate device protection automatically after installation.
-Users must explicitly activate protection after onboarding.
-
-Once protection is activated:
-- Protection remains ON by default
-- Users cannot freely disable protection
-- Temporary unlocks require intentional friction
-
-Uninstalling the app or disabling VPN/DNS:
-- Interrupts protection
-- May trigger notifications to accountability contacts
-- Is treated as a protection interruption event
-
-CleanMind does not claim to be uninstall-proof.
-Its goal is to prevent impulsive, hidden, or consequence-free disabling.
+- Tablets and iPads
+- Web dashboard
+- Multi-profile parental control

@@ -15,21 +15,64 @@ class HomeScreen extends StatelessWidget {
         title: const Text('CleanMind'),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _StatusLabel(protectionState: protectionState),
-            const SizedBox(height: 16),
-            _Countdown(protectionState: protectionState),
-            const SizedBox(height: 24),
-            _ExplanationText(protectionState: protectionState),
-            const SizedBox(height: 40),
-            _PrimaryActionButton(protectionState: protectionState),
-          ],
-        ),
+      body: Builder(
+        builder: (context) {
+          final planState = context.watch<PlanState>();
+
+          // 🟡 STATE 1: Protection NOT activated yet
+          if (planState.isProtectionInactive) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Your device is not protected',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'CleanMind protection is currently inactive.\n'
+                      'Blocked content can still be accessed until protection is activated.',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: () {
+                        planState.activateProtection();
+                      },
+                      child: const Text('Activate Protection'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // 🟢 STATE 2: Protection already activated → EXISTING UI
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _StatusLabel(protectionState: protectionState),
+                const SizedBox(height: 16),
+                _Countdown(protectionState: protectionState),
+                const SizedBox(height: 24),
+                _ExplanationText(protectionState: protectionState),
+                const SizedBox(height: 40),
+                _PrimaryActionButton(protectionState: protectionState),
+              ],
+            ),
+          );
+        },
       ),
+
     );
   }
 }
@@ -136,7 +179,8 @@ class _PrimaryActionButton extends StatelessWidget {
       case ProtectionStatus.protectionOn:
         return ElevatedButton(
           onPressed: () {
-            final isPro = context.read<PlanState>().isPro;
+            final isPro =
+                 context.read<PlanState>().plan == UserPlan.pro;
             protectionState.requestTemporaryUnlock(isProUser: isPro);
           },
           child: const Text('Request Temporary Unlock'),

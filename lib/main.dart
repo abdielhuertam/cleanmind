@@ -10,7 +10,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ProtectionState()),
-        ChangeNotifierProvider(create: (_) => PlanState()),
+        ChangeNotifierProvider(create: (_) => PlanState.initial()),
       ],
       child: const CleanMindApp(),
     ),

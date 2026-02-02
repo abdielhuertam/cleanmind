@@ -2,148 +2,95 @@
 
 ## 1. General Rules
 
-- CleanMind operates using VPN/DNS-based content blocking.
-- The VPN must be enabled for blocking to work.
-- If VPN is disabled, the app must notify the user.
+- CleanMind uses VPN/DNS-based blocking
+- VPN must be enabled for protection to work
+- Protection state must always be visible to the user
 
 ---
 
 ## 2. Blocking Rules
 
 ### 2.1 Pornographic Content
-- Pornographic content is blocked by default when VPN is active.
-- Blocking duration is unlimited for both Free and Pro users.
-- Porn blocking cannot be permanently disabled in the Free plan.
+
+- Pornographic content is blocked by default when protection is active
+- Blocking duration is unlimited
 
 ### 2.2 Social Media
-- Free plan:
-  - User can block only **one** social media platform.
-- Pro plan:
-  - User can block **multiple** social media platforms.
+
+- Free plan: one social media platform
+- Pro plan: multiple social media platforms
 
 ---
 
 ## 3. Custom Blocked Sites
 
-- Free plan:
-  - Up to 5 custom domains.
-- Pro plan:
-  - Unlimited custom domains.
-
-Domains are blocked by category, not by inspecting content manually.
+- Free plan: up to 5 domains
+- Pro plan: unlimited domains
 
 ---
 
-## 4. Unlock Rules
+## 4. Unlock & Deactivation Rules
 
-### 4.1 Manual Unlocks
+### 4.1 Temporary Unlock (Partial)
 
-- Free plan:
-  - Maximum of **1 manual unlock per day**.
-- Pro plan:
-  - Unlimited manual unlocks.
+- Always time-limited
+- Protection is restored automatically when the timer ends
 
-Manual unlock methods:
-- Timed text copy (30 seconds)
-- Accountability code
+Methods:
+- Timed text copy
+- Accountability confirmation
 
 ---
 
-### 4.2 Automatic Unlock
+### 4.2 Total Protection Deactivation
 
-- Available for both Free and Pro users.
-- Maximum unlock duration: **8 hours**.
-- After unlock expires, blocking is re-enabled automatically.
+- Fully disables VPN/DNS blocking
+- Does NOT restore automatically
 
-Notifications:
-- User is always notified.
-- Accountability partner is notified if enabled.
+User must choose ONE option:
+
+1. Timed random message
+2. Accountability confirmation
+3. Waiting period
+
+Waiting period rules:
+- Free plan: 8 hours
+- Pro plan: user-defined
 
 ---
 
-## 5. Accountability Partners
+## 5. Accountability Notifications
 
-- Free plan:
-  - Maximum of 1 accountability partner.
-- Pro plan:
-  - Up to 5 accountability partners OR one WhatsApp group.
+- Accountability contacts are notified when protection is:
+  - Activated
+  - Deactivated
 
-The app does not read messages or access external conversations.
+- CleanMind does not read, store, or access external messages
 
 ---
 
 ## 6. Progress Counters
 
-- Separate counters are maintained for:
+- Separate counters for:
   - Pornography
   - Social media
-- Counters reset when:
-  - Manual unlock is performed
-  - Automatic unlock is activated
 
-Counters do not reset when VPN is temporarily disconnected unintentionally.
-
----
-
-## 7. Achievements (Medals)
-
-- Medals are awarded automatically.
-- Medals cannot be deleted or reset.
-- Medals reflect longest achieved streak.
+Counters reset when:
+- Temporary unlock is used
+- Total protection deactivation occurs
 
 ---
 
-## 8. Notifications
+## 7. Subscription Rules
 
-- Notifications are sent for:
-  - Unlock events
-  - Achievement milestones
-- Users can configure notification preferences.
-
----
-
-## 9. Subscription Rules
-
-- Subscription status is verified via App Store / Play Store.
+- Subscription status is verified via App Store / Play Store
 - If subscription expires:
-  - User is downgraded to Free plan
-  - Pro features are disabled immediately
+  - User is downgraded to Free
+  - Pro features are disabled
 
 ---
 
-## 10. Privacy Rules
+## 8. Error Handling
 
-- No human reviews browsing history.
-- No storage of visited URLs.
-- Only domain-level blocking data is processed.
-- User data is never sold.
-
----
-
-## 11. Error Handling
-
-- If VPN connection fails:
-  - User is notified
-  - Blocking status is set to OFF
-- App must clearly indicate protection status at all times.
-
----
-
-## 12. Versioning
-
-- This document: v1.0
-- Any rule changes require a new version.
-
-## Protection Interruption Rules
-
-- Protection is activated explicitly by the user.
-- Once active, protection cannot be freely disabled.
-- Temporary unlocks are the only supported method to disable blocking.
-
-If protection is interrupted unexpectedly (VPN off, app uninstall):
-- The interruption may be logged
-- The user may be notified
-- Accountability partners may be notified if configured
-
-For minors, CleanMind operates as a complementary layer to OS-level parental controls.
-
+- If VPN fails, the user is notified
+- Protection state must never be ambiguous
