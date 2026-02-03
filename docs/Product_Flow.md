@@ -5,7 +5,7 @@
 After installation and registration, CleanMind does NOT activate protection automatically.
 
 - Protection status: INACTIVE
-- The device is not protected yet
+- The device is not protected
 - The user is clearly informed of this state
 
 The only available action is:
@@ -19,23 +19,20 @@ Activate Protection
 Protection becomes active only after an explicit user action.
 
 When protection is activated:
-
 - VPN/DNS-based blocking is enabled
 - Protection becomes the default operating state
 - Protection is considered intentionally active
 
 The user is informed that:
-
 - Protection is designed to stay ON
 - Protection is not meant to be disabled casually
-- Accountability and visibility are core principles of the product
+- Accountability and visibility are core principles
 
 ---
 
 ## 3. Protected State (Normal Operation)
 
 When protection is active:
-
 - Blocked content cannot be accessed
 - The user may request temporary unlocks
 - The user may request total protection deactivation
@@ -48,18 +45,13 @@ When protection is active:
 Temporary unlock allows short, intentional access while protection remains conceptually active.
 
 Characteristics:
-
 - Always time-limited
 - Countdown is visible
 - Protection is restored automatically when time expires
 
 Available methods:
-
-1. Timed Text Copy  
-   - A random message must be written correctly within 30 seconds
-
-2. Accountability Confirmation  
-   - A confirmation or code is requested from a friend or parent
+1. Timed text copy (30 seconds)
+2. Accountability confirmation (friend or parent)
 
 Temporary unlock does NOT permanently disable protection.
 
@@ -67,65 +59,59 @@ Temporary unlock does NOT permanently disable protection.
 
 ## 5. Total Protection Deactivation (Explicit & Controlled)
 
-CleanMind allows full protection deactivation, but only through intentional friction.
+CleanMind allows full protection deactivation only through intentional friction.
 
 ### 5.1 Deactivation Entry Point
-
-- The user taps “Deactivate Protection”
+- User taps “Deactivate Protection”
 - Protection is NOT disabled immediately
 
-### 5.2 Deactivation Options (User Chooses ONE)
+### 5.2 Deactivation Options (Choose ONE)
 
-The user must complete one of the following options:
+The user must complete one of the following:
 
-1. Timed Random Message  
-   - Write a random message within 30 seconds
-
-2. Accountability Contact  
-   - Send a message or request confirmation from a friend or parent
-
-3. Waiting Period  
-   - Free plan: fixed 8-hour waiting period  
-   - Pro plan: user-defined waiting time
+1. Timed random message (30 seconds)
+2. Accountability confirmation (friend or parent)
+3. Waiting period
+   - Free plan: fixed 8 hours
+   - Premium plan: user-defined duration
 
 ### 5.3 Deactivation Completion
-
-Once the selected option is completed:
-
+Once the selected option completes:
 - Protection becomes FULLY DISABLED
 - VPN/DNS blocking is turned OFF
 
 ### 5.4 Reactivation Rules
-
 - Protection does NOT reactivate automatically
 - Only the user can manually activate protection again
 
 ### 5.5 Notifications
-
 Whenever protection is activated or deactivated:
-
-- A friend or parent is notified via WhatsApp
+- A friend, parent, or configured contact is notified via WhatsApp
 
 CleanMind does not read, store, or access message content.
 
 ---
 
-## 6. Free vs Pro Summary
+## 6. Optional Support Community (Premium Only)
 
-Free Plan:
-- Limited temporary unlocks
-- Fixed 8-hour waiting period for total deactivation
+Premium users may opt into additional support features.
 
-Pro Plan:
-- Unlimited temporary unlocks
-- User-defined waiting period for total deactivation
+- Receive daily supportive messages
+- Join a support community
+  - Website
+  - Chatbot
+  - WhatsApp channel or group
+
+These features:
+- Are optional
+- Do not affect blocking behavior
+- Can be enabled or disabled by the user at any time
 
 ---
 
 ## 7. Protection Interruption
 
 If protection is interrupted unexpectedly (VPN disabled, app uninstalled):
-
 - Protection is considered interrupted
 - The event is not silent
 - The user may be notified
