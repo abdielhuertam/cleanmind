@@ -1,135 +1,111 @@
 # CleanMind — Development Log
 
-This file records the development progress of the CleanMind MVP.
-It is used to resume work consistently between sessions.
+This file records the factual development state of the CleanMind project.
+Its purpose is to preserve context across sessions and prevent reinterpretation of past decisions.
 
 ---
 
-## Session: Initial MVP Foundation
+## Session: Core MVP Completion — Protection Logic
 
-### Completed
-- Product scope finalized (Architecture, Business Rules, MVP, Legal)
-- Product_Flow.md created and approved
-- Home Screen aligned with Product Flow
-- Global protection state implemented
-- Local persistence of unlock state implemented (offline-first)
+### Scope of This Session
 
-### Current State
-- App runs successfully on iOS simulator
-- Protection ON by default
-- Temporary Unlock with countdown works
-- Unlock persists across app restarts
-
-### Not Implemented Yet
-- Backend (Firebase)
-- Authentication
-- Free vs Pro rule enforcement
-- VPN / DNS real blocking
-- Notifications
-- Payments
-
-### Next Planned Block
-- Simulate Free vs Pro rules locally
-- Restrict unlock behavior based on plan
-
-## Session Closure
-
-- Global protection state implemented
-- Temporary unlock flow working correctly
-- Development mode allows rapid testing
-- Product decisions finalized:
-  - Protection must be explicitly activated
-  - App uninstallation is treated as protection interruption
-  - Accountability and visibility are core deterrents
-
-## Next Planned Block
-
-- Implement Protection Inactive state (pre-activation)
-- Add "Activate Protection" onboarding screen
-- UX for protection interruption messaging
-
-# CleanMind — Development Log
-
-This file records the development progress of the CleanMind MVP.
-It exists to preserve context across sessions and prevent re-interpretation of past decisions.
+The objective of this session was to complete the **core MVP logic** of CleanMind, focusing on protection states, intentional friction, and controlled deactivation.
 
 ---
 
-## Session: MVP Foundation & State Modeling
+## Completed Work
 
-### Completed
+### 1. Protection State Model
 
-- Product vision and core principles finalized
-- Explicit Protection Inactive state implemented (pre-activation)
-- Protection activation flow implemented
-- Temporary Unlock logic implemented and verified
-- UI corrected to respect product states:
-  - No protection assumed by default
-  - Activation required before any unlock
-- Initial PlanState refactor completed and validated
-- Flutter app successfully running on iOS simulator
-
----
-
-## Session: Product Definition Alignment (Critical)
-
-### Completed
-
-- Clarified distinction between:
-  - Temporary Unlock (partial, time-limited)
-  - Total Protection Deactivation (explicit, controlled)
-- Defined Total Protection Deactivation rules:
-  - User must explicitly request deactivation
-  - Protection is NOT disabled immediately
-  - User may choose ONE option to proceed:
-    - Timed random message (30 seconds)
-    - Accountability contact confirmation
-    - Waiting period
-  - Free plan: fixed 8-hour waiting period
-  - Pro plan: user-defined waiting period
-  - Once deactivated, protection remains OFF until manually reactivated
-  - No automatic reactivation
-- Defined mandatory notifications:
-  - Friend or parent is notified whenever protection is activated or deactivated
+- Refactored `PlanState` as the single source of truth for protection behavior.
+- Defined and implemented the following protection lifecycle states:
+  - Inactive (never activated)
+  - Active
+  - Temporarily Unlocked (auto-restores)
+  - Deactivation Pending
+  - Protection Disabled
+- Confirmed that protection:
+  - Does not activate automatically
+  - Does not reactivate automatically after deactivation
 
 ---
 
-## Documentation Updates
+### 2. Temporary Unlock Flow
 
-### Updated Documents
+- Temporary unlock implemented as a partial, time-limited state.
+- Unlock restores protection automatically after the timer expires.
+- Unlock cannot be used when protection is fully disabled.
+
+---
+
+### 3. Total Protection Deactivation (Core Differentiator)
+
+- Implemented total protection deactivation with intentional friction.
+- Deactivation is not immediate.
+- User must choose a deactivation method (simulated in MVP):
+  - Waiting period (Free vs Premium simulated with short timers)
+- Added `Deactivation Pending` state.
+- After waiting period:
+  - Protection transitions automatically to `Protection Disabled`
+- Once disabled:
+  - Protection remains OFF
+  - No automatic reactivation occurs
+  - Only manual user action can reactivate protection
+
+---
+
+### 4. UI State Verification
+
+- UI updated to correctly reflect all protection states:
+  - Inactive
+  - Active
+  - Deactivation Pending
+  - Protection Disabled
+- Verified visually in iOS Simulator that:
+  - States transition correctly
+  - No unintended reactivation occurs
+  - User always understands current protection status
+
+---
+
+## Documentation Alignment
+
+During this session, the following documents were reviewed and aligned with the implemented behavior:
 
 - Product_Flow.md
 - Business_Rules.md
 - CleanMind_MVP_v1.0.md
+- Working_Agreements.md (session closure protocol added)
 
-### Verified Documents (No changes required at this stage)
-
-- Architecture.md
-- Working_Agreements.md
-- Legal_Checklist.md
+No further changes are required to these documents at this time.
 
 ---
 
-## Current State
+## Current Project State
 
-- Product rules, UX flow, and business logic are fully aligned
-- No conceptual contradictions between documentation
-- Code reflects correct protection activation behavior
-- Total Protection Deactivation is defined at product level but NOT yet implemented in code
+- Core MVP protection logic is complete and functional.
+- Product behavior matches documented intent.
+- No backend, messaging, or payment systems are implemented (by design).
+- The project is in a stable, resumable state.
 
 ---
 
-## Next Planned Block (When Resuming)
+## Next Optional Blocks (Not Started)
 
-1. Model Total Protection Deactivation state in code
-2. Implement deactivation waiting logic (Free vs Pro)
-3. Add deactivation UX and confirmation flows
-4. Extend notification handling (logical layer only, no real messaging yet)
+These are explicitly out of scope for the current session:
+
+1. Premium enforcement refinements
+2. Community support features
+3. Backend and real notifications
+4. App Store / Play Store preparation
 
 ---
 
 ## Session Closure
 
-- Development paused intentionally after documentation alignment
-- Project is in a stable and resumable state
-- Safe to commit all changes to version control
+This session concludes with:
+- A completed core MVP
+- Aligned documentation
+- Clear stopping point
+
+The project can be safely committed and resumed later without loss of context.

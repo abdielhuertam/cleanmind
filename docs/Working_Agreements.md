@@ -72,7 +72,22 @@ When resuming work after a break or a new conversation:
 
 ---
 
-## 7. Context Preservation Principle
+## 7. Session Closure Protocol  🆕
+
+When ending a development session that includes meaningful product or code changes:
+
+1. Update `Development_Log.md` to record:
+   - What was completed
+   - What state the project is left in
+   - What the next planned block is
+2. Ensure documentation and code are aligned
+3. Only then commit and push changes to Git
+
+Closing a session without updating the Development Log is considered incomplete work.
+
+---
+
+## 8. Context Preservation Principle
 
 - If a rule, agreement, or decision is repeated more than once,
   it must be written into documentation.
@@ -80,7 +95,7 @@ When resuming work after a break or a new conversation:
 
 ---
 
-## 8. Change Management
+## 9. Change Management
 
 - Product changes require updating Product_Flow.md.
 - Process changes require updating this file.
@@ -88,43 +103,34 @@ When resuming work after a break or a new conversation:
 
 ---
 
-## 9. Objective
+## 10. Objective
 
 The objective of these agreements is to ensure that:
 - The original product vision is never lost
 - Context survives across days and conversations
 - Development remains calm, predictable, and intentional
 
+---
+
 ## Canonical Project Documents (Source of Truth)
 
 The following documents define the complete context, objectives, scope, and constraints of the CleanMind MVP.
-These files collectively represent the single source of truth for the project.
-
 They must be reviewed before resuming development after any pause or new session.
 
 ### Product & UX
-- `docs/Product_Flow.md`  
-  Defines user-facing behavior, states, flows, and restrictions.
-
-- `docs/CleanMind_MVP_v1.0.md`  
-  Defines product scope, target users, core principles, features included in the MVP, and out-of-scope items.
+- `docs/Product_Flow.md`
 
 ### Business Rules
-- `docs/Business_Rules.md`  
-  Defines Free vs Pro rules, unlock limitations, accountability constraints, counters, and enforcement logic.
+- `docs/Business_Rules.md`
 
 ### Technical Architecture
-- `docs/Architecture.md`  
-  Defines system responsibilities, offline-first approach, backend authority, and blocking engine strategy.
+- `docs/Architecture.md`
 
 ### Legal & Compliance
-- `docs/Legal_Checklist.md`  
-  Defines privacy, VPN disclosure, App Store / Play Store compliance, and legal requirements.
+- `docs/Legal_Checklist.md`
 
 ### Development State
-- `docs/Development_Log.md`  
-  Records completed work, current status, and next planned development blocks.
+- `docs/Development_Log.md`
 
 ### Collaboration & Process
-- `docs/Working_Agreements.md`  
-  Defines communication rules, development rhythm, Git usage, and context preservation agreements.
+- `docs/Working_Agreements.md`
