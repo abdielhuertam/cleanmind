@@ -19,60 +19,25 @@ class HomeScreen extends StatelessWidget {
         builder: (context) {
           final planState = context.watch<PlanState>();
 
-          // 🟡 STATE 1: Protection NOT activated yet
-          if (planState.isProtectionInactive) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Your device is not protected',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'CleanMind protection is currently inactive.\n'
-                      'Blocked content can still be accessed until protection is activated.',
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: () {
-                        planState.activateProtection();
-                      },
-                      child: const Text('Activate Protection'),
-                    ),
-                  ],
-                ),
-              ),
-            );
+          // 1️⃣ Protection never activated
+          if (planState.lifecycle == ProtectionLifecycle.inactive) {
+            return _buildInactive(planState);
           }
 
-          // 🟢 STATE 2: Protection already activated → EXISTING UI
-          return Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _StatusLabel(protectionState: protectionState),
-                const SizedBox(height: 16),
-                _Countdown(protectionState: protectionState),
-                const SizedBox(height: 24),
-                _ExplanationText(protectionState: protectionState),
-                const SizedBox(height: 40),
-                _PrimaryActionButton(protectionState: protectionState),
-              ],
-            ),
-          );
+          // 2️⃣ Total deactivation in progress
+          if (planState.isDeactivationPending) {
+            return _buildDeactivationPending(planState);
+          }
+
+          // 3️⃣ Protection fully disabled
+          if (planState.isProtectionDisabled) {
+            return _buildProtectionDisabled(planState);
+          }
+
+          // 4️⃣ Normal protected state (existing UI)
+          return _buildProtected(planState);
         },
       ),
-
     );
   }
 }
@@ -180,7 +145,7 @@ class _PrimaryActionButton extends StatelessWidget {
         return ElevatedButton(
           onPressed: () {
             final isPro =
-                 context.read<PlanState>().plan == UserPlan.pro;
+                 context.read<PlanState>().plan == UserPlan.premium;
             protectionState.requestTemporaryUnlock(isProUser: isPro);
           },
           child: const Text('Request Temporary Unlock'),
@@ -198,4 +163,114 @@ class _PrimaryActionButton extends StatelessWidget {
         );
     }
   }
+}
+
+Widget _buildInactive(PlanState planState) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Your device is not protected',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: planState.activateProtection,
+            child: const Text('Activate Protection'),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildProtected(PlanState planState) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Protection ON',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              planState.startTemporaryUnlock(
+                const Duration(seconds: 10),
+              );
+            },
+            child: const Text('Request Temporary Unlock'),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: () {
+              planState.requestTotalDeactivation(
+                method: DeactivationMethod.waitingPeriod,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('Deactivate Protection'),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildDeactivationPending(PlanState planState) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Text(
+            'Deactivation in progress',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Protection will be disabled once the selected condition is met.',
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildProtectionDisabled(PlanState planState) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Protection Disabled',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Your device is currently not protected.',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: planState.reactivateProtection,
+            child: const Text('Reactivate Protection'),
+          ),
+        ],
+      ),
+    ),
+  );
 }

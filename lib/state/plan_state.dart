@@ -3,86 +3,108 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 
-/// ------------------------------------------------------------
+/// --------------------------------------------
 /// CleanMind — Plan & Protection State
-/// ------------------------------------------------------------
-/// Canonical source of truth for product protection state.
-/// Product authority: Product_Flow.md
-/// ------------------------------------------------------------
+/// --------------------------------------------
+/// Source of truth for protection, unlock,
+/// and total deactivation logic.
+/// --------------------------------------------
 
 enum UserPlan {
   free,
-  pro,
+  premium,
 }
 
 enum ProtectionLifecycle {
-  /// App installed, but protection NOT activated yet
+  /// Protection has never been activated
   inactive,
 
-  /// Protection active and enforced
+  /// Protection is active and enforced
   active,
 
-  /// Protection temporarily disabled by intentional unlock
+  /// Temporary unlock (auto-restores)
   temporarilyUnlocked,
+
+  /// User requested total deactivation
+  /// but friction is still in progress
+  deactivationPending,
+
+  /// Protection fully disabled
+  protectionDisabled,
+}
+
+enum DeactivationMethod {
+  timedMessage,
+  accountabilityContact,
+  waitingPeriod,
 }
 
 class PlanState extends ChangeNotifier {
-  /// -------------------------------
-  /// Core Product State
-  /// -------------------------------
+  // ----------------------------
+  // Core State
+  // ----------------------------
 
-  bool protectionEverActivated;
-  ProtectionLifecycle lifecycle;
   UserPlan plan;
+  ProtectionLifecycle lifecycle;
+  bool protectionEverActivated;
 
-  /// -------------------------------
-  /// Temporary Unlock State
-  /// -------------------------------
+  // ----------------------------
+  // Temporary Unlock
+  // ----------------------------
 
   DateTime? unlockEndsAt;
-  Timer? unlockTimer;
+
+  // ----------------------------
+  // Total Deactivation
+  // ----------------------------
+
+  DeactivationMethod? deactivationMethod;
+  DateTime? deactivationAvailableAt;
+
+  // ----------------------------
+  // Constructor
+  // ----------------------------
 
   PlanState({
-    required this.protectionEverActivated,
-    required this.lifecycle,
     required this.plan,
+    required this.lifecycle,
+    required this.protectionEverActivated,
     this.unlockEndsAt,
-    this.unlockTimer,
+    this.deactivationMethod,
+    this.deactivationAvailableAt,
   });
 
-  /// -------------------------------
-  /// Initial State
-  /// -------------------------------
+  // ----------------------------
+  // Initial State
+  // ----------------------------
 
   factory PlanState.initial() {
     return PlanState(
-      protectionEverActivated: false,
-      lifecycle: ProtectionLifecycle.inactive,
       plan: UserPlan.free,
+      lifecycle: ProtectionLifecycle.inactive,
+      protectionEverActivated: false,
     );
   }
 
-  /// -------------------------------
-  /// Derived Getters
-  /// -------------------------------
-
-  bool get isProtectionInactive =>
-      lifecycle == ProtectionLifecycle.inactive;
+  // ----------------------------
+  // Derived Helpers
+  // ----------------------------
 
   bool get isProtectionActive =>
       lifecycle == ProtectionLifecycle.active;
 
-  bool get isTemporarilyUnlocked =>
-      lifecycle == ProtectionLifecycle.temporarilyUnlocked;
+  bool get isProtectionDisabled =>
+      lifecycle == ProtectionLifecycle.protectionDisabled;
 
-  bool get canRequestUnlock =>
-      protectionEverActivated && isProtectionActive;
+  bool get isDeactivationPending =>
+      lifecycle == ProtectionLifecycle.deactivationPending;
 
-  bool get isPro => plan == UserPlan.pro;
+  bool get canRequestTemporaryUnlock =>
+      lifecycle == ProtectionLifecycle.active;
 
-  /// -------------------------------
-  /// State Transitions
-  /// -------------------------------
+  // ----------------------------
+  // Protection Activation
+  // ----------------------------
 
   void activateProtection() {
     protectionEverActivated = true;
@@ -90,21 +112,68 @@ class PlanState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ----------------------------
+  // Temporary Unlock
+  // ----------------------------
+
   void startTemporaryUnlock(Duration duration) {
-    if (!canRequestUnlock) return;
+    if (!canRequestTemporaryUnlock) return;
 
     unlockEndsAt = DateTime.now().add(duration);
     lifecycle = ProtectionLifecycle.temporarilyUnlocked;
     notifyListeners();
   }
 
-  void restoreProtection() {
+  void restoreProtectionFromUnlock() {
     if (!protectionEverActivated) return;
 
     unlockEndsAt = null;
-    unlockTimer?.cancel();
-    unlockTimer = null;
     lifecycle = ProtectionLifecycle.active;
+    notifyListeners();
+  }
+
+  // ----------------------------
+  // Total Deactivation — A1
+  // ----------------------------
+
+  /// User starts total deactivation
+void requestTotalDeactivation({
+  required DeactivationMethod method,
+}) {
+  deactivationMethod = method;
+  lifecycle = ProtectionLifecycle.deactivationPending;
+
+  if (method == DeactivationMethod.waitingPeriod) {
+    // ⏱️ SIMULACIÓN PARA MVP (5 segundos)
+    // En producción:
+    // Free  -> 8 horas
+    // Pro   -> tiempo configurable
+    final waitDuration =
+        plan == UserPlan.free ? const Duration(seconds: 5) : const Duration(seconds: 3);
+
+    deactivationAvailableAt =
+        DateTime.now().add(waitDuration);
+
+    Timer(waitDuration, () {
+      completeTotalDeactivation();
+    });
+  }
+
+  notifyListeners();
+}
+
+  /// Called when friction is completed
+  void completeTotalDeactivation() {
+    lifecycle = ProtectionLifecycle.protectionDisabled;
+    unlockEndsAt = null;
+    notifyListeners();
+  }
+
+  /// Manual reactivation only
+  void reactivateProtection() {
+    lifecycle = ProtectionLifecycle.active;
+    deactivationMethod = null;
+    deactivationAvailableAt = null;
     notifyListeners();
   }
 }
