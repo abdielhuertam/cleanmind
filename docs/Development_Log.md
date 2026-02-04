@@ -1,111 +1,143 @@
 # CleanMind — Development Log
 
-This file records the factual development state of the CleanMind project.
-Its purpose is to preserve context across sessions and prevent reinterpretation of past decisions.
+This document tracks meaningful development milestones, decisions, and checkpoints.
+It serves as the primary re-entry point between work sessions.
+
+This log records **what was done**, **what was decided**, and **where to continue next**.
 
 ---
 
-## Session: Core MVP Completion — Protection Logic
+## 2026-01-29 — Project Initialization
 
-### Scope of This Session
-
-The objective of this session was to complete the **core MVP logic** of CleanMind, focusing on protection states, intentional friction, and controlled deactivation.
-
----
-
-## Completed Work
-
-### 1. Protection State Model
-
-- Refactored `PlanState` as the single source of truth for protection behavior.
-- Defined and implemented the following protection lifecycle states:
-  - Inactive (never activated)
-  - Active
-  - Temporarily Unlocked (auto-restores)
-  - Deactivation Pending
-  - Protection Disabled
-- Confirmed that protection:
-  - Does not activate automatically
-  - Does not reactivate automatically after deactivation
+- Repository created.
+- Documentation-first workflow established.
+- Initial MVP scope defined.
+- Core principles agreed:
+  - Offline-first
+  - Accountability over punishment
+  - Friction over force
+  - Privacy-first approach
 
 ---
 
-### 2. Temporary Unlock Flow
+## 2026-01-30 — Architecture & Core Concepts
 
-- Temporary unlock implemented as a partial, time-limited state.
-- Unlock restores protection automatically after the timer expires.
-- Unlock cannot be used when protection is fully disabled.
-
----
-
-### 3. Total Protection Deactivation (Core Differentiator)
-
-- Implemented total protection deactivation with intentional friction.
-- Deactivation is not immediate.
-- User must choose a deactivation method (simulated in MVP):
-  - Waiting period (Free vs Premium simulated with short timers)
-- Added `Deactivation Pending` state.
-- After waiting period:
-  - Protection transitions automatically to `Protection Disabled`
-- Once disabled:
-  - Protection remains OFF
-  - No automatic reactivation occurs
-  - Only manual user action can reactivate protection
+- Architecture defined:
+  - Local state-driven behavior
+  - VPN/DNS-based blocking
+  - No traffic inspection
+- Protection lifecycle concept introduced.
+- Manual activation and deactivation principles outlined.
+- Documentation aligned:
+  - Architecture.md
+  - Business_Rules.md
+  - Product_Flow.md
 
 ---
 
-### 4. UI State Verification
+## 2026-02-01 — Core State Model Implemented
 
-- UI updated to correctly reflect all protection states:
-  - Inactive
-  - Active
-  - Deactivation Pending
-  - Protection Disabled
-- Verified visually in iOS Simulator that:
-  - States transition correctly
-  - No unintended reactivation occurs
-  - User always understands current protection status
-
----
-
-## Documentation Alignment
-
-During this session, the following documents were reviewed and aligned with the implemented behavior:
-
-- Product_Flow.md
-- Business_Rules.md
-- CleanMind_MVP_v1.0.md
-- Working_Agreements.md (session closure protocol added)
-
-No further changes are required to these documents at this time.
+- Flutter project initialized.
+- Core state models implemented:
+  - PlanState
+  - ProtectionState
+- Protection lifecycle implemented in code:
+  - inactive
+  - active
+  - deactivationPending
+  - protectionDisabled
+- App starts with protection OFF by default.
+- No automatic reactivation implemented.
 
 ---
 
-## Current Project State
+## 2026-02-02 — Home Screen & Core Loop
 
-- Core MVP protection logic is complete and functional.
-- Product behavior matches documented intent.
-- No backend, messaging, or payment systems are implemented (by design).
-- The project is in a stable, resumable state.
-
----
-
-## Next Optional Blocks (Not Started)
-
-These are explicitly out of scope for the current session:
-
-1. Premium enforcement refinements
-2. Community support features
-3. Backend and real notifications
-4. App Store / Play Store preparation
+- HomeScreen implemented and wired to PlanState.
+- UI driven strictly by ProtectionLifecycle.
+- No simple ON/OFF toggle.
+- Deactivation requires friction.
+- Core User Loop validated in simulator:
+  - Activate protection
+  - Attempt access
+  - Friction-based unlock
+  - Manual reactivation
 
 ---
 
-## Session Closure
+## 2026-02-03 — Unlock Methods & UX Closure
 
-This session concludes with:
-- A completed core MVP
-- Aligned documentation
-- Clear stopping point
+### Summary
+This session focused on **closing the MVP at a product and UX level**.
+No new code was written intentionally; instead, irreversible product decisions were finalized.
 
-The project can be safely committed and resumed later without loss of context.
+### Decisions Finalized
+
+- **Protection is never reactivated automatically**
+  - User must manually re-enable protection in all cases.
+- **Time-based unlock is intention-based**
+  - Duration selection does NOT trigger automatic reactivation.
+- **Manual reactivation triggers accountability notification**
+  - A discreet message is sent to the configured contact when protection is reactivated.
+- **Accountability messaging is non-incriminatory**
+  - No mention of pornography or specific content.
+  - No URLs or domains shared.
+  - Messaging framed as digital detox / support.
+- **SMS support removed**
+  - Accountability messages are sent only via WhatsApp or manual copy.
+- **Progress counters reset on unlock**
+  - User is warned before unlocking.
+  - Language avoids moral judgment (“failure”, “victory”).
+- **Motivational reminders approved**
+  - Optional reminders while protection is disabled.
+  - Intervals: 1h, 3h, 12h, 24h.
+- **Language selection approved**
+  - User chooses language on first launch.
+  - Supported languages: English, Spanish, French, Portuguese.
+
+### UX Closed
+
+- User Core Loop finalized.
+- Home Screen behavior finalized for all states.
+- Unlock methods finalized:
+  - Copy Challenge
+  - Accountability Code (support-based)
+  - Time-based Unlock (Pro, manual reactivation)
+
+### Documentation Updated
+
+- Business_Rules.md aligned with final unlock and accountability behavior.
+- Product_Flow.md aligned with updated UX and language selection.
+- Legal_Checklist.md expanded (not reduced) to include:
+  - Discreet accountability messaging
+  - Motivational notifications
+  - Manual reactivation behavior
+
+---
+
+## Current State (Checkpoint)
+
+- MVP product behavior: **CLOSED**
+- UX flows: **CLOSED**
+- Legal & compliance: **ALIGNED**
+- Codebase: **NEEDS UPDATE to reflect final decisions**
+
+---
+
+## Next Session — Code Work (Priority)
+
+The next session must focus exclusively on code changes:
+
+1. Align PlanState and ProtectionLifecycle with final decisions:
+   - Remove any automatic reactivation logic.
+   - Ensure all unlock paths lead to `protectionDisabled`.
+
+2. Update HomeScreen:
+   - Manual reactivation only.
+   - Correct copy per state.
+
+3. Add placeholder hooks for:
+   - Accountability notification on reactivation.
+   - Motivational reminders (no backend yet).
+
+No new product decisions should be introduced until code alignment is complete.

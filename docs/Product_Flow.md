@@ -1,124 +1,191 @@
-# CleanMind — Product Flow
+# CleanMind — Product Flow (MVP)
 
-## 1. Initial State (Post-Registration)
+This document describes the end-to-end user experience and core interaction loops
+of the CleanMind mobile application.
 
-After installation and registration, CleanMind does NOT activate protection automatically.
-
-- Protection status: INACTIVE
-- The device is not protected
-- The user is clearly informed of this state
-
-The only available action is:
-
-Activate Protection
+This file reflects CLOSED product decisions and must stay aligned with
+Business_Rules.md and the codebase.
 
 ---
 
-## 2. Protection Activation
+## 1. First Launch & Language Selection
 
-Protection becomes active only after an explicit user action.
-
-When protection is activated:
-- VPN/DNS-based blocking is enabled
-- Protection becomes the default operating state
-- Protection is considered intentionally active
-
-The user is informed that:
-- Protection is designed to stay ON
-- Protection is not meant to be disabled casually
-- Accountability and visibility are core principles
+- On first launch, the user is prompted to select a language.
+- Supported languages (MVP):
+  - English
+  - Spanish
+  - French
+  - Portuguese
+- The selected language:
+  - Is stored locally
+  - Applies to all UI copy and motivational messages
+  - Can be changed later from Settings
 
 ---
 
-## 3. Protected State (Normal Operation)
+## 2. Initial State (Protection Inactive)
+
+- The app always starts with protection **OFF**.
+- No blocking is applied until the user activates protection.
+- No counters are running.
+
+Primary CTA:
+> Activate Protection
+
+---
+
+## 3. Protection Active State
 
 When protection is active:
-- Blocked content cannot be accessed
-- The user may request temporary unlocks
-- The user may request total protection deactivation
-- There is no simple ON/OFF toggle
+
+- Content blocking is enforced
+- Progress counters increment daily
+- The Home screen clearly displays:
+  - Protection status: ON
+  - Current streak (days of consistency)
+
+Primary actions:
+- Request Temporary Unlock
+- View progress
 
 ---
 
-## 4. Temporary Unlock (Partial, Time-Limited)
+## 4. Request Temporary Unlock — Entry Point
 
-Temporary unlock allows short, intentional access while protection remains conceptually active.
+When the user taps **Request Temporary Unlock**:
 
-Characteristics:
-- Always time-limited
-- Countdown is visible
-- Protection is restored automatically when time expires
+1. The app displays a clear warning:
+   > “If you continue, your progress counter will reset.”
 
-Available methods:
-1. Timed text copy (30 seconds)
-2. Accountability confirmation (friend or parent)
+2. The user must explicitly confirm to proceed.
 
-Temporary unlock does NOT permanently disable protection.
+3. The user is presented with the available unlock methods
+   based on their current plan.
 
 ---
 
-## 5. Total Protection Deactivation (Explicit & Controlled)
+## 5. Unlock Methods Overview
 
-CleanMind allows full protection deactivation only through intentional friction.
+Available unlock methods:
 
-### 5.1 Deactivation Entry Point
-- User taps “Deactivate Protection”
-- Protection is NOT disabled immediately
+- Copy Challenge
+- Accountability Code
+- Time-based Unlock (Pro)
 
-### 5.2 Deactivation Options (Choose ONE)
-
-The user must complete one of the following:
-
-1. Timed random message (30 seconds)
-2. Accountability confirmation (friend or parent)
-3. Waiting period
-   - Free plan: fixed 8 hours
-   - Premium plan: user-defined duration
-
-### 5.3 Deactivation Completion
-Once the selected option completes:
-- Protection becomes FULLY DISABLED
-- VPN/DNS blocking is turned OFF
-
-### 5.4 Reactivation Rules
-- Protection does NOT reactivate automatically
-- Only the user can manually activate protection again
-
-### 5.5 Notifications
-Whenever protection is activated or deactivated:
-- A friend, parent, or configured contact is notified via WhatsApp
-
-CleanMind does not read, store, or access message content.
+All unlock methods:
+- Disable protection immediately upon success
+- Do NOT schedule automatic reactivation
 
 ---
 
-## 6. Optional Support Community (Premium Only)
+## 6. Copy Challenge Flow
 
-Premium users may opt into additional support features.
+- A motivational phrase is displayed.
+- Autocorrect and autocomplete are disabled.
+- The user must type the phrase exactly.
+- A visible countdown timer is shown.
 
-- Receive daily supportive messages
-- Join a support community
-  - Website
-  - Chatbot
-  - WhatsApp channel or group
-
-These features:
-- Are optional
-- Do not affect blocking behavior
-- Can be enabled or disabled by the user at any time
+Outcomes:
+- Success → Protection disabled
+- Failure / timeout → Return to protected state
 
 ---
 
-## 7. Protection Interruption
+## 7. Accountability Code Flow (Discreet Support)
 
-If protection is interrupted unexpectedly (VPN disabled, app uninstalled):
-- Protection is considered interrupted
-- The event is not silent
-- The user may be notified
-- Accountability contacts may be notified
+- The user selects a trusted contact.
+- The app generates a temporary unlock code.
+- The app prepares a **discreet, non-incriminatory message**.
+
+Example message:
+> “{Name} is doing a digital detox and is asking for your help.”
+
+- The user sends the message manually (e.g., via WhatsApp).
+- The user enters the received code to disable protection.
+
+Notes:
+- SMS is not supported in the MVP.
+- CleanMind does not read or store any messages.
 
 ---
 
-## 8. Minors
+## 8. Time-based Unlock Flow (Pro)
 
-For minors, CleanMind operates as a complementary layer alongside OS-level parental controls.
+- The user selects an intended unlock duration:
+  - 15 minutes
+  - 30 minutes
+  - 1 hour
+  - 2 hours
+  - 4 hours
+  - 8 hours
+
+Important:
+- The duration is **intentional only**
+- Protection is NOT reactivated automatically
+- Protection remains disabled until the user manually re-enables it
+
+---
+
+## 9. Protection Disabled State
+
+When protection is disabled:
+
+- Blocking is fully off
+- Progress counters are paused
+- The Home screen displays:
+  - Protection status: OFF
+  - Time since deactivation
+  - Intended duration (if selected)
+
+Primary CTA:
+> Activate Protection
+
+---
+
+## 10. Motivational Reminders
+
+While protection is disabled:
+
+- Optional motivational reminders may be sent
+- Available intervals:
+  - Every 1 hour
+  - Every 3 hours
+  - Every 12 hours
+  - Every 24 hours
+- Reminders are:
+  - Optional
+  - Supportive
+  - Non-judgmental
+- Reminders do NOT change protection state
+
+---
+
+## 11. Manual Reactivation Flow
+
+- The user manually activates protection.
+- Upon activation:
+  - Blocking resumes
+  - Progress tracking restarts
+  - Accountability contact is notified
+
+Example notification:
+> “{Name} has turned protection back on in CleanMind.”
+
+---
+
+## 12. User Core Loop (Closed)
+
+1. Protection OFF
+2. User activates protection
+3. Protection ON
+4. User requests unlock (with friction)
+5. Protection OFF
+6. User manually reactivates protection
+7. Loop repeats
+
+---
+
+## 13. Versioning
+
+This document reflects CLOSED MVP behavior.
+Any future changes must be logged in Development_Log.md.

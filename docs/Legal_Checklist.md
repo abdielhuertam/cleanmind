@@ -1,6 +1,10 @@
 # CleanMind — Legal & Compliance Checklist (MVP)
 
-This document defines the minimum legal, privacy, and compliance requirements required to publish CleanMind on the Apple App Store and Google Play Store.
+This document defines the minimum legal, privacy, and compliance requirements
+required to publish CleanMind on the Apple App Store and Google Play Store.
+
+This file is cumulative and must not remove historical or required sections.
+New requirements must be appended, not replaced.
 
 ---
 
@@ -10,36 +14,38 @@ Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
 
 The Privacy Policy must clearly state:
 
-- What data is collected:
-  - Email address
-  - User ID
-  - Subscription status
-  - Progress counters
-  - App preferences
+### Data Collected
+- Email address (if registration is enabled)
+- User ID
+- Subscription status
+- Protection state
+- Progress counters
+- App preferences
+- Language selection
 
-- What data is NOT collected:
-  - Browsing history
-  - Full URLs
-  - Message content
-  - Personal conversations
-  - Website content
+### Data NOT Collected
+- Browsing history
+- Full URLs
+- Website content
+- Message content
+- Contact lists
+- Personal conversations
 
-- How data is used:
-  - App functionality
-  - Progress tracking
-  - Subscription validation
-  - Notifications
+### Data Usage
+- App functionality
+- Progress tracking
+- Subscription validation
+- Optional notifications
 
-- Data sharing:
-  - No selling of user data
-  - No advertising data sharing
+### Data Sharing
+- No selling of user data
+- No advertising data sharing
+- No third-party analytics that inspect traffic
 
-- Data storage:
-  - Secure cloud storage
-  - Limited retention
-  - User-controlled deletion
-
-The Privacy Policy must be publicly accessible via a URL.
+### Data Storage
+- Secure storage
+- Minimal retention
+- User-initiated deletion
 
 ---
 
@@ -47,19 +53,18 @@ The Privacy Policy must be publicly accessible via a URL.
 
 Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
 
-The Terms must include:
-
+Must include:
 - Description of the service
 - User responsibilities
 - Acceptable use
 - Subscription terms
 - Limitation of liability
-- Service availability disclaimer
+- Availability disclaimer
 - Termination conditions
 
 ---
 
-## 3. VPN Usage Disclosure (CRITICAL)
+## 3. VPN / DNS Usage Disclosure (CRITICAL)
 
 Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
 
@@ -67,17 +72,13 @@ CleanMind must clearly disclose:
 
 - That the app uses VPN/DNS technology
 - That the VPN is used exclusively for content blocking
-- That no traffic is inspected or logged
-- That no user browsing activity is monitored
-- CleanMind does not prevent app uninstallation.
-- Users are informed that uninstalling the app disables protection and may trigger notifications.
-
+- That no traffic is inspected
+- That no browsing activity is logged
 
 This disclosure must appear:
-- In the App Store listing
+- In App Store / Play Store listings
 - In the Privacy Policy
 - In the in-app onboarding
-
 
 ---
 
@@ -86,12 +87,12 @@ This disclosure must appear:
 Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
 
 Requirements:
-- VPN usage justification provided
-- Privacy nutrition labels completed
-- Sign in with Apple implemented (if third-party login exists)
-- No deceptive behavior
+- VPN usage justification
+- Privacy Nutrition Labels completed
+- Sign in with Apple (if third-party login exists)
 - Clear subscription explanation
-- No dark patterns for upgrades
+- No deceptive behavior
+- No dark patterns
 
 ---
 
@@ -102,7 +103,7 @@ Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
 Requirements:
 - Data Safety section completed
 - VPN permission properly explained
-- Subscription details transparent
+- Transparent subscription details
 - Refund policy disclosure
 - No misleading claims
 
@@ -116,7 +117,7 @@ Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
   - Apple App Store
   - Google Play Store
 - No external payment links
-- Clear pricing and renewal terms
+- Clear renewal terms
 - Easy access to manage subscriptions
 
 ---
@@ -127,68 +128,89 @@ Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
 
 - Explicit user consent required
 - Clear explanation of notification types:
-  - Unlock alerts
-  - Progress milestones
-  - Motivational messages
+  - Motivational reminders
+  - Protection reactivation confirmations
+- Notifications must be optional and configurable
 
 ---
 
-## 8. Accountability Partner Communication
+## 8. Accountability Messaging (MVP ADDITION)
 
 Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
 
-- CleanMind does NOT:
-  - Read messages
-  - Access WhatsApp chats
-  - Store communication content
+- Accountability messages are **generic and non-sensitive**
+- Messages do NOT disclose:
+  - Content categories
+  - Pornography
+  - Websites or apps
+- Messages are sent only via:
+  - WhatsApp
+  - Manual copy
+- SMS is not supported in MVP
 
-- All communication is user-initiated via external apps.
-
-This must be stated clearly in Privacy Policy.
+CleanMind does NOT:
+- Read messages
+- Access chats
+- Store message content
 
 ---
 
-## 9. Child & Teen Usage Considerations
+## 9. Motivational Notifications (MVP ADDITION)
+
+Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
+
+- Motivational reminders are optional
+- User-selectable intervals:
+  - 1 hour
+  - 3 hours
+  - 12 hours
+  - 24 hours
+- Notifications are supportive and non-judgmental
+- Notifications do not change protection state
+
+---
+
+## 10. Child & Family Usage
 
 Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
 
 - App is suitable for general audiences
 - No explicit content is displayed
-- Parents are responsible for device installation
+- Parents are responsible for installation
 - No direct data collection from children beyond app usage
 
-COPPA compliance must be reviewed before launch.
+COPPA compliance must be reviewed prior to launch.
 
 ---
 
-## 10. Data Deletion & Account Removal
+## 11. Data Deletion & Account Removal
 
 Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
 
-- Users must be able to:
-  - Request account deletion
-  - Remove stored data
-- Deletion process must be documented
-- Backend deletion must be enforced
+Users must be able to:
+- Request account deletion
+- Remove stored data
+
+Deletion must:
+- Be documented
+- Be enforced in backend systems
 
 ---
 
-## 11. Legal Hosting
+## 12. Legal Hosting
 
 Status: ⬜ Not started / ⬜ In progress / ⬜ Completed
 
-- Privacy Policy URL hosted publicly
-- Terms & Conditions URL hosted publicly
-- Domain used:
+- Privacy Policy must be publicly accessible
+- Terms & Conditions must be publicly accessible
+- Hosted domain:
   - cleanmindblocker.com (tentative)
 
 ---
 
-## 12. Versioning
+## 13. Versioning
 
-- This document: v1.0
-- Updates required if:
-  - Data handling changes
-  - New features added
-  - App Store policies change
-
+- This document is cumulative
+- Sections must not be removed
+- Updates must append new requirements
+- Review required before store submission
