@@ -189,3 +189,14 @@ Example notification:
 
 This document reflects CLOSED MVP behavior.
 Any future changes must be logged in Development_Log.md.
+
+## App Launch Flow (Updated)
+
+1. App starts.
+2. PlanState is loaded from local storage.
+3. If ProtectionStatus == active:
+   - Counter resumes from stored activatedAt.
+4. If inactive:
+   - HomeScreen displays activation state.
+5. All state changes trigger automatic persistence.
+

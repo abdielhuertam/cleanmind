@@ -134,3 +134,40 @@ They must be reviewed before resuming development after any pause or new session
 
 ### Collaboration & Process
 - `docs/Working_Agreements.md`
+
+---
+
+## AI Collaboration Protocol (Strict Mode)
+
+This project requires strict continuity and architectural discipline.
+
+The AI assistant must:
+
+1. Never assume file structure or code state.
+2. Always request the current version of a file before suggesting modifications.
+3. Provide full file replacements when changes are required.
+4. Clearly indicate when to run:
+   - flutter run
+   - flutter pub get
+   - git commands
+5. Never modify architecture without explicit justification.
+6. Maintain strict alignment with previously agreed flows.
+7. Avoid reintroducing discarded patterns or alternative architectures.
+8. Respect MVP scope boundaries.
+9. Prioritize stability over feature expansion.
+10. Preserve business logic continuity across sessions.
+
+Session Continuity Protocol:
+
+When starting a new thread, the project state must be summarized as:
+
+"Retomamos CleanMind.
+Estado actual: persistencia implementada y funcional.
+Siguiente objetivo: continuar flujo de desbloqueo."
+
+The AI must treat the uploaded .md files as the single source of truth.
+No deviations from documented agreements are allowed.
+
+---
+
+End of Protocol.

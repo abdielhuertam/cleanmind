@@ -197,3 +197,26 @@ The app:
 
 - This document: v1.0
 - Any architectural change requires a new version
+
+## Local State Persistence (v1)
+
+CleanMind uses local device storage via SharedPreferences to persist:
+
+- ProtectionStatus
+- activatedAt timestamp
+- isPro flag
+
+On app launch:
+
+1. main.dart initializes asynchronously.
+2. LocalStorageService.loadPlan() reconstructs PlanState.
+3. HomeScreen renders only after state restoration.
+
+This ensures:
+
+- Counter continuity across restarts.
+- Real activation timestamp tracking.
+- Stable state-driven architecture.
+
+No backend dependency required for MVP persistence.
+

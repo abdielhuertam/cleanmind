@@ -141,3 +141,29 @@ The next session must focus exclusively on code changes:
    - Motivational reminders (no backend yet).
 
 No new product decisions should be introduced until code alignment is complete.
+
+## 2026-02-13 — Local Persistence Implemented
+
+### Completed
+
+- Implemented local persistence using SharedPreferences.
+- Created LocalStorageService.
+- PlanState is now persisted across app restarts.
+- ProtectionStatus is restored correctly.
+- activatedAt timestamp persists correctly.
+- Counter resumes based on original activation time.
+- Architecture adjusted to initialize PlanState asynchronously.
+- main.dart refactored to support loading state before rendering HomeScreen.
+
+### Technical Notes
+
+- State is saved on every onPlanChanged call.
+- PlanState reconstructed from stored ProtectionStatus and activatedAt.
+- Confirmed persistence works after full simulator shutdown.
+- Debug logs temporarily added for validation.
+
+### Status
+
+Persistence architecture stable.
+Ready to continue unlock flow completion and notifications layer.
+

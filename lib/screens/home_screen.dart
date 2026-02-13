@@ -1,276 +1,191 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../state/protection_state.dart';
 import '../state/plan_state.dart';
+import '../state/protection_state.dart';
+import 'copy_challenge_screen.dart';
+import 'accountability_code_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  final PlanState plan;
+  final ValueChanged<PlanState> onPlanChanged;
+
+  const HomeScreen({
+    super.key,
+    required this.plan,
+    required this.onPlanChanged,
+  });
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoRefresh();
+  }
+
+  void _startAutoRefresh() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final protectionState = context.watch<ProtectionState>();
+    final status = widget.plan.protection.status;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('CleanMind'),
         centerTitle: true,
       ),
-      body: Builder(
-        builder: (context) {
-          final planState = context.watch<PlanState>();
-
-          // 1️⃣ Protection never activated
-          if (planState.lifecycle == ProtectionLifecycle.inactive) {
-            return _buildInactive(planState);
-          }
-
-          // 2️⃣ Total deactivation in progress
-          if (planState.isDeactivationPending) {
-            return _buildDeactivationPending(planState);
-          }
-
-          // 3️⃣ Protection fully disabled
-          if (planState.isProtectionDisabled) {
-            return _buildProtectionDisabled(planState);
-          }
-
-          // 4️⃣ Normal protected state (existing UI)
-          return _buildProtected(planState);
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildStatusLabel(status),
+            const SizedBox(height: 12),
+            _buildProgressInfo(status),
+            const SizedBox(height: 32),
+            _buildPrimaryAction(context, status),
+          ],
+        ),
       ),
     );
   }
-}
 
-class _StatusLabel extends StatelessWidget {
-  final ProtectionState protectionState;
-
-  const _StatusLabel({required this.protectionState});
-
-  @override
-  Widget build(BuildContext context) {
-    final status = protectionState.status;
-
-    String label;
-    Color color;
-
+  Widget _buildStatusLabel(ProtectionStatus status) {
     switch (status) {
-      case ProtectionStatus.protectionOn:
-        label = 'Protection ON';
-        color = Colors.green;
-        break;
-      case ProtectionStatus.temporaryUnlockActive:
-        label = 'Temporary Unlock Active';
-        color = Colors.orange;
-        break;
-      case ProtectionStatus.protectionOffError:
-        label = 'Protection OFF';
-        color = Colors.red;
-        break;
+      case ProtectionStatus.active:
+        return const Text(
+          'Protection is ON',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        );
+      case ProtectionStatus.protectionDisabled:
+      case ProtectionStatus.inactive:
+        return const Text(
+          'Protection is OFF',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        );
+      case ProtectionStatus.deactivationPending:
+        return const Text(
+          'Unlock in progress',
+          style: TextStyle(fontSize: 18),
+        );
     }
-
-    return Text(
-      label,
-      style: TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-        color: color,
-      ),
-    );
   }
-}
 
-class _Countdown extends StatelessWidget {
-  final ProtectionState protectionState;
-
-  const _Countdown({required this.protectionState});
-
-  @override
-  Widget build(BuildContext context) {
-    if (protectionState.status != ProtectionStatus.temporaryUnlockActive) {
-      return const SizedBox.shrink();
+  Widget _buildProgressInfo(ProtectionStatus status) {
+    if (status != ProtectionStatus.active) {
+      return const SizedBox();
     }
 
-    final d = protectionState.remainingUnlock;
-    final h = d.inHours.toString().padLeft(2, '0');
-    final m = (d.inMinutes % 60).toString().padLeft(2, '0');
-    final s = (d.inSeconds % 60).toString().padLeft(2, '0');
+    final duration = widget.plan.protection.getActiveDuration();
+    final days = duration.inDays;
+    final hours = duration.inHours % 24;
+    final minutes = duration.inMinutes % 60;
 
     return Text(
-      '$h:$m:$s',
-      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-    );
-  }
-}
-
-class _ExplanationText extends StatelessWidget {
-  final ProtectionState protectionState;
-
-  const _ExplanationText({required this.protectionState});
-
-  @override
-  Widget build(BuildContext context) {
-    String text;
-
-    switch (protectionState.status) {
-      case ProtectionStatus.protectionOn:
-        text = 'Protection is active. Blocked content cannot be accessed.';
-        break;
-      case ProtectionStatus.temporaryUnlockActive:
-        text = 'Protection will be restored automatically when the timer ends.';
-        break;
-      case ProtectionStatus.protectionOffError:
-        text =
-            'Protection is currently disabled. VPN must be enabled for CleanMind to work.';
-        break;
-    }
-
-    return Text(
-      text,
-      textAlign: TextAlign.center,
+      'Protected for: $days day(s) $hours hour(s) $minutes minute(s)',
       style: const TextStyle(fontSize: 16),
     );
   }
-}
 
-class _PrimaryActionButton extends StatelessWidget {
-  final ProtectionState protectionState;
+  Widget _buildPrimaryAction(BuildContext context, ProtectionStatus status) {
+    switch (status) {
+      case ProtectionStatus.active:
+        return Column(
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                final confirmed = await _showUnlockWarning(context);
+                if (!confirmed) return;
 
-  const _PrimaryActionButton({required this.protectionState});
+                final updatedPlan = widget.plan.requestUnlock();
+                widget.onPlanChanged(updatedPlan);
 
-  @override
-  Widget build(BuildContext context) {
-    switch (protectionState.status) {
-      case ProtectionStatus.protectionOn:
-        return ElevatedButton(
-          onPressed: () {
-            final isPro =
-                 context.read<PlanState>().plan == UserPlan.premium;
-            protectionState.requestTemporaryUnlock(isProUser: isPro);
-          },
-          child: const Text('Request Temporary Unlock'),
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => CopyChallengeScreen(
+                      plan: updatedPlan,
+                      onPlanChanged: widget.onPlanChanged,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('Copy Challenge'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                final confirmed = await _showUnlockWarning(context);
+                if (!confirmed) return;
+
+                final updatedPlan = widget.plan.requestUnlock();
+                widget.onPlanChanged(updatedPlan);
+
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AccountabilityCodeScreen(
+                      plan: updatedPlan,
+                      onPlanChanged: widget.onPlanChanged,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('Accountability Code'),
+            ),
+          ],
         );
 
-      case ProtectionStatus.temporaryUnlockActive:
-        return const SizedBox.shrink();
-
-      case ProtectionStatus.protectionOffError:
+      case ProtectionStatus.protectionDisabled:
+      case ProtectionStatus.inactive:
         return ElevatedButton(
           onPressed: () {
-            protectionState.enableProtectionFromError();
+            widget.onPlanChanged(widget.plan.manualReactivate());
           },
-          child: const Text('Enable Protection'),
+          child: const Text('Activate Protection'),
         );
+
+      case ProtectionStatus.deactivationPending:
+        return const CircularProgressIndicator();
     }
   }
-}
 
-Widget _buildInactive(PlanState planState) {
-  return Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'Your device is not protected',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
+  Future<bool> _showUnlockWarning(BuildContext context) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Confirm Unlock'),
+        content: const Text(
+          'If you continue, your progress counter will reset.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
           ),
-          const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: planState.activateProtection,
-            child: const Text('Activate Protection'),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Continue'),
           ),
         ],
       ),
-    ),
-  );
-}
+    );
 
-Widget _buildProtected(PlanState planState) {
-  return Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'Protection ON',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              planState.startTemporaryUnlock(
-                const Duration(seconds: 10),
-              );
-            },
-            child: const Text('Request Temporary Unlock'),
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: () {
-              planState.requestTotalDeactivation(
-                method: DeactivationMethod.waitingPeriod,
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text('Deactivate Protection'),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-Widget _buildDeactivationPending(PlanState planState) {
-  return Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Text(
-            'Deactivation in progress',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Protection will be disabled once the selected condition is met.',
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-Widget _buildProtectionDisabled(PlanState planState) {
-  return Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'Protection Disabled',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Your device is currently not protected.',
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: planState.reactivateProtection,
-            child: const Text('Reactivate Protection'),
-          ),
-        ],
-      ),
-    ),
-  );
+    return result ?? false;
+  }
 }
