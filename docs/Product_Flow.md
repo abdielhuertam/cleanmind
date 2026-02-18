@@ -200,3 +200,32 @@ Any future changes must be logged in Development_Log.md.
    - HomeScreen displays activation state.
 5. All state changes trigger automatic persistence.
 
+Free Plan — Total Protection Deactivation (8-Hour Waiting Period)
+
+For Free users, full protection deactivation requires an 8-hour waiting period.
+
+Flow:
+
+User selects “Deactivate Protection (8-hour waiting period)”.
+
+A confirmation dialog warns that:
+
+Progress will reset.
+
+Accountability partner will be notified once protection is disabled.
+
+Protection remains ACTIVE during the waiting period.
+
+A countdown is displayed.
+
+User may cancel the scheduled deactivation at any time.
+
+When the waiting period expires:
+
+Protection automatically transitions to disabled.
+
+Progress resets.
+
+Accountability partner is notified.
+
+If the app was closed, expiration is evaluated upon next launch.

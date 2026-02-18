@@ -8,55 +8,71 @@ enum ProtectionStatus {
 class ProtectionState {
   final ProtectionStatus status;
   final DateTime? activatedAt;
+  final DateTime? deactivationScheduledAt;
 
   const ProtectionState({
     required this.status,
     this.activatedAt,
+    this.deactivationScheduledAt,
   });
 
-  factory ProtectionState.initial() {
-    return const ProtectionState(
-      status: ProtectionStatus.inactive,
-      activatedAt: null,
-    );
-  }
-
-  // KEEP ORIGINAL METHOD NAME
   ProtectionState activate() {
     return ProtectionState(
       status: ProtectionStatus.active,
       activatedAt: DateTime.now(),
+      deactivationScheduledAt: null,
     );
   }
 
-  // KEEP ORIGINAL METHOD NAME
-  ProtectionState requestDeactivation() {
+  ProtectionState scheduleDeactivation() {
     return ProtectionState(
       status: ProtectionStatus.deactivationPending,
       activatedAt: activatedAt,
+      deactivationScheduledAt: DateTime.now(),
     );
   }
 
-  // KEEP ORIGINAL METHOD NAME
-  ProtectionState disable() {
-    return const ProtectionState(
-      status: ProtectionStatus.protectionDisabled,
-      activatedAt: null,
-    );
-  }
-
-  // Manual reactivation (used in HomeScreen)
-  ProtectionState manualReactivate() {
+  ProtectionState cancelScheduledDeactivation() {
     return ProtectionState(
       status: ProtectionStatus.active,
-      activatedAt: DateTime.now(),
+      activatedAt: activatedAt,
+      deactivationScheduledAt: null,
+    );
+  }
+
+  ProtectionState disable() {
+    return ProtectionState(
+      status: ProtectionStatus.protectionDisabled,
+      activatedAt: null,
+      deactivationScheduledAt: null,
     );
   }
 
   Duration getActiveDuration() {
-    if (activatedAt == null) {
-      return Duration.zero;
-    }
+    if (activatedAt == null) return Duration.zero;
     return DateTime.now().difference(activatedAt!);
+  }
+
+  Duration? getRemainingDeactivationTime() {
+    if (status != ProtectionStatus.deactivationPending ||
+        deactivationScheduledAt == null) {
+      return null;
+    }
+
+    final elapsed = DateTime.now().difference(deactivationScheduledAt!);
+    final remaining = const Duration(minutes: 1) - elapsed;
+
+    if (remaining.isNegative) return Duration.zero;
+    return remaining;
+  }
+
+  bool isDeactivationExpired() {
+    if (status != ProtectionStatus.deactivationPending ||
+        deactivationScheduledAt == null) {
+      return false;
+    }
+
+    final elapsed = DateTime.now().difference(deactivationScheduledAt!);
+    return elapsed >= const Duration(minutes: 1);
   }
 }

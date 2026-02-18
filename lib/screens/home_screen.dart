@@ -105,65 +105,82 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPrimaryAction(BuildContext context, ProtectionStatus status) {
-    switch (status) {
-      case ProtectionStatus.active:
-        return Column(
-          children: [
-            ElevatedButton(
-              onPressed: () async {
-                final confirmed = await _showUnlockWarning(context);
-                if (!confirmed) return;
-
-                final updatedPlan = widget.plan.requestUnlock();
-                widget.onPlanChanged(updatedPlan);
-
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => CopyChallengeScreen(
-                      plan: updatedPlan,
-                      onPlanChanged: widget.onPlanChanged,
-                    ),
-                  ),
-                );
-              },
-              child: const Text('Copy Challenge'),
+  switch (status) {
+    case ProtectionStatus.active:
+      return Column(
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              final updatedPlan = widget.plan.requestUnlock();
+              widget.onPlanChanged(updatedPlan);
+              Navigator.pushNamed(context, '/copy-challenge');
+            },
+            child: const Text('Copy Challenge'),
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () {
+              final updatedPlan = widget.plan.requestUnlock();
+              widget.onPlanChanged(updatedPlan);
+              Navigator.pushNamed(context, '/accountability-code');
+            },
+            child: const Text('Accountability Code'),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () async {
-                final confirmed = await _showUnlockWarning(context);
-                if (!confirmed) return;
+            onPressed: () {
+              _showDeactivationDialog(context);
+            },
+            child: const Text('Deactivate Protection (8-hour waiting period)'),
+          ),
+        ],
+      );
 
-                final updatedPlan = widget.plan.requestUnlock();
-                widget.onPlanChanged(updatedPlan);
+    case ProtectionStatus.deactivationPending:
+      final remaining =
+          widget.plan.protection.getRemainingDeactivationTime();
 
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => AccountabilityCodeScreen(
-                      plan: updatedPlan,
-                      onPlanChanged: widget.onPlanChanged,
-                    ),
-                  ),
-                );
-              },
-              child: const Text('Accountability Code'),
+      return Column(
+        children: [
+          const Text(
+            'Deactivation scheduled',
+            style: TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          if (remaining != null)
+            Text(
+              'Time remaining: ${remaining.inHours}h '
+              '${remaining.inMinutes.remainder(60)}m',
             ),
-          ],
-        );
+          const SizedBox(height: 20),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey,
+            ),
+            onPressed: () {
+              final updatedPlan =
+                  widget.plan.cancelDeactivation();
+              widget.onPlanChanged(updatedPlan);
+            },
+            child: const Text('Cancel Deactivation'),
+          ),
+        ],
+      );
 
-      case ProtectionStatus.protectionDisabled:
-      case ProtectionStatus.inactive:
-        return ElevatedButton(
-          onPressed: () {
-            widget.onPlanChanged(widget.plan.manualReactivate());
-          },
-          child: const Text('Activate Protection'),
-        );
-
-      case ProtectionStatus.deactivationPending:
-        return const CircularProgressIndicator();
-    }
+    case ProtectionStatus.protectionDisabled:
+    case ProtectionStatus.inactive:
+      return ElevatedButton(
+        onPressed: () {
+          widget.onPlanChanged(widget.plan.manualReactivate());
+        },
+        child: const Text('Activate Protection'),
+      );
   }
+}
+
 
   Future<bool> _showUnlockWarning(BuildContext context) async {
     final result = await showDialog<bool>(
@@ -187,5 +204,33 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     return result ?? false;
+  }
+
+    void _showDeactivationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Confirm Deactivation'),
+        content: const Text(
+          'If you continue, your progress will reset after 8 hours. '
+          'Your accountability partner will be notified when protection is disabled.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              final updatedPlan =
+                  widget.plan.requestDeactivation();
+              widget.onPlanChanged(updatedPlan);
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
   }
 }

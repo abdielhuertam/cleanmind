@@ -1,48 +1,67 @@
 import 'protection_state.dart';
 
 class PlanState {
-  final bool isPro;
   final ProtectionState protection;
+  final bool isPro;
 
   const PlanState({
-    required this.isPro,
     required this.protection,
+    required this.isPro,
   });
 
-  factory PlanState.initial({required bool isPro}) {
+  factory PlanState.initial() {
     return PlanState(
-      isPro: isPro,
       protection: const ProtectionState(
         status: ProtectionStatus.inactive,
       ),
+      isPro: false,
     );
   }
 
   PlanState activateProtection() {
     return PlanState(
-      isPro: isPro,
       protection: protection.activate(),
+      isPro: isPro,
     );
   }
 
+  // Mantener compatibilidad con HomeScreen actual
   PlanState requestUnlock() {
+    return this;
+  }
+
+  PlanState requestDeactivation() {
     return PlanState(
+      protection: protection.scheduleDeactivation(),
       isPro: isPro,
-      protection: protection.requestDeactivation(),
+    );
+  }
+
+  PlanState cancelDeactivation() {
+    return PlanState(
+      protection: protection.cancelScheduledDeactivation(),
+      isPro: isPro,
     );
   }
 
   PlanState unlockSucceeded() {
     return PlanState(
-      isPro: isPro,
       protection: protection.disable(),
+      isPro: isPro,
     );
   }
 
   PlanState manualReactivate() {
     return PlanState(
+      protection: protection.activate(),
       isPro: isPro,
-      protection: protection.manualReactivate(),
+    );
+  }
+
+  PlanState updatePlan(bool newIsPro) {
+    return PlanState(
+      protection: protection,
+      isPro: newIsPro,
     );
   }
 }

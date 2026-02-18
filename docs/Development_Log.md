@@ -154,6 +154,12 @@ No new product decisions should be introduced until code alignment is complete.
 - Counter resumes based on original activation time.
 - Architecture adjusted to initialize PlanState asynchronously.
 - main.dart refactored to support loading state before rendering HomeScreen.
+- Expiration logic stabilized and validated.
+- deactivationScheduledAt persistence verified across full restart.
+- Automatic transition to protectionDisabled confirmed.
+- Cancel deactivation flow validated.
+- Expiration tested using temporary 1-minute duration.
+
 
 ### Technical Notes
 
@@ -167,3 +173,31 @@ No new product decisions should be introduced until code alignment is complete.
 Persistence architecture stable.
 Ready to continue unlock flow completion and notifications layer.
 
+---
+
+## 2026-02-18 — Free Plan Waiting Period Implementation
+
+### Completed
+
+- Implemented deactivationScheduledAt in ProtectionState.
+- Implemented scheduleDeactivation() and cancelScheduledDeactivation().
+- Persisted deactivationScheduledAt using SharedPreferences.
+- Implemented automatic expiration check during app initialization.
+- Implemented deactivationPending UI with countdown display.
+- Validated automatic transition to protectionDisabled after expiration.
+- Validated cancel deactivation restores active state.
+- Expiration tested using temporary 1-minute duration.
+
+### Status
+
+Waiting period is functional and persistent.
+Expiration triggers correctly when reopening the app.
+Duration currently in temporary 1-minute test mode.
+Debug logs still present.
+
+### Next Session Focus
+
+- Restore duration to 8 hours.
+- Implement active in-app countdown timer.
+- Improve deactivation UX copy.
+- Remove debug print statements.

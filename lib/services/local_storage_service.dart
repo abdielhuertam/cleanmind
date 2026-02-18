@@ -6,6 +6,8 @@ class LocalStorageService {
   static const _statusKey = 'protection_status';
   static const _activatedAtKey = 'activated_at';
   static const _isProKey = 'is_pro';
+  static const _deactivationScheduledAtKey =
+      'deactivation_scheduled_at';
 
   static Future<void> savePlan(PlanState plan) async {
     final prefs = await SharedPreferences.getInstance();
@@ -13,16 +15,27 @@ class LocalStorageService {
     await prefs.setInt(
         _statusKey, plan.protection.status.index);
 
+    await prefs.setBool(_isProKey, plan.isPro);
+
     if (plan.protection.activatedAt != null) {
       await prefs.setInt(
         _activatedAtKey,
-        plan.protection.activatedAt!.millisecondsSinceEpoch,
+        plan.protection.activatedAt!
+            .millisecondsSinceEpoch,
       );
     } else {
       await prefs.remove(_activatedAtKey);
     }
 
-    await prefs.setBool(_isProKey, plan.isPro);
+    if (plan.protection.deactivationScheduledAt != null) {
+      await prefs.setInt(
+        _deactivationScheduledAtKey,
+        plan.protection.deactivationScheduledAt!
+            .millisecondsSinceEpoch,
+      );
+    } else {
+      await prefs.remove(_deactivationScheduledAtKey);
+    }
   }
 
   static Future<PlanState> loadPlan() async {
@@ -32,20 +45,25 @@ class LocalStorageService {
         prefs.getInt(_statusKey) ??
             ProtectionStatus.inactive.index;
 
-    final activatedMillis =
-        prefs.getInt(_activatedAtKey);
-
     final isPro = prefs.getBool(_isProKey) ?? false;
 
-    final status =
-        ProtectionStatus.values[statusIndex];
+    final activatedAtMillis =
+        prefs.getInt(_activatedAtKey);
+
+    final deactivationScheduledAtMillis =
+        prefs.getInt(_deactivationScheduledAtKey);
 
     final protection = ProtectionState(
-      status: status,
-      activatedAt: activatedMillis != null
+      status: ProtectionStatus.values[statusIndex],
+      activatedAt: activatedAtMillis != null
           ? DateTime.fromMillisecondsSinceEpoch(
-              activatedMillis)
+              activatedAtMillis)
           : null,
+      deactivationScheduledAt:
+          deactivationScheduledAtMillis != null
+              ? DateTime.fromMillisecondsSinceEpoch(
+                  deactivationScheduledAtMillis)
+              : null,
     );
 
     return PlanState(
