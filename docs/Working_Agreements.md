@@ -201,6 +201,12 @@ The AI assistant must:
 8. Respect MVP scope boundaries.
 9. Prioritize stability over feature expansion.
 10. Preserve business logic continuity across sessions.
+11. When .md files are uploaded at the beginning of a session, the Assistant must:
+    - Read them completely.
+    - Return their detected structure (sections and last log entry).
+    - Explicitly confirm understanding.
+    - Propose no modifications until the structure is validated by Abdiel.
+
 
 Session Continuity Protocol:
 
