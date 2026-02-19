@@ -22,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
 
+
   @override
   void initState() {
     super.initState();
@@ -30,11 +31,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _startAutoRefresh() {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) {
+      if (!mounted) return;
+
+      final protection = widget.plan.protection;
+
+      if (protection.status == ProtectionStatus.deactivationPending) {
+        if (protection.isDeactivationExpired()) {
+          _timer?.cancel();
+          widget.onPlanChanged(widget.plan.unlockSucceeded());
+        } else {
+          setState(() {});
+        }
+      } else {
         setState(() {});
       }
     });
   }
+
 
   @override
   void dispose() {
@@ -110,7 +123,10 @@ class _HomeScreenState extends State<HomeScreen> {
       return Column(
         children: [
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              final confirmed = await _showUnlockWarning(context);
+              if (!confirmed) return;
+
               final updatedPlan = widget.plan.requestUnlock();
               widget.onPlanChanged(updatedPlan);
               Navigator.pushNamed(context, '/copy-challenge');
@@ -119,7 +135,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 10),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              final confirmed = await _showUnlockWarning(context);
+              if (!confirmed) return;
+
               final updatedPlan = widget.plan.requestUnlock();
               widget.onPlanChanged(updatedPlan);
               Navigator.pushNamed(context, '/accountability-code');
@@ -134,7 +153,9 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               _showDeactivationDialog(context);
             },
-            child: const Text('Deactivate Protection (8-hour waiting period)'),
+            child: Text(
+              'Deactivate Protection (${_formatWaitingPeriod()} waiting period)',
+            ),
           ),
         ],
       );
@@ -153,7 +174,8 @@ class _HomeScreenState extends State<HomeScreen> {
           if (remaining != null)
             Text(
               'Time remaining: ${remaining.inHours}h '
-              '${remaining.inMinutes.remainder(60)}m',
+              '${remaining.inMinutes.remainder(60)}m '
+              '${remaining.inSeconds.remainder(60)}s',
             ),
           const SizedBox(height: 20),
           ElevatedButton(
@@ -211,8 +233,8 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Confirm Deactivation'),
-        content: const Text(
-          'If you continue, your progress will reset after 8 hours. '
+        content: Text(
+          'If you continue, your progress will reset after ${_formatWaitingPeriod()}. '
           'Your accountability partner will be notified when protection is disabled.',
         ),
         actions: [
@@ -232,5 +254,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  String _formatWaitingPeriod() {
+    final duration = kFreeDeactivationDuration;
+
+    if (duration.inHours >= 1) {
+      final hours = duration.inHours;
+      return '$hours hour${hours == 1 ? '' : 's'}';
+    } else if (duration.inMinutes >= 1) {
+      final minutes = duration.inMinutes;
+      return '$minutes minute${minutes == 1 ? '' : 's'}';
+    } else {
+      final seconds = duration.inSeconds;
+      return '$seconds second${seconds == 1 ? '' : 's'}';
+    }
   }
 }

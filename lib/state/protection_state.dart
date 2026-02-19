@@ -5,6 +5,8 @@ enum ProtectionStatus {
   protectionDisabled,
 }
 
+const Duration kFreeDeactivationDuration = Duration(minutes: 1);
+
 class ProtectionState {
   final ProtectionStatus status;
   final DateTime? activatedAt;
@@ -60,7 +62,7 @@ class ProtectionState {
     }
 
     final elapsed = DateTime.now().difference(deactivationScheduledAt!);
-    final remaining = const Duration(minutes: 1) - elapsed;
+    final remaining = kFreeDeactivationDuration - elapsed;
 
     if (remaining.isNegative) return Duration.zero;
     return remaining;
@@ -73,6 +75,6 @@ class ProtectionState {
     }
 
     final elapsed = DateTime.now().difference(deactivationScheduledAt!);
-    return elapsed >= const Duration(minutes: 1);
+    return elapsed >= kFreeDeactivationDuration;
   }
 }

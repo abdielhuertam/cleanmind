@@ -3,6 +3,8 @@ import 'state/plan_state.dart';
 import 'services/local_storage_service.dart';
 import 'screens/home_screen.dart';
 import 'state/protection_state.dart';
+import 'screens/copy_challenge_screen.dart';
+import 'screens/accountability_code_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,6 +67,16 @@ class _MyAppState extends State<MyApp> {
         plan: _plan,
         onPlanChanged: _onPlanChanged,
       ),
+      routes: {
+        '/copy-challenge': (context) => CopyChallengeScreen(
+              plan: _plan,
+              onPlanChanged: _onPlanChanged,
+            ),
+        '/accountability-code': (context) => AccountabilityCodeScreen(
+              plan: _plan,
+              onPlanChanged: _onPlanChanged,
+            ),
+      },
     );
   }
 }

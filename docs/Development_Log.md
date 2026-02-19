@@ -201,3 +201,34 @@ Debug logs still present.
 - Implement active in-app countdown timer.
 - Improve deactivation UX copy.
 - Remove debug print statements.
+
+
+---
+
+## 2026-02-18 — Countdown Stabilization & Unlock Flow Restoration
+
+### Completed
+
+- Implemented active in-app countdown timer with seconds display.
+- Consolidated countdown logic to a single periodic timer.
+- Ensured automatic expiration while app is running.
+- Validated expiration while app is closed and reopened.
+- Restored unlock confirmation dialog for Copy Challenge.
+- Restored unlock confirmation dialog for Accountability Code.
+- Registered named routes for unlock flows.
+- Replaced hardcoded waiting period references with kFreeDeactivationDuration.
+- Updated deactivation dialog to reflect dynamic waiting duration.
+- Removed duplicate imports.
+
+### Status
+
+Countdown is stable and persistent.
+Unlock flows are fully functional.
+Waiting period is configurable through a single constant.
+Core engine behavior validated.
+
+### Next Session Focus
+
+- Implement Free vs Pro duration differentiation.
+- Remove remaining debug statements if present.
+- Review unlock UX messaging consistency.

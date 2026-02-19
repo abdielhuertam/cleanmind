@@ -89,7 +89,13 @@ When ending a development session that includes meaningful product or code chang
    * What the next planned block is
 2. Ensure documentation and code are aligned
 3. Only then commit and push changes to Git
+4. Before writing any new Development Log entry, the Assistant must:
+   - Read the current Development_Log.md file.
+   - Return the exact detected structure of the latest entry.
+   - Confirm the structural pattern (separators, headings, sections).
+   - Only then draft the new entry strictly matching that exact format.
 
+Failure to follow this step is considered a violation of the Session Closure Protocol.
 Closing a session without updating the Development Log is considered incomplete work.
 
 ---
