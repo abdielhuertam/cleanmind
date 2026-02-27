@@ -5,17 +5,17 @@ enum ProtectionStatus {
   protectionDisabled,
 }
 
-const Duration kFreeDeactivationDuration = Duration(minutes: 1);
-
 class ProtectionState {
   final ProtectionStatus status;
   final DateTime? activatedAt;
   final DateTime? deactivationScheduledAt;
+  final Duration? deactivationDuration;
 
   const ProtectionState({
     required this.status,
     this.activatedAt,
     this.deactivationScheduledAt,
+    this.deactivationDuration,
   });
 
   ProtectionState activate() {
@@ -23,14 +23,16 @@ class ProtectionState {
       status: ProtectionStatus.active,
       activatedAt: DateTime.now(),
       deactivationScheduledAt: null,
+      deactivationDuration: null,
     );
   }
 
-  ProtectionState scheduleDeactivation() {
+  ProtectionState scheduleDeactivation(Duration duration) {
     return ProtectionState(
       status: ProtectionStatus.deactivationPending,
       activatedAt: activatedAt,
       deactivationScheduledAt: DateTime.now(),
+      deactivationDuration: duration,
     );
   }
 
@@ -39,6 +41,7 @@ class ProtectionState {
       status: ProtectionStatus.active,
       activatedAt: activatedAt,
       deactivationScheduledAt: null,
+      deactivationDuration: null,
     );
   }
 
@@ -47,6 +50,7 @@ class ProtectionState {
       status: ProtectionStatus.protectionDisabled,
       activatedAt: null,
       deactivationScheduledAt: null,
+      deactivationDuration: null,
     );
   }
 
@@ -57,12 +61,13 @@ class ProtectionState {
 
   Duration? getRemainingDeactivationTime() {
     if (status != ProtectionStatus.deactivationPending ||
-        deactivationScheduledAt == null) {
+        deactivationScheduledAt == null ||
+        deactivationDuration == null) {
       return null;
     }
 
     final elapsed = DateTime.now().difference(deactivationScheduledAt!);
-    final remaining = kFreeDeactivationDuration - elapsed;
+    final remaining = deactivationDuration! - elapsed;
 
     if (remaining.isNegative) return Duration.zero;
     return remaining;
@@ -70,11 +75,15 @@ class ProtectionState {
 
   bool isDeactivationExpired() {
     if (status != ProtectionStatus.deactivationPending ||
-        deactivationScheduledAt == null) {
+        deactivationScheduledAt == null ||
+        deactivationDuration == null) {
       return false;
     }
 
     final elapsed = DateTime.now().difference(deactivationScheduledAt!);
-    return elapsed >= kFreeDeactivationDuration;
+    return elapsed >= deactivationDuration!;
   }
+
+  bool get isProtectionDisabled =>
+      status == ProtectionStatus.protectionDisabled;
 }

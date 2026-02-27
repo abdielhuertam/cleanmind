@@ -45,7 +45,7 @@ class LocalStorageService {
         prefs.getInt(_statusKey) ??
             ProtectionStatus.inactive.index;
 
-    final isPro = prefs.getBool(_isProKey) ?? false;
+    final isPro = prefs.getBool(_isProKey) ?? false; //Change Pro or Free plan
 
     final activatedAtMillis =
         prefs.getInt(_activatedAtKey);

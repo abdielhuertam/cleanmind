@@ -1,10 +1,12 @@
-# CleanMind — MVP v1.0
+# CleanMind — MVP v2.0
 
 ## 1. Product Overview
 
 CleanMind is a mobile application designed to help users intentionally reduce access to pornographic content and distracting digital platforms through friction, accountability, and conscious decision-making.
 
-The app focuses on creating intentional pauses, visibility, and support rather than punishment or shame.
+The app combines local protection enforcement with backend-validated accountability mechanisms.
+
+The product focuses on creating intentional pauses, visibility, and structured support rather than punishment or shame.
 
 ---
 
@@ -13,7 +15,7 @@ The app focuses on creating intentional pauses, visibility, and support rather t
 - Adults seeking digital detox
 - Young adults
 - Parents who install the app on their children’s devices
-- Users who value accountability and support over restriction alone
+- Users who value structured accountability over restriction alone
 
 The app maintains a neutral, non-religious tone.
 
@@ -26,6 +28,7 @@ The app maintains a neutral, non-religious tone.
 - Visibility over secrecy  
 - Progress over perfection  
 - No shame-based UX  
+- Server-validated unlock logic  
 
 ---
 
@@ -34,7 +37,7 @@ The app maintains a neutral, non-religious tone.
 - iOS (phones only)
 - Android (phones only)
 
-Tablets, iPads, and web dashboards are out of scope for the MVP.
+Tablets, iPads, web dashboards, and desktop clients are out of scope for the MVP.
 
 ---
 
@@ -42,10 +45,11 @@ Tablets, iPads, and web dashboards are out of scope for the MVP.
 
 - VPN/DNS-based content blocking
 - Explicit protection activation
-- Temporary unlocks with intentional friction
-- Controlled total protection deactivation
-- Accountability notifications
-- Free and Premium subscription tiers
+- Backend-validated unlock flows
+- SMS-based verification codes
+- Optional Support approval system
+- Activity logging for approval events
+- Free and Pro subscription tiers
 
 ---
 
@@ -54,71 +58,91 @@ Tablets, iPads, and web dashboards are out of scope for the MVP.
 - Protection is NOT activated automatically after installation
 - The user must explicitly activate protection
 - Once activated, protection remains ON by default
-- Protection can only be disabled through intentional actions defined by the product
+- Protection can only be disabled through intentional, validated actions
+- Unlock transitions are validated server-side when required
 
 ---
 
 ## 7. Unlock & Deactivation Philosophy
 
-CleanMind differentiates clearly between:
+CleanMind differentiates between:
 
-- **Temporary Unlock**: short, time-limited access with automatic restoration  
-- **Total Protection Deactivation**: full disabling of protection until the user manually reactivates it
+- **Waiting Period Unlock** (Free and Pro without Support)
+- **SMS Verification Unlock**
+- **Support Approval Unlock (App-based)**
 
-Total deactivation:
+Total protection deactivation:
+
 - Requires explicit user intent
-- Applies intentional friction
+- May require external verification (SMS or Support approval)
 - Does NOT restore automatically
 - Is always visible
-- Notifies accountability contacts
+- Is logged in backend when Support is configured
+
+There is no automatic reactivation.
 
 ---
 
-## 8. Free vs Premium
+## 8. Free vs Pro
 
 ### Free Plan
+
 - Pornographic content blocking
 - Blocking of one social media platform
-- Limited temporary unlocks
-- One accountability contact
-- Fixed 8-hour waiting period for total protection deactivation
+- Copy Challenge
+- Fixed 8-hour waiting period for protection deactivation
 - Basic progress tracking
+- No Support configuration
+- No automatic SMS sending
 
-### Premium Plan
+### Pro Plan
+
 Includes everything in Free, plus:
-- Up to five accountability contacts
-- Option to notify a WhatsApp group
-- Ability to block multiple social media platforms
-- Ability to customize a list of blocked websites (added one by one)
-- Configurable waiting period for total protection deactivation
-- Access to optional support community features
+
+- Configurable waiting period (minimum 1 hour) when no Support is configured
+- SMS-based verification codes
+- Optional Support configuration
+- Mandatory Support approval when configured
+- Activity logging for unlock and approval events
+- Access to extended blocking customization (planned within MVP scope)
 
 ---
 
-## 9. Premium Support Community (Optional)
+## 9. Support Role (Pro Only)
 
-Premium users may optionally join a support community designed to provide encouragement and accountability.
+Pro users may configure a Support contact.
 
-Community features may include:
-- Daily supportive messages
-- Access to a shared community space
-  - Website
-  - Chatbot
-  - WhatsApp channel or group
+When Support is configured:
 
-Participation is:
-- Completely optional (opt-in)
-- Independent from blocking or protection logic
-- Designed for support, not surveillance or enforcement
+- Waiting period is disabled
+- Copy Challenge is disabled
+- Unlock requires Support approval
+
+Two Support modes are supported:
+
+1. Support with CleanMind app installed  
+   - Receives push notification  
+   - Must authenticate  
+   - Can approve or reject  
+   - All actions logged  
+
+2. Support without app  
+   - Receives SMS with verification code  
+   - Code must be entered in the app  
+   - Backend validates before unlock  
+
+Support approval is mandatory in this configuration.
 
 ---
 
 ## 10. Privacy & Legal (MVP)
 
 - CleanMind does not inspect browsing content
-- CleanMind does not read or store personal messages
-- CleanMind does not sell user data
-- All communication with accountability contacts is user-initiated
+- CleanMind does not log specific URLs
+- CleanMind does not read personal messages
+- SMS messages contain neutral, non-incriminatory language
+- Verification codes are time-limited and single-use
+- Approval logs contain timestamps only (no browsing history)
 
 ---
 
@@ -128,10 +152,11 @@ Participation is:
 - Advanced analytics dashboards
 - Multi-profile parental management
 - Desktop or web-based blocking
+- Community group integrations
 
 ---
 
 ## 12. Versioning
 
-- This document version: v1.0
+- This document version: v2.0 (Backend-Validated MVP)
 - Any product scope changes require a new version

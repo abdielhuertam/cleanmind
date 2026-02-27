@@ -1,5 +1,7 @@
 import 'protection_state.dart';
 
+const Duration kFreeDeactivationDuration = Duration(seconds: 10);
+
 class PlanState {
   final ProtectionState protection;
   final bool isPro;
@@ -14,7 +16,7 @@ class PlanState {
       protection: const ProtectionState(
         status: ProtectionStatus.inactive,
       ),
-      isPro: false,
+      isPro: true,
     );
   }
 
@@ -25,16 +27,25 @@ class PlanState {
     );
   }
 
-  // Mantener compatibilidad con HomeScreen actual
   PlanState requestUnlock() {
     return this;
   }
 
   PlanState requestDeactivation() {
-    return PlanState(
-      protection: protection.scheduleDeactivation(),
-      isPro: isPro,
-    );
+    if (isPro) {
+      // Pro: desactivación inmediata
+      return PlanState(
+        protection: protection.disable(),
+        isPro: isPro,
+      );
+    } else {
+      // Free: waiting period obligatorio
+      return PlanState(
+        protection:
+            protection.scheduleDeactivation(kFreeDeactivationDuration),
+        isPro: isPro,
+      );
+    }
   }
 
   PlanState cancelDeactivation() {

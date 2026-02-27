@@ -38,7 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
       if (protection.status == ProtectionStatus.deactivationPending) {
         if (protection.isDeactivationExpired()) {
           _timer?.cancel();
-          widget.onPlanChanged(widget.plan.unlockSucceeded());
+          final updatedPlan = widget.plan.unlockSucceeded();
+          widget.onPlanChanged(updatedPlan);
+
+          print("SEND ACCOUNTABILITY MESSAGE");
         } else {
           setState(() {});
         }
@@ -74,6 +77,23 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildProgressInfo(status),
             const SizedBox(height: 32),
             _buildPrimaryAction(context, status),
+            const SizedBox(height: 40),
+
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey,
+              ),
+              onPressed: () {
+                final updatedPlan =
+                    widget.plan.updatePlan(!widget.plan.isPro);
+                widget.onPlanChanged(updatedPlan);
+              },
+              child: Text(
+                widget.plan.isPro
+                    ? 'Switch to Free Plan'
+                    : 'Switch to Pro Plan',
+              ),
+            ),
           ],
         ),
       ),
@@ -154,7 +174,9 @@ class _HomeScreenState extends State<HomeScreen> {
               _showDeactivationDialog(context);
             },
             child: Text(
-              'Deactivate Protection (${_formatWaitingPeriod()} waiting period)',
+                widget.plan.isPro
+                  ? 'Deactivate Protection'
+                  : 'Deactivate Protection (${_formatWaitingPeriod()} waiting period)',
             ),
           ),
         ],
@@ -228,14 +250,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return result ?? false;
   }
 
-    void _showDeactivationDialog(BuildContext context) {
+  void _showDeactivationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Confirm Deactivation'),
         content: Text(
-          'If you continue, your progress will reset after ${_formatWaitingPeriod()}. '
-          'Your accountability partner will be notified when protection is disabled.',
+          widget.plan.isPro
+              ? 'If you continue, your protection will be disabled immediately. '
+                'Your accountability partner will be notified.'
+              : 'If you continue, your progress will reset after ${_formatWaitingPeriod()}. '
+                'Your accountability partner will be notified when protection is disabled.',
         ),
         actions: [
           TextButton(
@@ -245,9 +270,15 @@ class _HomeScreenState extends State<HomeScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
+
               final updatedPlan =
                   widget.plan.requestDeactivation();
+
               widget.onPlanChanged(updatedPlan);
+
+              if (updatedPlan.protection.isProtectionDisabled) {
+                print("SEND ACCOUNTABILITY MESSAGE");
+              }
             },
             child: const Text('Continue'),
           ),

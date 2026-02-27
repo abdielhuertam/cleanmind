@@ -60,73 +60,127 @@ When the user taps **Request Temporary Unlock**:
 2. The user must explicitly confirm to proceed.
 
 3. The user is presented with the available unlock methods
-   based on their current plan.
+   based on their current plan and Support configuration.
 
 ---
 
 ## 5. Unlock Methods Overview
 
-Available unlock methods:
+Unlock behavior depends on the user’s plan and whether a Support is configured.
+
+### Free Plan
+
+Available methods:
 
 - Copy Challenge
-- Accountability Code
-- Time-based Unlock (Pro)
+- 8-hour Waiting Period
 
-All unlock methods:
-- Disable protection immediately upon success
-- Do NOT schedule automatic reactivation
+Behavior:
+
+- Protection remains ACTIVE during the waiting period.
+- Protection automatically disables when the waiting period expires.
+- No external notifications are sent.
 
 ---
 
-## 6. Copy Challenge Flow
+### Pro Plan (No Support Configured)
 
-- A motivational phrase is displayed.
-- Autocorrect and autocomplete are disabled.
-- The user must type the phrase exactly.
-- A visible countdown timer is shown.
+Available methods:
+
+- Copy Challenge
+- Configurable Waiting Period (minimum 1 hour)
+- Accountability Code via SMS
+
+Behavior:
+
+- Waiting Period automatically disables protection when it expires.
+- Accountability Code sends an automatic SMS containing a verification code.
+- Protection disables only after successful code validation.
+
+---
+
+### Pro Plan (Support Configured)
+
+If a Support contact is configured:
+
+- Waiting Period is disabled.
+- Copy Challenge is disabled.
+- Unlock requires mandatory Support approval.
+
+Two approval paths are available:
+
+1. Support with CleanMind app installed
+2. Support without app (SMS code verification)
+
+Protection remains ACTIVE until approval is completed.
+
+---
+
+## 6. Accountability Code Flow (Pro — No Support or SMS-Based Support)
+
+- The user requests immediate unlock.
+- The backend generates a temporary verification code.
+- An automatic SMS is sent to the configured contact.
+- The contact receives a discreet message with a verification code.
+- The user must enter the received code.
+- The backend validates the code.
 
 Outcomes:
-- Success → Protection disabled
-- Failure / timeout → Return to protected state
 
----
-
-## 7. Accountability Code Flow (Discreet Support)
-
-- The user selects a trusted contact.
-- The app generates a temporary unlock code.
-- The app prepares a **discreet, non-incriminatory message**.
-
-Example message:
-> “{Name} is doing a digital detox and is asking for your help.”
-
-- The user sends the message manually (e.g., via WhatsApp).
-- The user enters the received code to disable protection.
+- Correct code → Protection disabled
+- Incorrect or expired code → Protection remains active
 
 Notes:
-- SMS is not supported in the MVP.
-- CleanMind does not read or store any messages.
+
+- Codes are generated server-side.
+- Codes expire after a defined time window.
+- CleanMind does not read incoming messages.
 
 ---
 
-## 8. Time-based Unlock Flow (Pro)
+## 7. Support Approval Flow (Pro — Support Configured)
 
-- The user selects an intended unlock duration:
-  - 15 minutes
-  - 30 minutes
-  - 1 hour
-  - 2 hours
-  - 4 hours
-  - 8 hours
+When a Support is configured:
 
-Important:
-- The duration is **intentional only**
-- Protection is NOT reactivated automatically
-- Protection remains disabled until the user manually re-enables it
+1. The user requests deactivation.
+2. Protection remains ACTIVE.
+3. A Support approval request is created in the backend.
+
+### If Support has the app installed:
+
+- Support receives a push notification.
+- Support must authenticate (PIN or biometric).
+- Support can Approve or Reject.
+- All actions are logged in an Activity Log.
+
+If approved:
+
+- User sees confirmation screen:
+  > “Your Support has approved this request.”
+- User confirms final deactivation.
+- Protection disables.
+- Event is recorded in history.
+
+If rejected:
+
+- Protection remains active.
 
 ---
 
-## 9. Protection Disabled State
+### If Support does not have the app installed:
+
+- A verification code is generated server-side.
+- An automatic SMS is sent to Support.
+- Support shares the code verbally.
+- User enters the code.
+- Backend validates.
+- Protection disables upon successful validation.
+
+All events are logged.
+
+---
+
+## 8. Protection Disabled State
 
 When protection is disabled:
 
@@ -135,14 +189,13 @@ When protection is disabled:
 - The Home screen displays:
   - Protection status: OFF
   - Time since deactivation
-  - Intended duration (if selected)
 
 Primary CTA:
 > Activate Protection
 
 ---
 
-## 10. Motivational Reminders
+## 9. Motivational Reminders
 
 While protection is disabled:
 
@@ -160,72 +213,49 @@ While protection is disabled:
 
 ---
 
-## 11. Manual Reactivation Flow
+## 10. Manual Reactivation Flow
 
 - The user manually activates protection.
 - Upon activation:
   - Blocking resumes
   - Progress tracking restarts
-  - Accountability contact is notified
-
-Example notification:
-> “{Name} has turned protection back on in CleanMind.”
+  - If Support is configured, activation is logged in history
 
 ---
 
-## 12. User Core Loop (Closed)
+## 11. User Core Loop (Updated)
+
+### Free
 
 1. Protection OFF
 2. User activates protection
 3. Protection ON
-4. User requests unlock (with friction)
+4. User requests unlock (friction or waiting period)
 5. Protection OFF
 6. User manually reactivates protection
-7. Loop repeats
 
 ---
 
-## 13. Versioning
+### Pro without Support
 
-This document reflects CLOSED MVP behavior.
+1. Protection ON
+2. User requests unlock
+3. Waiting Period or SMS code verification
+4. Protection OFF
+
+---
+
+### Pro with Support
+
+1. Protection ON
+2. User requests unlock
+3. Support approval required
+4. Protection OFF only after approval
+
+---
+
+## 12. Versioning
+
+This document reflects CLOSED MVP behavior including backend-based approval and SMS verification.
+
 Any future changes must be logged in Development_Log.md.
-
-## App Launch Flow (Updated)
-
-1. App starts.
-2. PlanState is loaded from local storage.
-3. If ProtectionStatus == active:
-   - Counter resumes from stored activatedAt.
-4. If inactive:
-   - HomeScreen displays activation state.
-5. All state changes trigger automatic persistence.
-
-Free Plan — Total Protection Deactivation (8-Hour Waiting Period)
-
-For Free users, full protection deactivation requires an 8-hour waiting period.
-
-Flow:
-
-User selects “Deactivate Protection (8-hour waiting period)”.
-
-A confirmation dialog warns that:
-
-Progress will reset.
-
-Accountability partner will be notified once protection is disabled.
-
-Protection remains ACTIVE during the waiting period.
-
-A countdown is displayed.
-
-User may cancel the scheduled deactivation at any time.
-
-When the waiting period expires:
-
-Protection automatically transitions to disabled.
-
-Progress resets.
-
-Accountability partner is notified.
-
-If the app was closed, expiration is evaluated upon next launch.

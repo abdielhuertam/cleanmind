@@ -2,14 +2,17 @@
 
 ## 1. Architecture Overview
 
-CleanMind follows an **offline-first architecture with periodic synchronization**.
+CleanMind follows a **backend-validated architecture with local state persistence**.
 
 The app is designed to:
-- Minimize mobile data usage
-- Minimize battery consumption
-- Operate reliably even with intermittent connectivity
+- Maintain reliable local protection state
+- Delegate critical unlock logic to the backend
+- Enforce plan rules server-side
+- Support SMS-based verification and Support approval
 
-Internet access is required, but backend communication is intentionally limited.
+Internet access is required for all unlock-related flows.
+
+Protection activation and DNS blocking remain locally enforced.
 
 ---
 
@@ -23,12 +26,16 @@ Platforms:
 
 Responsibilities:
 - User interface and navigation
-- Local storage of rules and counters
+- Local storage of protection state
 - VPN/DNS configuration and status
-- Trigger unlock flows
-- Display progress and achievements
+- Initiating unlock requests
+- Displaying approval status
+- Displaying Activity Log
+- Handling SMS code entry
+- Rendering Support approval screens
 
-The app does NOT contain critical business logic.
+The app does NOT make final unlock decisions.
+All critical unlock validation is performed server-side.
 
 ---
 
@@ -46,7 +53,11 @@ Stored data:
 - Email
 - Account creation date
 
-No passwords are stored or managed by CleanMind.
+Authentication is required for:
+- Unlock requests
+- Support approval
+- Activity logging
+- Plan validation
 
 ---
 
@@ -55,10 +66,12 @@ No passwords are stored or managed by CleanMind.
 ### Firestore (Database)
 
 Stores:
-- User profile and plan (Free / Pro)
-- Progress counters
-- Achievement state
-- Accountability partners
+- User profile
+- Plan type (Free / Pro)
+- Support relationship
+- Unlock requests
+- Verification codes (hashed)
+- Activity logs
 - Preferences
 - Domain list version metadata
 
@@ -67,14 +80,28 @@ Stores:
 ### Cloud Functions (Business Logic)
 
 Responsible for:
-- Validating unlock requests
-- Enforcing Free vs Pro limits
-- Resetting counters
-- Scheduling automatic unlock expiration
-- Sending notifications
+- Generating verification codes
+- Sending SMS via provider
+- Creating unlock requests
+- Validating verification codes
+- Processing Support approval or rejection
+- Enforcing plan restrictions
+- Logging approval and unlock events
 - Validating subscription status
 
-Critical rules always execute server-side.
+All unlock transitions to protectionDisabled must be validated server-side.
+
+---
+
+### SMS Provider Integration
+
+An external SMS provider is integrated via backend.
+
+Responsibilities:
+- Deliver verification codes
+- Send approval-related notifications (when required)
+
+SMS sending is triggered only after explicit user confirmation.
 
 ---
 
@@ -89,6 +116,8 @@ Characteristics:
 - Lower battery and CPU usage
 - Lower App Store rejection risk
 
+Blocking decisions are local and independent of backend connectivity.
+
 ---
 
 ## 3. Domain Database Strategy
@@ -98,7 +127,7 @@ Characteristics:
 - On first app launch, the app downloads:
   - Pornographic domain list
   - Social media domain list
-  - A version identifier (e.g. timestamp or version number)
+  - A version identifier
 
 - Domain lists are stored locally on the device.
 
@@ -108,13 +137,13 @@ Characteristics:
 
 The app checks for updates:
 - On app launch
-- Once per defined interval (e.g. daily)
-- When user manually triggers a refresh
+- Once per defined interval
+- When user manually triggers refresh
 
-Only metadata (version info) is checked first.
+Only metadata is checked first.
 
-If the version is unchanged:
-- No full download occurs
+If unchanged:
+- No full download occurs.
 
 ---
 
@@ -125,21 +154,27 @@ If a domain is accessed that:
 - Is not in the local database
 
 The app may:
-- Suggest the user to add the domain manually
-- Optionally report the domain (without content inspection)
+- Suggest manual addition
+- Optionally report metadata (without content inspection)
 
 ---
 
 ## 4. Connectivity Rules
 
-The app connects to the backend only when necessary:
-- Login and authentication
-- Subscription validation
-- Unlock requests
-- Notifications
-- Domain database updates
+The app connects to the backend for:
 
-Blocking decisions use local data whenever possible.
+- Authentication
+- Subscription validation
+- Unlock request creation
+- Verification code validation
+- Support approval processing
+- Activity log synchronization
+- Push notification handling
+- Domain database metadata updates
+
+Protection activation and DNS enforcement remain functional offline.
+
+Unlock requests require backend connectivity.
 
 ---
 
@@ -149,12 +184,13 @@ Provider:
 - Firebase Cloud Messaging
 
 Used for:
-- Unlock events
-- Automatic unlock expiration
-- Achievement milestones
-- Monthly motivational messages
+- Support approval requests
+- Unlock approval confirmation
+- Rejection notifications
+- Activity log updates
+- Motivational reminders
 
-Notifications are optional and configurable.
+Notifications are configurable.
 
 ---
 
@@ -167,7 +203,9 @@ Notifications are optional and configurable.
 The app:
 - Queries subscription status
 - Backend validates entitlement
-- Access is granted or revoked accordingly
+- Pro features are enabled or disabled accordingly
+
+Unlock methods are restricted based on validated plan status.
 
 ---
 
@@ -176,8 +214,11 @@ The app:
 - No browsing history is stored
 - No URLs are logged
 - No message content is accessed
-- Only domain categories and counters are processed
-- All sensitive logic runs server-side
+- SMS content is limited to neutral verification messages
+- Verification codes are stored securely
+- Approval logs contain timestamps only (no browsing data)
+
+Sensitive business logic executes server-side.
 
 ---
 
@@ -188,35 +229,42 @@ The app:
   - Protection status is clearly shown as OFF
 
 - If backend is unreachable:
-  - App continues using cached rules
-  - Unlock requests are temporarily disabled
+  - Protection remains ACTIVE
+  - Unlock requests are disabled
+  - Waiting periods cannot be initiated
+  - User is informed that approval requires connectivity
+
+- If SMS delivery fails:
+  - Unlock remains pending
+  - User may retry sending
 
 ---
 
-## 9. Versioning
-
-- This document: v1.0
-- Any architectural change requires a new version
-
-## Local State Persistence (v1)
+## 9. Local State Persistence (v2)
 
 CleanMind uses local device storage via SharedPreferences to persist:
 
 - ProtectionStatus
 - activatedAt timestamp
 - isPro flag
+- deactivationScheduledAt (Free / Pro without Support)
 
 On app launch:
 
 1. main.dart initializes asynchronously.
 2. LocalStorageService.loadPlan() reconstructs PlanState.
-3. HomeScreen renders only after state restoration.
+3. HomeScreen renders after state restoration.
+4. Backend is queried if unlock status is pending approval.
 
 This ensures:
 
-- Counter continuity across restarts.
-- Real activation timestamp tracking.
-- Stable state-driven architecture.
+- Counter continuity across restarts
+- Accurate unlock state synchronization
+- Stable state-driven architecture
 
-No backend dependency required for MVP persistence.
+---
 
+## 10. Versioning
+
+- This document: v2.0 (Backend-validated MVP)
+- Any architectural change requires a new version
