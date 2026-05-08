@@ -1,7 +1,8 @@
 enum ProtectionStatus {
   inactive,
   active,
-  deactivationPending,
+  waitingPeriod,
+  awaitingApproval,
   protectionDisabled,
 }
 
@@ -27,14 +28,14 @@ class ProtectionState {
     );
   }
 
-  ProtectionState scheduleDeactivation(Duration duration) {
-    return ProtectionState(
-      status: ProtectionStatus.deactivationPending,
-      activatedAt: activatedAt,
-      deactivationScheduledAt: DateTime.now(),
-      deactivationDuration: duration,
-    );
-  }
+ProtectionState scheduleWaitingPeriod(Duration duration) {
+  return ProtectionState(
+    status: ProtectionStatus.waitingPeriod,
+    activatedAt: activatedAt,
+    deactivationScheduledAt: DateTime.now(),
+    deactivationDuration: duration,
+  );
+}
 
   ProtectionState cancelScheduledDeactivation() {
     return ProtectionState(
@@ -60,7 +61,7 @@ class ProtectionState {
   }
 
   Duration? getRemainingDeactivationTime() {
-    if (status != ProtectionStatus.deactivationPending ||
+    if (status != ProtectionStatus.waitingPeriod ||
         deactivationScheduledAt == null ||
         deactivationDuration == null) {
       return null;
@@ -74,7 +75,7 @@ class ProtectionState {
   }
 
   bool isDeactivationExpired() {
-    if (status != ProtectionStatus.deactivationPending ||
+    if (status != ProtectionStatus.waitingPeriod ||
         deactivationScheduledAt == null ||
         deactivationDuration == null) {
       return false;
@@ -83,6 +84,14 @@ class ProtectionState {
     final elapsed = DateTime.now().difference(deactivationScheduledAt!);
     return elapsed >= deactivationDuration!;
   }
+
+  ProtectionState requestApproval() {
+  return ProtectionState(
+    status: ProtectionStatus.awaitingApproval,
+    activatedAt: activatedAt,
+    deactivationScheduledAt: null,
+  );
+}
 
   bool get isProtectionDisabled =>
       status == ProtectionStatus.protectionDisabled;

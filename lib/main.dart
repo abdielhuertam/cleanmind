@@ -20,7 +20,7 @@ print("SCHEDULED AT: ${loadedPlan.protection.deactivationScheduledAt}");
 print("IS EXPIRED: ${loadedPlan.protection.isDeactivationExpired()}");
 
 if (loadedPlan.protection.status ==
-        ProtectionStatus.deactivationPending &&
+        ProtectionStatus.waitingPeriod &&
     loadedPlan.protection.isDeactivationExpired()) {
 
   print("DEACTIVATION EXPIRED - DISABLING");

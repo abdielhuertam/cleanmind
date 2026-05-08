@@ -1,9 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+
 import '../state/plan_state.dart';
 import '../state/protection_state.dart';
-import 'copy_challenge_screen.dart';
-import 'accountability_code_screen.dart';
+
+import '../theme/app_colors.dart';
+
+import '../widgets/primary_button.dart';
+import '../widgets/status_card.dart';
+import '../widgets/bottom_navigation.dart';
 
 class HomeScreen extends StatefulWidget {
   final PlanState plan;
@@ -22,7 +27,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
 
-
   @override
   void initState() {
     super.initState();
@@ -30,27 +34,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startAutoRefresh() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) {
+        if (!mounted) return;
 
-      final protection = widget.plan.protection;
+        final protection = widget.plan.protection;
 
-      if (protection.status == ProtectionStatus.deactivationPending) {
-        if (protection.isDeactivationExpired()) {
-          _timer?.cancel();
-          final updatedPlan = widget.plan.unlockSucceeded();
-          widget.onPlanChanged(updatedPlan);
+        if (protection.status ==
+            ProtectionStatus.waitingPeriod) {
+          if (protection.isDeactivationExpired()) {
+            final updatedPlan =
+                widget.plan.unlockSucceeded();
 
-          print("SEND ACCOUNTABILITY MESSAGE");
-        } else {
-          setState(() {});
+            widget.onPlanChanged(updatedPlan);
+          } else {
+            setState(() {});
+          }
         }
-      } else {
-        setState(() {});
-      }
-    });
+      },
+    );
   }
-
 
   @override
   void dispose() {
@@ -60,39 +64,108 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final status = widget.plan.protection.status;
+    final protection = widget.plan.protection;
+
+
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('CleanMind'),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildStatusLabel(status),
-            const SizedBox(height: 12),
-            _buildProgressInfo(status),
-            const SizedBox(height: 32),
-            _buildPrimaryAction(context, status),
-            const SizedBox(height: 40),
+      backgroundColor: AppColors.background,
 
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey,
+      body: SafeArea(
+        child: Column(
+          children: [
+
+            // TOP BAR
+            Container(
+              height: 42,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(22),
+                  bottomRight: Radius.circular(22),
+                ),
               ),
-              onPressed: () {
-                final updatedPlan =
-                    widget.plan.updatePlan(!widget.plan.isPro);
-                widget.onPlanChanged(updatedPlan);
-              },
-              child: Text(
-                widget.plan.isPro
-                    ? 'Switch to Free Plan'
-                    : 'Switch to Pro Plan',
+            ),
+
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
+                child: ListView(
+                  padding: const EdgeInsets.only(
+                    bottom: 40,
+                    ),
+                  children: [
+
+                    // HEADER
+                    Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'Clean Mind',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        Stack(
+                          children: [
+                            const Icon(
+                              Icons.notifications,
+                              size: 34,
+                              color: AppColors.primary,
+                            ),
+
+                            Positioned(
+                              right: 0,
+                              child: Container(
+                                width: 16,
+                                height: 16,
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 18),
+                    if (protection.status == ProtectionStatus.waitingPeriod)
+                      _buildActionArea()
+                    else ...[
+                      StatusCard(
+                        isActive:
+                            protection.status == ProtectionStatus.active ||
+                            protection.status == ProtectionStatus.waitingPeriod,
+                        streakDays:
+                            protection.getActiveDuration().inDays,
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      _buildActionArea(),
+                    ],
+                  ],
+                ),
               ),
+            ),
+
+            BottomNavigation(
+              isPro: widget.plan.isPro,
             ),
           ],
         ),
@@ -100,205 +173,261 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildStatusLabel(ProtectionStatus status) {
+  Widget _buildActionArea() {
+    final status = widget.plan.protection.status;
+
     switch (status) {
+
       case ProtectionStatus.active:
-        return const Text(
-          'Protection is ON',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+
+              PrimaryButton(
+                text: 'Request Unlock',
+                onPressed: () {},
+              ),
+
+              const SizedBox(height: 12),
+
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(
+                      color: const Color(0xFFE57373),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(28),
+                    ),
+                  ),
+                  onPressed: () {
+                    _showDeactivationDialog(context);
+                  },
+                  child: const Text(
+                    'Deactivate Protection',
+                    style: TextStyle(
+                      color: AppColors.danger,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
+
+      case ProtectionStatus.waitingPeriod:
+
+        final remaining =
+            widget.plan.protection
+                .getRemainingDeactivationTime();
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 14,
+                offset: Offset(0, 6),
+              ),
+            ],
+          ),
+
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              Container(
+                width: 88,
+                height: 88,
+
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.10),
+                  shape: BoxShape.circle,
+                ),
+
+                child: const Icon(
+                  Icons.schedule,
+                  size: 42,
+                  color: AppColors.primary,
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              const Text(
+                'Take a moment.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              const Text(
+                'Pause before disabling protection.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.4,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              Text(
+                remaining == null
+                    ? '--:--:--'
+                    : '${remaining.inHours.toString().padLeft(2, '0')}:'
+                      '${(remaining.inMinutes % 60).toString().padLeft(2, '0')}:'
+                      '${(remaining.inSeconds % 60).toString().padLeft(2, '0')}',
+
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                  color: AppColors.primary,
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              PrimaryButton(
+                text: 'Cancel Deactivation',
+                onPressed: () {
+
+                  final updatedPlan =
+                      widget.plan.cancelDeactivation();
+
+                  widget.onPlanChanged(updatedPlan);
+                },
+              ),
+            ],
+          ),
+        );
+        case ProtectionStatus.awaitingApproval:
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+
+                const Icon(
+                  Icons.lock_clock,
+                  size: 70,
+                  color: AppColors.primary,
+                ),
+
+                const SizedBox(height: 20),
+
+                const Text(
+                  'Waiting for Approval',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                const Text(
+                  'Your support contact must approve this request.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                PrimaryButton(
+                  text: 'Cancel Request',
+                  onPressed: () {
+
+                    final updatedPlan =
+                        widget.plan.cancelDeactivation();
+
+                    widget.onPlanChanged(updatedPlan);
+                  },
+                ),
+              ],
+            ),
+          );
       case ProtectionStatus.protectionDisabled:
       case ProtectionStatus.inactive:
-        return const Text(
-          'Protection is OFF',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        );
-      case ProtectionStatus.deactivationPending:
-        return const Text(
-          'Unlock in progress',
-          style: TextStyle(fontSize: 18),
+
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+
+              PrimaryButton(
+                text: 'Activate Protection',
+                onPressed: () {
+                  final updatedPlan =
+                      widget.plan.manualReactivate();
+
+                  widget.onPlanChanged(updatedPlan);
+                },
+              ),
+            ],
+          ),
         );
     }
-  }
-
-  Widget _buildProgressInfo(ProtectionStatus status) {
-    if (status != ProtectionStatus.active) {
-      return const SizedBox();
-    }
-
-    final duration = widget.plan.protection.getActiveDuration();
-    final days = duration.inDays;
-    final hours = duration.inHours % 24;
-    final minutes = duration.inMinutes % 60;
-
-    return Text(
-      'Protected for: $days day(s) $hours hour(s) $minutes minute(s)',
-      style: const TextStyle(fontSize: 16),
-    );
-  }
-
-  Widget _buildPrimaryAction(BuildContext context, ProtectionStatus status) {
-  switch (status) {
-    case ProtectionStatus.active:
-      return Column(
-        children: [
-          ElevatedButton(
-            onPressed: () async {
-              final confirmed = await _showUnlockWarning(context);
-              if (!confirmed) return;
-
-              final updatedPlan = widget.plan.requestUnlock();
-              widget.onPlanChanged(updatedPlan);
-              Navigator.pushNamed(context, '/copy-challenge');
-            },
-            child: const Text('Copy Challenge'),
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () async {
-              final confirmed = await _showUnlockWarning(context);
-              if (!confirmed) return;
-
-              final updatedPlan = widget.plan.requestUnlock();
-              widget.onPlanChanged(updatedPlan);
-              Navigator.pushNamed(context, '/accountability-code');
-            },
-            child: const Text('Accountability Code'),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-            ),
-            onPressed: () {
-              _showDeactivationDialog(context);
-            },
-            child: Text(
-                widget.plan.isPro
-                  ? 'Deactivate Protection'
-                  : 'Deactivate Protection (${_formatWaitingPeriod()} waiting period)',
-            ),
-          ),
-        ],
-      );
-
-    case ProtectionStatus.deactivationPending:
-      final remaining =
-          widget.plan.protection.getRemainingDeactivationTime();
-
-      return Column(
-        children: [
-          const Text(
-            'Deactivation scheduled',
-            style: TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 8),
-          if (remaining != null)
-            Text(
-              'Time remaining: ${remaining.inHours}h '
-              '${remaining.inMinutes.remainder(60)}m '
-              '${remaining.inSeconds.remainder(60)}s',
-            ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey,
-            ),
-            onPressed: () {
-              final updatedPlan =
-                  widget.plan.cancelDeactivation();
-              widget.onPlanChanged(updatedPlan);
-            },
-            child: const Text('Cancel Deactivation'),
-          ),
-        ],
-      );
-
-    case ProtectionStatus.protectionDisabled:
-    case ProtectionStatus.inactive:
-      return ElevatedButton(
-        onPressed: () {
-          widget.onPlanChanged(widget.plan.manualReactivate());
-        },
-        child: const Text('Activate Protection'),
-      );
-  }
-}
-
-
-  Future<bool> _showUnlockWarning(BuildContext context) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Confirm Unlock'),
-        content: const Text(
-          'If you continue, your progress counter will reset.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Continue'),
-          ),
-        ],
-      ),
-    );
-
-    return result ?? false;
   }
 
   void _showDeactivationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Confirm Deactivation'),
+        title: const Text(
+          'Confirm Deactivation',
+        ),
         content: Text(
-          widget.plan.isPro
-              ? 'If you continue, your protection will be disabled immediately. '
-                'Your accountability partner will be notified.'
-              : 'If you continue, your progress will reset after ${_formatWaitingPeriod()}. '
-                'Your accountability partner will be notified when protection is disabled.',
+          !widget.plan.isPro
+              ? 'Protection will be disabled after the waiting period.'
+              : widget.plan.hasSupport
+                  ? 'A support approval request will be sent.'
+                  : 'Protection will be disabled after the configured waiting period.',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+
           TextButton(
             onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          ),
+
+          TextButton(
+            onPressed: () {
+
               Navigator.pop(context);
 
               final updatedPlan =
                   widget.plan.requestDeactivation();
 
               widget.onPlanChanged(updatedPlan);
-
-              if (updatedPlan.protection.isProtectionDisabled) {
-                print("SEND ACCOUNTABILITY MESSAGE");
-              }
             },
             child: const Text('Continue'),
           ),
         ],
       ),
     );
-  }
-
-  String _formatWaitingPeriod() {
-    final duration = kFreeDeactivationDuration;
-
-    if (duration.inHours >= 1) {
-      final hours = duration.inHours;
-      return '$hours hour${hours == 1 ? '' : 's'}';
-    } else if (duration.inMinutes >= 1) {
-      final minutes = duration.inMinutes;
-      return '$minutes minute${minutes == 1 ? '' : 's'}';
-    } else {
-      final seconds = duration.inSeconds;
-      return '$seconds second${seconds == 1 ? '' : 's'}';
-    }
   }
 }

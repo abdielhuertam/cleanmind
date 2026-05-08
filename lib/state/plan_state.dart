@@ -1,14 +1,16 @@
 import 'protection_state.dart';
 
-const Duration kFreeDeactivationDuration = Duration(seconds: 10);
+const Duration kFreeDeactivationDuration = Duration(hours: 8);
 
 class PlanState {
   final ProtectionState protection;
   final bool isPro;
+  final bool hasSupport;
 
   const PlanState({
     required this.protection,
     required this.isPro,
+    required this.hasSupport,
   });
 
   factory PlanState.initial() {
@@ -17,6 +19,7 @@ class PlanState {
         status: ProtectionStatus.inactive,
       ),
       isPro: true,
+      hasSupport: false,
     );
   }
 
@@ -24,6 +27,7 @@ class PlanState {
     return PlanState(
       protection: protection.activate(),
       isPro: isPro,
+      hasSupport: hasSupport,
     );
   }
 
@@ -32,26 +36,41 @@ class PlanState {
   }
 
   PlanState requestDeactivation() {
-    if (isPro) {
-      // Pro: desactivación inmediata
+    // FREE
+    if (!isPro) {
       return PlanState(
-        protection: protection.disable(),
+        protection: protection.scheduleWaitingPeriod(
+          kFreeDeactivationDuration,
+        ),
         isPro: isPro,
-      );
-    } else {
-      // Free: waiting period obligatorio
-      return PlanState(
-        protection:
-            protection.scheduleDeactivation(kFreeDeactivationDuration),
-        isPro: isPro,
+        hasSupport: hasSupport,
       );
     }
+
+    // PRO SIN SOPORTE
+    if (isPro && !hasSupport) {
+      return PlanState(
+        protection: protection.scheduleWaitingPeriod(
+          const Duration(hours: 1),
+        ),
+        isPro: isPro,
+        hasSupport: hasSupport,
+      );
+    }
+
+    // PRO CON SOPORTE
+    return PlanState(
+      protection: protection.requestApproval(),
+      isPro: isPro,
+      hasSupport: hasSupport,
+    );
   }
 
   PlanState cancelDeactivation() {
     return PlanState(
       protection: protection.cancelScheduledDeactivation(),
       isPro: isPro,
+      hasSupport: hasSupport,
     );
   }
 
@@ -59,6 +78,7 @@ class PlanState {
     return PlanState(
       protection: protection.disable(),
       isPro: isPro,
+      hasSupport: hasSupport,
     );
   }
 
@@ -66,6 +86,7 @@ class PlanState {
     return PlanState(
       protection: protection.activate(),
       isPro: isPro,
+      hasSupport: hasSupport,
     );
   }
 
@@ -73,6 +94,15 @@ class PlanState {
     return PlanState(
       protection: protection,
       isPro: newIsPro,
+      hasSupport: hasSupport,
+    );
+  }
+
+  PlanState updateSupport(bool newHasSupport) {
+    return PlanState(
+      protection: protection,
+      isPro: isPro,
+      hasSupport: newHasSupport,
     );
   }
 }

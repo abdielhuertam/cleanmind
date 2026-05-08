@@ -261,3 +261,128 @@ Persistence remains consistent across restarts.
 - Redefine Product_Flow.md to reflect updated Free vs Pro responsibilities.
 - Define backend data model for principal ↔ support relationship.
 - Design unlock request approval workflow for March beta.
+
+## 2026-05-08 — Waiting Period UI Stabilization
+
+### Completed
+
+* Stabilized `waitingPeriod` flow inside `home_screen.dart`.
+* Fixed repeated layout overflow caused by rendering both `StatusCard` and waiting state UI simultaneously.
+* Waiting state now replaces the main content area instead of stacking underneath the active protection card.
+* Preserved top header and bottom navigation during waiting period.
+* Added visible countdown timer for deactivation waiting period.
+* Added functional `Cancel Deactivation` action.
+* Confirmed active protection state remains enabled during waiting countdown.
+* Removed scroll dependency for viewing waiting state actions.
+* Recovered build stability after multiple syntax and bracket issues introduced during iterative edits.
+* Restored successful Flutter iOS simulator compilation.
+
+### Status
+
+Current HomeScreen behavior is now aligned with the intended UX flow:
+
+1. User taps `Deactivate Protection`
+2. Confirmation dialog appears
+3. Waiting period screen replaces the main content card
+4. Countdown timer is displayed immediately
+5. User may cancel deactivation during countdown
+6. Header and bottom navigation remain visible
+
+Known follow-up items:
+
+* Business-rule naming inconsistency still exists between documentation (`deactivationPending`) and implementation (`waitingPeriod`).
+* `home_screen.dart` should still be cleaned/refactored in a future dedicated session after stabilization.
+* Additional UX polish still pending:
+
+  * spacing refinement
+  * animation/transitions
+  * typography tuning
+  * premium/free state handling
+  * onboarding integration
+
+### Next Session Focus
+
+* Refactor `home_screen.dart` into smaller isolated widgets.
+* Align state naming between architecture docs and implementation.
+* Validate timer persistence after app restart.
+* Begin UX polish pass for protection states.
+* Review and clean any temporary/debug logic added during stabilization.
+
+### Technical Notes
+
+* Main issue originated from rendering waiting-period UI as secondary content inside the same `ListView`.
+* Correct solution was conditional replacement of the central content area while preserving persistent shell UI.
+* Multiple syntax issues during the session were caused by partial block replacements inside deeply nested Flutter widgets.
+* Future modifications to `home_screen.dart` should use full-section replacements instead of incremental inline patches.
+
+---
+
+## Documentation Alignment Required Before Commit
+
+### Business_Rules.md
+
+Current documentation uses:
+
+* `deactivationPending`
+
+Current implementation uses:
+
+* `waitingPeriod`
+
+These must be unified in a future cleanup pass to avoid architecture drift.
+
+### Product_Flow.md
+
+Waiting-period UX is now effectively:
+
+* Header remains visible
+* Bottom navigation remains visible
+* Waiting state replaces the central protection content area
+* Countdown and cancel action are immediately visible without scrolling
+
+### Working_Agreements.md
+
+This session exposed repeated instability caused by partial inline modifications to large Flutter widgets.
+Future UI modifications should:
+
+* Prefer full-section replacements
+* Avoid multi-step patch chains on deeply nested layouts
+* Validate syntax structure before incremental visual tuning
+
+---
+
+## Pre-Commit Validation Checklist
+
+Before committing:
+
+* Confirm Flutter project compiles successfully
+* Confirm waiting countdown updates every second
+* Confirm deactivation auto-expires correctly
+* Confirm `Cancel Deactivation` restores active state
+* Confirm no scroll is required to access waiting actions
+* Confirm header and footer remain visible during waiting period
+* Confirm no syntax warnings/errors remain in `home_screen.dart`
+
+---
+
+## Delivery Tracking
+
+### Blocks Completed This Session
+
+* Waiting-period UI stabilization
+* Countdown visibility recovery
+* HomeScreen conditional rendering fix
+* Build recovery after syntax instability
+
+### Estimated Remaining Major Blocks
+
+* HomeScreen refactor
+* Unlock architecture cleanup
+* Premium/Support flows
+* Backend integration
+* VPN/DNS integration
+* Authentication layer
+* Settings & onboarding
+* Activity log
+* Legal/compliance implementation
+* Store readiness
