@@ -386,3 +386,138 @@ Before committing:
 * Activity log
 * Legal/compliance implementation
 * Store readiness
+
+---
+
+## 2026-05-13 — Push Approval Flow Stabilization & Home UX Refactor
+
+### Completed
+
+- Stabilized Push Notification unlock request flow.
+- Implemented Pending Requests approval screen.
+- Added notification bell navigation from Home and Protection screens.
+- Implemented automatic return to Home after approval/rejection.
+- Implemented pending request countdown banner.
+- Added cancel pending request behavior.
+- Refactored HomeScreen to prioritize pending approval state visually.
+- Refactored ProtectionScreen to separate protection actions from Home dashboard behavior.
+- Added compact protection status banner component.
+- Implemented conditional Activate Protection behavior when protection is disabled.
+- Stabilized navigation between:
+  - Home
+  - Protection
+  - Unlock Methods
+  - Pending Requests
+- Restored consistent protection state synchronization across screens.
+- Added groundwork for SMS unlock redesign based on approved mockup.
+- Added groundwork for future accountability-user relationship flow.
+
+### Status
+
+Push approval flow is now functionally stable.
+
+Current working flow:
+
+1. User requests unlock via Push Notification.
+2. Request remains pending while protection stays active.
+3. Countdown remains visible.
+4. Other unlock methods are blocked while pending.
+5. Accountability user can approve or reject request.
+6. App automatically returns to Home after decision.
+7. Protection state updates correctly.
+
+HomeScreen and ProtectionScreen are now visually separated by responsibility:
+
+- Home:
+  - Dashboard/state visibility
+  - Pending request priority
+  - Fast navigation
+
+- Protection:
+  - Protection actions
+  - Unlock method access
+  - Protection controls
+
+### Next Session Focus
+
+- Restore Waiting Period countdown flow regression.
+- Restore automatic Waiting Period start behavior.
+- Redesign SMS Code screen using approved mockup.
+- Redesign Challenge screen UX.
+- Polish Unlock Methods visual hierarchy.
+- Implement persistent unlock request restoration across app restart.
+- Begin preparation for backend-backed accountability users.
+
+### Technical Notes
+
+- Several UI regressions originated from partial widget replacements inside large Flutter layouts.
+- Full-file replacements proved significantly more stable than incremental patches.
+- HomeScreen required full reconstruction after nested widget corruption.
+- PendingRequestsScreen was accidentally overwritten during iterative patching and had to be rebuilt.
+- Notification bell state is now correctly tied to unlockRequest.isPending.
+- Push Notification currently operates as local simulated state only (no backend yet).
+
+---
+
+## Documentation Alignment Required Before Commit
+
+### Product_Flow.md
+
+Current UX behavior now includes:
+
+- Notification bell access from Home and Protection screens.
+- Pending Requests screen as dedicated approval center.
+- Pending request countdown banner prioritized in Home.
+- Home and Protection screens now have separated responsibilities.
+- Unlock requests return automatically to Home after approval/rejection.
+
+### Working_Agreements.md
+
+This session further confirmed that:
+- Large Flutter widget trees should be modified using full-file replacement strategy whenever possible.
+- Incremental nested widget patching creates high syntax instability risk.
+- Visual UX stabilization should occur only after state-flow stabilization.
+
+---
+
+## Pre-Commit Validation Checklist
+
+Before committing:
+
+- Confirm Push Notification request flow works end-to-end.
+- Confirm approval returns automatically to Home.
+- Confirm rejection returns automatically to Home.
+- Confirm countdown remains visible while pending.
+- Confirm pending request blocks parallel unlock methods.
+- Confirm Home displays pending request state correctly.
+- Confirm Protection screen displays correct CTA depending on protection state.
+- Confirm notification bell routes correctly.
+- Confirm project compiles without syntax errors.
+
+---
+
+## Delivery Tracking
+
+### Blocks Completed This Session
+
+- Push approval unlock flow stabilization
+- Pending Requests architecture
+- HomeScreen UX refactor
+- ProtectionScreen UX refactor
+- Notification bell integration
+- Unlock navigation stabilization
+
+### Estimated Remaining Major Blocks
+
+- Waiting Period restoration
+- SMS verification flow redesign
+- Challenge flow redesign
+- Persistent state hardening
+- Authentication layer
+- Accountability relationship system
+- Backend integration
+- Push notifications (real)
+- VPN/DNS enforcement layer
+- Activity log
+- Settings/onboarding
+- Store readiness

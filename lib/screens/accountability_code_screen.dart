@@ -35,7 +35,7 @@ class _AccountabilityCodeScreenState
 
   void _cancel() {
     // Restore protection to active
-    widget.onPlanChanged(widget.plan.activateProtection());
+    widget.onPlanChanged(widget.plan.manualReactivate());
     Navigator.of(context).pop();
   }
 

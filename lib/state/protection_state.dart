@@ -1,98 +1,99 @@
 enum ProtectionStatus {
-  inactive,
   active,
   waitingPeriod,
   awaitingApproval,
   protectionDisabled,
+  inactive,
 }
 
 class ProtectionState {
   final ProtectionStatus status;
-  final DateTime? activatedAt;
+
+  final DateTime activatedAt;
+
   final DateTime? deactivationScheduledAt;
-  final Duration? deactivationDuration;
 
   const ProtectionState({
     required this.status,
-    this.activatedAt,
+    required this.activatedAt,
     this.deactivationScheduledAt,
-    this.deactivationDuration,
   });
 
-  ProtectionState activate() {
+  factory ProtectionState.active() {
     return ProtectionState(
       status: ProtectionStatus.active,
       activatedAt: DateTime.now(),
-      deactivationScheduledAt: null,
-      deactivationDuration: null,
     );
   }
 
-ProtectionState scheduleWaitingPeriod(Duration duration) {
-  return ProtectionState(
-    status: ProtectionStatus.waitingPeriod,
-    activatedAt: activatedAt,
-    deactivationScheduledAt: DateTime.now(),
-    deactivationDuration: duration,
-  );
-}
+  factory ProtectionState.disabled() {
+    return ProtectionState(
+      status:
+          ProtectionStatus
+              .protectionDisabled,
+      activatedAt: DateTime.now(),
+    );
+  }
 
-  ProtectionState cancelScheduledDeactivation() {
+  ProtectionState scheduleWaitingPeriod(
+    Duration duration,
+  ) {
+    return ProtectionState(
+      status:
+          ProtectionStatus.waitingPeriod,
+      activatedAt: activatedAt,
+      deactivationScheduledAt:
+          DateTime.now().add(duration),
+    );
+  }
+
+  ProtectionState cancelDeactivation() {
     return ProtectionState(
       status: ProtectionStatus.active,
       activatedAt: activatedAt,
-      deactivationScheduledAt: null,
-      deactivationDuration: null,
     );
   }
 
-  ProtectionState disable() {
+  ProtectionState disableProtection() {
     return ProtectionState(
-      status: ProtectionStatus.protectionDisabled,
-      activatedAt: null,
-      deactivationScheduledAt: null,
-      deactivationDuration: null,
+      status:
+          ProtectionStatus
+              .protectionDisabled,
+      activatedAt: activatedAt,
     );
-  }
-
-  Duration getActiveDuration() {
-    if (activatedAt == null) return Duration.zero;
-    return DateTime.now().difference(activatedAt!);
-  }
-
-  Duration? getRemainingDeactivationTime() {
-    if (status != ProtectionStatus.waitingPeriod ||
-        deactivationScheduledAt == null ||
-        deactivationDuration == null) {
-      return null;
-    }
-
-    final elapsed = DateTime.now().difference(deactivationScheduledAt!);
-    final remaining = deactivationDuration! - elapsed;
-
-    if (remaining.isNegative) return Duration.zero;
-    return remaining;
   }
 
   bool isDeactivationExpired() {
-    if (status != ProtectionStatus.waitingPeriod ||
-        deactivationScheduledAt == null ||
-        deactivationDuration == null) {
+    if (deactivationScheduledAt ==
+        null) {
       return false;
     }
 
-    final elapsed = DateTime.now().difference(deactivationScheduledAt!);
-    return elapsed >= deactivationDuration!;
+    return DateTime.now().isAfter(
+      deactivationScheduledAt!,
+    );
   }
 
-  ProtectionState requestApproval() {
-  return ProtectionState(
-    status: ProtectionStatus.awaitingApproval,
-    activatedAt: activatedAt,
-    deactivationScheduledAt: null,
-  );
-}
+  Duration? getRemainingDeactivationTime() {
+    if (deactivationScheduledAt ==
+        null) {
+      return null;
+    }
 
-  bool get isProtectionDisabled =>
-      status == ProtectionStatus.protectionDisabled;
+    final difference =
+        deactivationScheduledAt!
+            .difference(DateTime.now());
+
+    if (difference.isNegative) {
+      return Duration.zero;
+    }
+
+    return difference;
+  }
+
+  Duration getActiveDuration() {
+    return DateTime.now().difference(
+      activatedAt,
+    );
+  }
 }

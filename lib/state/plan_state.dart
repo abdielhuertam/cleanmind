@@ -1,108 +1,139 @@
 import 'protection_state.dart';
-
-const Duration kFreeDeactivationDuration = Duration(hours: 8);
+import 'unlock_request_state.dart';
 
 class PlanState {
-  final ProtectionState protection;
   final bool isPro;
   final bool hasSupport;
 
+  final ProtectionState protection;
+
+  final UnlockRequestState unlockRequest;
+
   const PlanState({
-    required this.protection,
     required this.isPro,
     required this.hasSupport,
+    required this.protection,
+    required this.unlockRequest,
   });
 
-  factory PlanState.initial() {
+  factory PlanState.free() {
     return PlanState(
-      protection: const ProtectionState(
-        status: ProtectionStatus.inactive,
-      ),
+      isPro: false,
+      hasSupport: false,
+      protection: ProtectionState.active(),
+      unlockRequest:
+          UnlockRequestState.none(),
+    );
+  }
+
+  factory PlanState.pro() {
+    return PlanState(
       isPro: true,
       hasSupport: false,
+      protection: ProtectionState.active(),
+      unlockRequest:
+          UnlockRequestState.none(),
     );
   }
 
-  PlanState activateProtection() {
+  PlanState copyWith({
+    bool? isPro,
+    bool? hasSupport,
+    ProtectionState? protection,
+    UnlockRequestState? unlockRequest,
+  }) {
     return PlanState(
-      protection: protection.activate(),
-      isPro: isPro,
-      hasSupport: hasSupport,
+      isPro: isPro ?? this.isPro,
+      hasSupport:
+          hasSupport ?? this.hasSupport,
+      protection:
+          protection ?? this.protection,
+      unlockRequest:
+          unlockRequest ?? this.unlockRequest,
     );
-  }
-
-  PlanState requestUnlock() {
-    return this;
   }
 
   PlanState requestDeactivation() {
-    // FREE
-    if (!isPro) {
-      return PlanState(
-        protection: protection.scheduleWaitingPeriod(
-          kFreeDeactivationDuration,
-        ),
-        isPro: isPro,
-        hasSupport: hasSupport,
-      );
-    }
-
-    // PRO SIN SOPORTE
-    if (isPro && !hasSupport) {
-      return PlanState(
-        protection: protection.scheduleWaitingPeriod(
+    if (isPro) {
+      return copyWith(
+        protection:
+            protection.scheduleWaitingPeriod(
           const Duration(hours: 1),
         ),
-        isPro: isPro,
-        hasSupport: hasSupport,
       );
     }
 
-    // PRO CON SOPORTE
-    return PlanState(
-      protection: protection.requestApproval(),
-      isPro: isPro,
-      hasSupport: hasSupport,
+    return copyWith(
+      protection:
+          protection.scheduleWaitingPeriod(
+        const Duration(hours: 8),
+      ),
     );
   }
 
   PlanState cancelDeactivation() {
-    return PlanState(
-      protection: protection.cancelScheduledDeactivation(),
-      isPro: isPro,
-      hasSupport: hasSupport,
+    return copyWith(
+      protection:
+          protection.cancelDeactivation(),
     );
   }
 
   PlanState unlockSucceeded() {
-    return PlanState(
-      protection: protection.disable(),
-      isPro: isPro,
-      hasSupport: hasSupport,
+    return copyWith(
+      protection:
+          protection.disableProtection(),
+      unlockRequest:
+          UnlockRequestState.none(),
     );
   }
 
   PlanState manualReactivate() {
-    return PlanState(
-      protection: protection.activate(),
-      isPro: isPro,
-      hasSupport: hasSupport,
+    return copyWith(
+      protection:
+          ProtectionState.active(),
+      unlockRequest:
+          UnlockRequestState.none(),
     );
   }
 
-  PlanState updatePlan(bool newIsPro) {
-    return PlanState(
-      protection: protection,
-      isPro: newIsPro,
-      hasSupport: hasSupport,
+  PlanState startPushRequest() {
+    return copyWith(
+      unlockRequest:
+          unlockRequest.createPending(
+        duration: const Duration(
+          minutes: 5,
+        ),
+      ),
     );
   }
 
-  PlanState updateSupport(bool newHasSupport) {
-    return PlanState(
-      protection: protection,
-      isPro: isPro,
-      hasSupport: newHasSupport,
+  PlanState cancelPushRequest() {
+    return copyWith(
+      unlockRequest:
+          unlockRequest.cancel(),
+    );
+  }
+
+  PlanState approvePushRequest() {
+    return copyWith(
+      protection:
+          protection.disableProtection(),
+      unlockRequest:
+          unlockRequest.approve(),
+    );
+  }
+
+  PlanState rejectPushRequest() {
+    return copyWith(
+      unlockRequest:
+          unlockRequest.reject(),
+    );
+  }
+
+  PlanState expirePushRequest() {
+    return copyWith(
+      unlockRequest:
+          unlockRequest.expire(),
     );
   }
 }

@@ -1,141 +1,129 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../state/plan_state.dart';
 import '../state/protection_state.dart';
+import '../state/unlock_request_state.dart';
 
 class LocalStorageService {
-
-  static const _statusKey = 'protection_status';
-  static const _activatedAtKey = 'activated_at';
-  static const _isProKey = 'is_pro';
-
-  static const _deactivationScheduledAtKey =
-      'deactivation_scheduled_at';
-
-  static const _deactivationDurationKey =
-      'deactivation_duration';
+  static const _planKey = 'plan_state';
 
   static Future<void> savePlan(
     PlanState plan,
   ) async {
-
     final prefs =
         await SharedPreferences.getInstance();
 
-    await prefs.setInt(
-      _statusKey,
-      plan.protection.status.index,
+    final jsonMap = {
+      'isPro': plan.isPro,
+      'hasSupport': plan.hasSupport,
+
+      'protectionStatus':
+          plan.protection.status.name,
+
+      'activatedAt':
+          plan.protection.activatedAt
+              .toIso8601String(),
+
+      'deactivationScheduledAt':
+          plan.protection
+              .deactivationScheduledAt
+              ?.toIso8601String(),
+
+      'unlockRequestStatus':
+          plan.unlockRequest.status.name,
+
+      'unlockRequestCreatedAt':
+          plan.unlockRequest.createdAt
+              ?.toIso8601String(),
+
+      'unlockRequestExpiresAt':
+          plan.unlockRequest.expiresAt
+              ?.toIso8601String(),
+    };
+
+    await prefs.setString(
+      _planKey,
+      jsonEncode(jsonMap),
     );
-
-    await prefs.setBool(
-      _isProKey,
-      plan.isPro,
-    );
-
-    // ACTIVATED AT
-    if (plan.protection.activatedAt != null) {
-
-      await prefs.setInt(
-        _activatedAtKey,
-        plan.protection.activatedAt!
-            .millisecondsSinceEpoch,
-      );
-
-    } else {
-
-      await prefs.remove(_activatedAtKey);
-    }
-
-    // DEACTIVATION SCHEDULED AT
-    if (plan.protection.deactivationScheduledAt != null) {
-
-      await prefs.setInt(
-        _deactivationScheduledAtKey,
-        plan.protection.deactivationScheduledAt!
-            .millisecondsSinceEpoch,
-      );
-
-    } else {
-
-      await prefs.remove(
-        _deactivationScheduledAtKey,
-      );
-    }
-
-    // DEACTIVATION DURATION
-    if (plan.protection.deactivationDuration != null) {
-
-      await prefs.setInt(
-        _deactivationDurationKey,
-        plan.protection.deactivationDuration!
-            .inSeconds,
-      );
-
-    } else {
-
-      await prefs.remove(
-        _deactivationDurationKey,
-      );
-    }
   }
 
-  static Future<PlanState> loadPlan() async {
-
+  static Future<PlanState> loadPlan()
+  async {
     final prefs =
         await SharedPreferences.getInstance();
 
-    final statusIndex =
-        prefs.getInt(_statusKey) ??
-            ProtectionStatus.inactive.index;
+    final raw =
+        prefs.getString(_planKey);
 
-    final isPro =
-        prefs.getBool(_isProKey) ?? false;
+    if (raw == null) {
+      return PlanState.pro();
+    }
 
-    final activatedAtMillis =
-        prefs.getInt(_activatedAtKey);
+    final map = jsonDecode(raw);
 
-    final deactivationScheduledAtMillis =
-        prefs.getInt(
-          _deactivationScheduledAtKey,
-        );
+    final protectionStatus =
+        ProtectionStatus.values.firstWhere(
+      (e) =>
+          e.name ==
+          map['protectionStatus'],
+    );
 
-    final deactivationDurationSeconds =
-        prefs.getInt(
-          _deactivationDurationKey,
-        );
-
-    final protection = ProtectionState(
-
-      status:
-          ProtectionStatus.values[statusIndex],
-
-      activatedAt:
-          activatedAtMillis != null
-              ? DateTime.fromMillisecondsSinceEpoch(
-                  activatedAtMillis,
-                )
-              : null,
-
-      deactivationScheduledAt:
-          deactivationScheduledAtMillis != null
-              ? DateTime.fromMillisecondsSinceEpoch(
-                  deactivationScheduledAtMillis,
-                )
-              : null,
-
-      deactivationDuration:
-          deactivationDurationSeconds != null
-              ? Duration(
-                  seconds:
-                      deactivationDurationSeconds,
-                )
-              : null,
+    final unlockRequestStatus =
+        UnlockRequestStatus.values
+            .firstWhere(
+      (e) =>
+          e.name ==
+          map['unlockRequestStatus'],
+      orElse: () =>
+          UnlockRequestStatus.none,
     );
 
     return PlanState(
-      protection: protection,
-      isPro: isPro,
-      hasSupport: false,
+      isPro: map['isPro'] ?? false,
+
+      hasSupport:
+          map['hasSupport'] ?? false,
+
+      protection: ProtectionState(
+        status: protectionStatus,
+
+        activatedAt: DateTime.parse(
+          map['activatedAt'],
+        ),
+
+        deactivationScheduledAt:
+            map['deactivationScheduledAt'] !=
+                    null
+                ? DateTime.parse(
+                    map[
+                        'deactivationScheduledAt'],
+                  )
+                : null,
+      ),
+
+      unlockRequest: UnlockRequestState(
+        status: unlockRequestStatus,
+
+        createdAt:
+            map['unlockRequestCreatedAt'] !=
+                    null
+                ? DateTime.parse(
+                    map[
+                        'unlockRequestCreatedAt'],
+                  )
+                : null,
+
+        expiresAt:
+            map['unlockRequestExpiresAt'] !=
+                    null
+                ? DateTime.parse(
+                    map[
+                        'unlockRequestExpiresAt'],
+                  )
+                : null,
+      ),
     );
   }
 }

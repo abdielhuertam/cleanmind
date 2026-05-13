@@ -1,46 +1,49 @@
 import 'package:flutter/material.dart';
+
 import 'state/plan_state.dart';
 import 'services/local_storage_service.dart';
-import 'screens/home_screen.dart';
 import 'state/protection_state.dart';
+
+import 'screens/main_shell_screen.dart';
+
 import 'screens/copy_challenge_screen.dart';
 import 'screens/accountability_code_screen.dart';
+import 'screens/unlock_methods_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  PlanState loadedPlan = await LocalStorageService.loadPlan();
+  PlanState loadedPlan =
+      await LocalStorageService.loadPlan();
 
-  // -----------------------------
-  // CHECK DEACTIVATION EXPIRATION
-  // -----------------------------
+  if (loadedPlan.protection.status ==
+          ProtectionStatus.waitingPeriod &&
+      loadedPlan.protection
+          .isDeactivationExpired()) {
+    loadedPlan =
+        loadedPlan.unlockSucceeded();
 
-print("STATUS AT LOAD: ${loadedPlan.protection.status}");
-print("SCHEDULED AT: ${loadedPlan.protection.deactivationScheduledAt}");
-print("IS EXPIRED: ${loadedPlan.protection.isDeactivationExpired()}");
+    await LocalStorageService.savePlan(
+      loadedPlan,
+    );
+  }
 
-if (loadedPlan.protection.status ==
-        ProtectionStatus.waitingPeriod &&
-    loadedPlan.protection.isDeactivationExpired()) {
-
-  print("DEACTIVATION EXPIRED - DISABLING");
-
-  loadedPlan = loadedPlan.unlockSucceeded();
-  await LocalStorageService.savePlan(loadedPlan);
-}
-
-
-
-  runApp(MyApp(initialPlan: loadedPlan));
+  runApp(
+    MyApp(initialPlan: loadedPlan),
+  );
 }
 
 class MyApp extends StatefulWidget {
   final PlanState initialPlan;
 
-  const MyApp({super.key, required this.initialPlan});
+  const MyApp({
+    super.key,
+    required this.initialPlan,
+  });
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<MyApp> createState() =>
+      _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -52,8 +55,13 @@ class _MyAppState extends State<MyApp> {
     _plan = widget.initialPlan;
   }
 
-  void _onPlanChanged(PlanState updatedPlan) async {
-    await LocalStorageService.savePlan(updatedPlan);
+  void _onPlanChanged(
+    PlanState updatedPlan,
+  ) async {
+    await LocalStorageService.savePlan(
+      updatedPlan,
+    );
+
     setState(() {
       _plan = updatedPlan;
     });
@@ -63,18 +71,34 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(
+
+      home: MainShellScreen(
         plan: _plan,
-        onPlanChanged: _onPlanChanged,
+        onPlanChanged:
+            _onPlanChanged,
       ),
+
       routes: {
-        '/copy-challenge': (context) => CopyChallengeScreen(
+        '/copy-challenge': (context) =>
+            CopyChallengeScreen(
               plan: _plan,
-              onPlanChanged: _onPlanChanged,
+              onPlanChanged:
+                  _onPlanChanged,
             ),
-        '/accountability-code': (context) => AccountabilityCodeScreen(
+
+        '/accountability-code':
+            (context) =>
+                AccountabilityCodeScreen(
+                  plan: _plan,
+                  onPlanChanged:
+                      _onPlanChanged,
+                ),
+
+        '/unlock-methods': (context) =>
+            UnlockMethodsScreen(
               plan: _plan,
-              onPlanChanged: _onPlanChanged,
+              onPlanChanged:
+                  _onPlanChanged,
             ),
       },
     );

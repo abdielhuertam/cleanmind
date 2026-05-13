@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_colors.dart';
 
-class BottomNavigation extends StatelessWidget {
+class BottomNavigation
+    extends StatelessWidget {
   final bool isPro;
 
   const BottomNavigation({
@@ -13,12 +15,18 @@ class BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.symmetric(
+
+      padding:
+          const EdgeInsets.symmetric(
         vertical: 10,
       ),
+
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
+
+        borderRadius:
+            BorderRadius.circular(28),
+
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -27,18 +35,50 @@ class BottomNavigation extends StatelessWidget {
           ),
         ],
       ),
+
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment:
+            MainAxisAlignment.spaceEvenly,
+
         children: [
-          _item(Icons.home, 'Home', false),
-          _item(Icons.shield, 'Protection', true),
-          _item(Icons.person, 'Account', false),
-          _item(Icons.groups, 'Community', false,
-              disabled: true),
-          _item(Icons.settings, 'Config', false),
+          _item(
+            Icons.home,
+            'Home',
+            false,
+          ),
+
+          _item(
+            Icons.shield,
+            'Protection',
+            true,
+          ),
+
+          _item(
+            Icons.person,
+            'Account',
+            false,
+          ),
+
+          _item(
+            Icons.groups,
+            'Community',
+            false,
+            disabled: true,
+          ),
+
+          _item(
+            Icons.settings,
+            'Config',
+            false,
+          ),
+
           if (!isPro)
-            _item(Icons.workspace_premium, 'Premium', false,
-                premium: true),
+            _item(
+              Icons.workspace_premium,
+              'Premium',
+              false,
+              premium: true,
+            ),
         ],
       ),
     );
@@ -48,30 +88,38 @@ class BottomNavigation extends StatelessWidget {
     IconData icon,
     String label,
     bool active, {
-    bool disabled = false,
     bool premium = false,
+    bool disabled = false,
   }) {
+    final color =
+        disabled
+            ? Colors.grey.shade400
+            : premium
+            ? Colors.amber
+            : active
+            ? AppColors.primary
+            : AppColors.textSecondary;
+
     return Opacity(
-      opacity: disabled ? 0.4 : 1,
+      opacity: disabled ? 0.6 : 1,
+
       child: Column(
         mainAxisSize: MainAxisSize.min,
+
         children: [
           Icon(
             icon,
-            color: premium
-                ? Colors.amber
-                : active
-                    ? AppColors.primary
-                    : AppColors.textSecondary,
+            color: color,
           ),
+
           const SizedBox(height: 4),
+
           Text(
             label,
+
             style: TextStyle(
               fontSize: 11,
-              color: active
-                  ? AppColors.primary
-                  : AppColors.textSecondary,
+              color: color,
             ),
           ),
         ],

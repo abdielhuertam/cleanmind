@@ -48,6 +48,13 @@ Primary actions:
 - Request Temporary Unlock
 - View progress
 
+Additional MVP UX behavior:
+
+- Home screen prioritizes pending unlock approval state visually.
+- A notification bell provides fast access to Pending Requests.
+- Pending unlock requests display an active countdown banner.
+- Protection actions are centralized inside the Protection screen.
+- Home screen functions primarily as a dashboard/status view.
 ---
 
 ## 4. Request Temporary Unlock — Entry Point
