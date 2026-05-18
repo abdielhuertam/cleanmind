@@ -6,6 +6,7 @@ import '../theme/app_colors.dart';
 
 import 'home_screen.dart';
 import 'protection_screen.dart';
+import 'account_screen.dart';
 
 class MainShellScreen
     extends StatefulWidget {
@@ -27,7 +28,7 @@ class MainShellScreen
 
 class _MainShellScreenState
     extends State<MainShellScreen> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +45,12 @@ class _MainShellScreenState
             widget.onPlanChanged,
       ),
 
-      const _PlaceholderScreen(
-        title: 'Account',
+      AccountScreen(
+        plan: widget.plan,
       ),
 
       const _PlaceholderScreen(
         title: 'Community',
-      ),
-
-      const _PlaceholderScreen(
-        title: 'Config',
       ),
     ];
 
@@ -116,12 +113,6 @@ class _MainShellScreenState
               label: 'Community',
               index: 3,
               disabled: true,
-            ),
-
-            _navItem(
-              icon: Icons.settings,
-              label: 'Config',
-              index: 4,
             ),
           ],
         ),

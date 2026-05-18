@@ -55,6 +55,15 @@ Additional MVP UX behavior:
 - Pending unlock requests display an active countdown banner.
 - Protection actions are centralized inside the Protection screen.
 - Home screen functions primarily as a dashboard/status view.
+
+- Users may manually add custom blocked websites/domains.
+- Blocked sites remain visible regardless of protection state.
+- While protection is ACTIVE:
+  - blocked sites cannot be edited
+  - blocked sites cannot be deleted
+- While protection is DISABLED:
+  - blocked sites may be edited
+  - blocked sites may be removed
 ---
 
 ## 4. Request Temporary Unlock — Entry Point
@@ -197,6 +206,12 @@ When protection is disabled:
   - Protection status: OFF
   - Time since deactivation
 
+  Additional disabled-state behavior:
+
+- Users may modify custom blocked sites.
+- Users may remove previously blocked sites.
+- Protection remains fully manual and does not reactivate automatically.
+
 Primary CTA:
 > Activate Protection
 
@@ -266,3 +281,5 @@ While protection is disabled:
 This document reflects CLOSED MVP behavior including backend-based approval and SMS verification.
 
 Any future changes must be logged in Development_Log.md.
+
+

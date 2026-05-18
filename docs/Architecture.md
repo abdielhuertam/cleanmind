@@ -268,3 +268,29 @@ This ensures:
 
 - This document: v2.0 (Backend-validated MVP)
 - Any architectural change requires a new version
+
+## 9. Local State Persistence (v2)
+
+Additional persistence introduced during MVP stabilization:
+
+Persisted locally via SharedPreferences:
+
+- blocked sites list
+- protectionEnabled state
+- waiting period selection
+- custom unlock target datetime
+- support phone number
+- streak counter state
+
+A centralized StorageService now manages local persistence access.
+
+Protection-related UI components currently synchronized through:
+- ProtectionScreen
+- ProtectionSettingsScreen
+- CustomBlockedSitesScreen
+
+Future architecture cleanup is still required to consolidate:
+- waiting-period restoration
+- unlock lifecycle restoration
+- protection-state synchronization
+into a single authoritative state source.

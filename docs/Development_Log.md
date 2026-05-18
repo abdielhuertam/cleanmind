@@ -521,3 +521,151 @@ Before committing:
 - Activity log
 - Settings/onboarding
 - Store readiness
+
+## 2026-05-18 — Persistence Layer & Protection State Stabilization
+
+### Completed
+
+- Implemented initial persistence layer using SharedPreferences.
+- Created centralized StorageService.
+- Added persistence for:
+  - blocked sites
+  - protection enabled state
+  - waiting period
+  - custom unlock date
+  - support phone
+  - streak days
+- Implemented persistent blocked-sites management:
+  - add site
+  - edit site
+  - delete site
+- Added dynamic blocked-sites UI behavior based on protection state.
+- Added lock state while protection is active.
+- Added edit/delete availability while protection is disabled.
+- Added blocked-site persistence across app restarts.
+- Added Settings access during waiting period state.
+- Replaced temporary SnackBar validation with AlertDialog validation flow.
+- Fixed custom unlock date validation precision issue caused by seconds/milliseconds mismatch.
+- Stabilized protection-state synchronization between:
+  - ProtectionScreen
+  - ProtectionSettingsScreen
+  - CustomBlockedSitesScreen
+- Fixed blocked-sites state desynchronization after multiple activate/deactivate cycles.
+- Added persistent synchronization of:
+  - protectionEnabled = false
+  directly from:
+  - _buildDisabledState()
+
+### Status
+
+Persistence layer is now partially stabilized.
+
+Blocked-sites behavior is now functioning correctly across:
+- app restarts
+- protection reactivation
+- protection deactivation
+- repeated protection-state transitions
+
+Current working behavior:
+
+Protection Enabled:
+- lock icon visible
+- delete disabled
+- edit disabled
+
+Protection Disabled:
+- edit icon visible
+- delete enabled
+- edit enabled
+
+### Next Session Focus
+
+- Implement real waiting-period engine.
+- Persist unlock target datetime.
+- Restore countdown correctly after app restart.
+- Remove remaining hardcoded waiting durations.
+- Synchronize waiting state globally.
+- Refactor protection-state restoration architecture.
+- Validate persistence integrity across full lifecycle flows.
+
+### Technical Notes
+
+- Main instability source originated from duplicated protection-state sources.
+- SharedPreferences synchronization was partially implemented before full lifecycle synchronization existed.
+- Final stabilization required synchronizing persistent protection state directly from rendered UI state.
+- Partial inline widget edits continued creating instability during nested Flutter updates.
+- Full-file replacement strategy remains significantly safer for large Flutter widget trees.
+
+---
+
+## Documentation Alignment Required Before Commit
+
+### Architecture.md
+
+Persistence architecture now includes:
+- blocked sites persistence
+- protection enabled persistence
+- waiting-period persistence groundwork
+- custom unlock date persistence
+
+Architecture document should later be expanded to reflect:
+- centralized StorageService
+- waiting engine restoration flow
+- lifecycle restoration sequence
+
+### Product_Flow.md
+
+Blocked-sites behavior now includes:
+
+Protection Enabled:
+- sites visible
+- editing disabled
+- delete disabled
+
+Protection Disabled:
+- editing enabled
+- delete enabled
+
+### Working_Agreements.md
+
+This session further validated that:
+- full-file replacement remains mandatory for large Flutter widget structures
+- partial inline modifications create high syntax instability risk
+- persistence synchronization must always have a single source of truth
+
+---
+
+## Pre-Commit Validation Checklist
+
+Before committing:
+
+- Confirm blocked sites persist after restart.
+- Confirm delete works after reactivating/deactivating protection multiple times.
+- Confirm edit/delete state changes correctly based on protection state.
+- Confirm waiting-period validation dialog appears correctly.
+- Confirm invalid custom dates are blocked correctly.
+- Confirm project compiles successfully on iOS simulator.
+- Confirm no syntax warnings/errors remain.
+
+---
+
+## Delivery Tracking
+
+### Blocks Completed This Session
+
+- Persistence layer initialization
+- Blocked-sites persistence
+- Protection-state synchronization stabilization
+- Waiting-period validation stabilization
+
+### Estimated Remaining Major Blocks
+
+- Waiting engine implementation
+- Unlock lifecycle persistence hardening
+- SMS verification redesign
+- Support approval backend integration
+- Authentication layer
+- VPN/DNS enforcement
+- Activity log system
+- Settings/onboarding completion
+- Store readiness
