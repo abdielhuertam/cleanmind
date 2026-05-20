@@ -3,51 +3,20 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 import 'custom_blocked_sites_screen.dart';
-
 import 'waiting_period_screen.dart';
-
-import '../services/storage_service.dart';
+import '../state/plan_state.dart';
+import 'waiting_period_screen.dart';
+import 'blocked_apps_screen.dart';
 
 class ProtectionSettingsScreen
-    extends StatefulWidget {
+    extends StatelessWidget {
+
+  final PlanState plan;
+
   const ProtectionSettingsScreen({
     super.key,
+    required this.plan,
   });
-
-  @override
-  State<ProtectionSettingsScreen>
-      createState() =>
-          _ProtectionSettingsScreenState();
-}
-
-class _ProtectionSettingsScreenState
-    extends State<
-      ProtectionSettingsScreen
-    > {
-
-  bool _protectionActive =
-      true;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _loadProtectionState();
-  }
-
-  Future<void>
-  _loadProtectionState()
-  async {
-
-    final enabled =
-        await StorageService
-            .loadProtectionEnabled();
-
-    setState(() {
-      _protectionActive =
-          enabled;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,203 +24,208 @@ class _ProtectionSettingsScreenState
       backgroundColor:
           AppColors.background,
 
-      body: SafeArea(
-        child: Padding(
-          padding:
-              const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 20,
-          ),
+      appBar: AppBar(
+        backgroundColor:
+            AppColors.primary,
 
-          child: Column(
-            children: [
+        foregroundColor:
+            Colors.white,
 
-              Container(
-                height: 42,
+        elevation: 0,
 
-                decoration:
-                    const BoxDecoration(
-                  color:
-                      AppColors.primary,
+        title: const Text(
+          'Protection Settings',
+        ),
+      ),
 
-                  borderRadius:
-                      BorderRadius.only(
-                    bottomLeft:
-                        Radius.circular(
-                      22,
-                    ),
+      body: Padding(
+        padding:
+            const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 20,
+        ),
 
-                    bottomRight:
-                        Radius.circular(
-                      22,
-                    ),
+        child: ListView(
+          children: [
+            _sectionTitle(
+              'Protection',
+            ),
+
+            _settingsTile(
+              icon:
+                  Icons.apps,
+
+              title:
+                  'Blocked Apps',
+
+              subtitle:
+                  'Manage protected applications and distractions.',
+
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) =>
+                            BlockedAppsScreen(
+                              plan: plan,
+                            ),
                   ),
-                ),
+                );
+              },
+            ),
+
+            _settingsTile(
+              icon:
+                  Icons.language,
+
+              title:
+                  'Custom Blocked Sites',
+
+              subtitle:
+                  'Add websites or URLs to block manually.',
+
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) =>
+                            CustomBlockedSitesScreen(
+                              plan: plan,
+                            ),
+                  ),
+                );
+              },
+            ),
+
+            _settingsTile(
+              icon:
+                  Icons.schedule,
+
+              title:
+                  'Waiting Period',
+
+              subtitle:
+                  'Configure unlock delay duration.',
+
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) =>
+                            const WaitingPeriodScreen(),
+                  ),
+                );
+              },
+            ),
+
+            _settingsTile(
+              icon:
+                  Icons.lock_outline,
+
+              title:
+                  'Strict Mode',
+
+              subtitle:
+                  'Prevent accidental disabling of protection.',
+
+              trailing:
+                  Switch(
+                value: true,
+
+                activeColor:
+                    AppColors.primary,
+
+                onChanged: (_) {},
               ),
+            ),
 
-              const SizedBox(height: 26),
+            const SizedBox(
+              height: 26,
+            ),
 
-              Row(
-                children: [
+            _sectionTitle(
+              'Notifications',
+            ),
 
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(
-                        context,
-                      );
-                    },
+            _settingsTile(
+              icon:
+                  Icons.notifications,
 
-                    icon: const Icon(
-                      Icons.arrow_back_ios,
+              title:
+                  'Daily Reminders',
 
-                      color:
-                          AppColors
-                              .primary,
-                    ),
-                  ),
+              subtitle:
+                  'Receive protection and focus reminders.',
 
-                  const Expanded(
-                    child: Text(
-                      'Settings',
+              trailing:
+                  Switch(
+                value: true,
 
-                      textAlign:
-                          TextAlign.center,
+                activeColor:
+                    AppColors.primary,
 
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight:
-                            FontWeight.bold,
-
-                        color:
-                            AppColors
-                                .primary,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(
-                    width: 48,
-                  ),
-                ],
+                onChanged: (_) {},
               ),
+            ),
 
-              const SizedBox(height: 28),
+            _settingsTile(
+              icon:
+                  Icons.local_fire_department,
 
-              Expanded(
-                child: ListView(
-                  children: [
+              title:
+                  'Streak Alerts',
 
-                    _sectionTitle(
-                      'General',
-                    ),
+              subtitle:
+                  'Celebrate focus milestones and progress.',
 
-                    _settingsTile(
-                      icon:
-                          Icons.language,
+              trailing:
+                  Switch(
+                value: true,
 
-                      title:
-                          'Custom Blocked Sites',
+                activeColor:
+                    AppColors.primary,
 
-                      subtitle:
-                          'Add websites or URLs to block manually.',
-
-                      onTap: () async {
-
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (_) =>
-                                    CustomBlockedSitesScreen(
-                                      protectionActive:
-                                          _protectionActive,
-                                    ),
-                          ),
-                        );
-
-                        _loadProtectionState();
-                      },
-                    ),
-
-                    _settingsTile(
-                      icon:
-                          Icons.schedule,
-
-                      title:
-                          'Waiting Period',
-
-                      subtitle:
-                          'Configure unlock delay duration.',
-
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (_) =>
-                                    const WaitingPeriodScreen(),
-                          ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(
-                      height: 26,
-                    ),
-
-                    _sectionTitle(
-                      'Notifications',
-                    ),
-
-                    _settingsTile(
-                      icon:
-                          Icons.notifications,
-
-                      title:
-                          'Daily Reminders',
-
-                      subtitle:
-                          'Receive protection and focus reminders.',
-                    ),
-
-                    _settingsTile(
-                      icon:
-                          Icons.local_fire_department,
-
-                      title:
-                          'Streak Alerts',
-
-                      subtitle:
-                          'Celebrate focus milestones and share your progress.',
-                    ),
-
-                    const SizedBox(
-                      height: 26,
-                    ),
-
-                    _sectionTitle(
-                      'Advanced',
-                    ),
-
-                    _settingsTile(
-                      icon:
-                          Icons.info_outline,
-
-                      title:
-                          'About CleanMind',
-
-                      subtitle:
-                          'App version and protection details.',
-                    ),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-                  ],
-                ),
+                onChanged: (_) {},
               ),
-            ],
-          ),
+            ),
+
+            const SizedBox(
+              height: 26,
+            ),
+
+            _sectionTitle(
+              'Advanced',
+            ),
+
+            _settingsTile(
+              icon:
+                  Icons.security,
+
+              title:
+                  'Unlock Methods',
+
+              subtitle:
+                  'Manage approval and verification methods.',
+            ),
+
+            _settingsTile(
+              icon:
+                  Icons.info_outline,
+
+              title:
+                  'About CleanMind',
+
+              subtitle:
+                  'App version and protection details.',
+            ),
+
+            const SizedBox(
+              height: 24,
+            ),
+          ],
         ),
       ),
     );
@@ -290,9 +264,9 @@ class _ProtectionSettingsScreenState
     required IconData icon,
     required String title,
     required String subtitle,
+    Widget? trailing,
     VoidCallback? onTap,
   }) {
-
     return Container(
       margin:
           const EdgeInsets.only(
@@ -355,14 +329,16 @@ class _ProtectionSettingsScreenState
           ),
         ),
 
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
+        trailing:
+            trailing ??
+            const Icon(
+              Icons.arrow_forward_ios,
 
-          size: 18,
+              size: 18,
 
-          color:
-              AppColors.primary,
-        ),
+              color:
+                  AppColors.primary,
+            ),
 
         onTap: onTap,
       ),

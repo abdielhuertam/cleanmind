@@ -1,6 +1,15 @@
 import 'protection_state.dart';
 import 'unlock_request_state.dart';
 
+const Duration kFreeWaitingDuration =
+    Duration(hours: 8);
+
+const Duration kProWaitingDuration =
+    Duration(hours: 1);
+
+const Duration kPushRequestDuration =
+    Duration(minutes: 5);
+
 class PlanState {
   final bool isPro;
   final bool hasSupport;
@@ -53,20 +62,39 @@ class PlanState {
     );
   }
 
-  PlanState requestDeactivation() {
-    if (isPro) {
-      return copyWith(
-        protection:
-            protection.scheduleWaitingPeriod(
-          const Duration(hours: 1),
-        ),
-      );
+  PlanState refreshLifecycle() {
+    PlanState updated = this;
+
+    // Waiting Period Expiration
+
+    if (updated.protection.status ==
+            ProtectionStatus
+                .waitingPeriod &&
+        updated.protection
+            .isDeactivationExpired()) {
+      updated =
+          updated.unlockSucceeded();
     }
 
+    // Push Request Expiration
+
+    if (updated.unlockRequest.isPending &&
+        updated.unlockRequest
+            .isExpired()) {
+      updated =
+          updated.expirePushRequest();
+    }
+
+    return updated;
+  }
+
+  PlanState requestDeactivation() {
     return copyWith(
       protection:
           protection.scheduleWaitingPeriod(
-        const Duration(hours: 8),
+        isPro
+            ? kProWaitingDuration
+            : kFreeWaitingDuration,
       ),
     );
   }
@@ -100,9 +128,8 @@ class PlanState {
     return copyWith(
       unlockRequest:
           unlockRequest.createPending(
-        duration: const Duration(
-          minutes: 5,
-        ),
+        duration:
+            kPushRequestDuration,
       ),
     );
   }

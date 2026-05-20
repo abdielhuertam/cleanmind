@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+
 import '../services/storage_service.dart';
+
+import '../state/plan_state.dart';
+import '../state/protection_state.dart';
 
 class CustomBlockedSitesScreen
     extends StatefulWidget {
-
-  final bool protectionActive;
+  final PlanState plan;
 
   const CustomBlockedSitesScreen({
     super.key,
-    required this.protectionActive,
+    required this.plan,
   });
 
   @override
@@ -23,7 +26,6 @@ class _CustomBlockedSitesScreenState
     extends State<
       CustomBlockedSitesScreen
     > {
-
   List<String> _sites = [];
 
   @override
@@ -39,16 +41,29 @@ class _CustomBlockedSitesScreenState
         await StorageService
             .loadBlockedSites();
 
+    if (!mounted) return;
+
     setState(() {
       _sites = loaded;
     });
+  }
+
+  bool get _protectionActive {
+    final status =
+        widget.plan.protection.status;
+
+    return status !=
+            ProtectionStatus
+                .protectionDisabled &&
+        status !=
+            ProtectionStatus
+                .inactive;
   }
 
   void _showAddSiteDialog({
     String? existingSite,
     int? editIndex,
   }) {
-
     final controller =
         TextEditingController(
       text: existingSite,
@@ -79,12 +94,11 @@ class _CustomBlockedSitesScreenState
             decoration:
                 const InputDecoration(
               hintText:
-                  'https://example.com',
+                  'example.com',
             ),
           ),
 
           actions: [
-
             TextButton(
               onPressed: () {
                 Navigator.pop(
@@ -99,25 +113,19 @@ class _CustomBlockedSitesScreenState
 
             ElevatedButton(
               onPressed: () async {
-
                 final value =
                     controller.text
                         .trim();
 
                 if (value
                     .isNotEmpty) {
-
                   setState(() {
-
                     if (editIndex !=
                         null) {
-
                       _sites[
                               editIndex] =
                           value;
-
                     } else {
-
                       _sites.add(
                         value,
                       );
@@ -151,15 +159,11 @@ class _CustomBlockedSitesScreenState
     );
   }
 
-  Future<void>
-  _removeSite(
+  Future<void> _removeSite(
     int index,
   ) async {
-
     setState(() {
-      _sites.removeAt(
-        index,
-      );
+      _sites.removeAt(index);
     });
 
     await StorageService
@@ -172,210 +176,268 @@ class _CustomBlockedSitesScreenState
   Widget build(
     BuildContext context,
   ) {
-
     final protectionActive =
-        widget.protectionActive;
+        _protectionActive;
 
     return Scaffold(
       backgroundColor:
           AppColors.background,
 
-      body: SafeArea(
-        child: Padding(
-          padding:
-              const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 20,
+      appBar: AppBar(
+        backgroundColor:
+            AppColors.primary,
+
+        foregroundColor:
+            Colors.white,
+
+        elevation: 0,
+
+        title: const Text(
+          'Blocked Sites',
+        ),
+
+        actions: [
+          IconButton(
+            onPressed:
+                _showAddSiteDialog,
+
+            icon: const Icon(
+              Icons.add,
+            ),
           ),
+        ],
+      ),
 
-          child: Column(
-            children: [
+      body: Padding(
+        padding:
+            const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 20,
+        ),
 
-              Container(
-                height: 42,
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
 
-                decoration:
-                    const BoxDecoration(
-                  color:
-                      AppColors.primary,
+              padding:
+                  const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 16,
+              ),
 
-                  borderRadius:
-                      BorderRadius.only(
-                    bottomLeft:
-                        Radius.circular(
-                      22,
-                    ),
+              decoration: BoxDecoration(
+                color: Colors.white,
 
-                    bottomRight:
-                        Radius.circular(
-                      22,
-                    ),
-                  ),
+                borderRadius:
+                    BorderRadius.circular(
+                  22,
                 ),
-              ),
 
-              const SizedBox(
-                height: 26,
-              ),
-
-              Row(
-                children: [
-
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(
-                        context,
-                      );
-                    },
-
-                    icon: const Icon(
-                      Icons.arrow_back_ios,
-
-                      color:
-                          AppColors
-                              .primary,
-                    ),
-                  ),
-
-                  const Expanded(
-                    child: Text(
-                      'Blocked Sites',
-
-                      textAlign:
-                          TextAlign.center,
-
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight:
-                            FontWeight.bold,
-
-                        color:
-                            AppColors
-                                .primary,
-                      ),
-                    ),
-                  ),
-
-                  IconButton(
-                    onPressed:
-                        _showAddSiteDialog,
-
-                    icon: const Icon(
-                      Icons.add,
-
-                      color:
-                          AppColors
-                              .primary,
-
-                      size: 32,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(
+                      0,
+                      4,
                     ),
                   ),
                 ],
               ),
 
-              const SizedBox(
-                height: 24,
-              ),
+              child: Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment
+                        .start,
 
-              Container(
-                width: double.infinity,
+                children: [
+                  Icon(
+                    protectionActive
+                        ? Icons.lock
+                        : Icons.edit,
 
-                padding:
-                    const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 16,
-                ),
-
-                decoration: BoxDecoration(
-                  color: Colors.white,
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    22,
+                    color:
+                        AppColors
+                            .primary,
                   ),
 
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 8,
-                      offset: Offset(
-                        0,
-                        4,
-                      ),
-                    ),
-                  ],
-                ),
+                  const SizedBox(
+                    width: 14,
+                  ),
 
-                child: Row(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
-
-                  children: [
-
-                    Icon(
+                  Expanded(
+                    child: Text(
                       protectionActive
-                          ? Icons.lock
-                          : Icons.edit,
+                          ? 'You can add new blocked websites while protection is active, but existing protections cannot be modified.'
+                          : 'You can now add, edit, or remove blocked websites.',
 
-                      color:
-                          AppColors
-                              .primary,
-                    ),
+                      style:
+                          const TextStyle(
+                        fontSize: 15,
+                        height: 1.4,
 
-                    const SizedBox(
-                      width: 14,
-                    ),
-
-                    Expanded(
-                      child: Text(
-
-                        protectionActive
-                            ? 'Blocked sites cannot be modified while protection is active.'
-                            : 'You can now edit or remove blocked sites.',
-
-                        style:
-                            const TextStyle(
-                          fontSize: 15,
-                          height: 1.4,
-
-                          color:
-                              AppColors
-                                  .textSecondary,
-                        ),
+                        color:
+                            AppColors
+                                .textSecondary,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
 
-              const SizedBox(
-                height: 22,
-              ),
+            const SizedBox(
+              height: 22,
+            ),
 
-              Expanded(
-                child:
-                    _sites.isEmpty
-                        ? _buildEmptyState()
-                        : _buildSitesList(
-                            protectionActive,
-                          ),
-              ),
-            ],
-          ),
+            Expanded(
+              child:
+                  _sites.isEmpty
+                      ? _buildEmptyState()
+                      : _buildSitesList(
+                          protectionActive,
+                        ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildEmptyState() {
-    return const SizedBox();
+    return Center(
+      child: Container(
+        width: double.infinity,
+
+        padding:
+            const EdgeInsets.all(
+          32,
+        ),
+
+        decoration: BoxDecoration(
+          color: Colors.white,
+
+          borderRadius:
+              BorderRadius.circular(
+            28,
+          ),
+
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+
+        child: Column(
+          mainAxisSize:
+              MainAxisSize.min,
+
+          children: [
+            const Icon(
+              Icons.public_off,
+
+              size: 72,
+
+              color:
+                  AppColors.primary,
+            ),
+
+            const SizedBox(
+              height: 20,
+            ),
+
+            const Text(
+              'No Blocked Websites',
+
+              textAlign:
+                  TextAlign.center,
+
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight:
+                    FontWeight.bold,
+
+                color:
+                    AppColors
+                        .textPrimary,
+              ),
+            ),
+
+            const SizedBox(
+              height: 12,
+            ),
+
+            const Text(
+              'Add websites you want CleanMind to protect you from.',
+
+              textAlign:
+                  TextAlign.center,
+
+              style: TextStyle(
+                fontSize: 16,
+                height: 1.45,
+
+                color:
+                    AppColors
+                        .textSecondary,
+              ),
+            ),
+
+            const SizedBox(
+              height: 24,
+            ),
+
+            SizedBox(
+              width: double.infinity,
+
+              height: 54,
+
+              child: ElevatedButton(
+                style:
+                    ElevatedButton
+                        .styleFrom(
+                  backgroundColor:
+                      AppColors.primary,
+
+                  foregroundColor:
+                      Colors.white,
+
+                  shape:
+                      RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(
+                      20,
+                    ),
+                  ),
+                ),
+
+                onPressed:
+                    _showAddSiteDialog,
+
+                child: const Text(
+                  'Add Website',
+
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildSitesList(
     bool protectionActive,
   ) {
-
     return ListView.builder(
       itemCount:
           _sites.length,
@@ -384,7 +446,6 @@ class _CustomBlockedSitesScreenState
         context,
         index,
       ) {
-
         final site =
             _sites[index];
 
@@ -397,7 +458,7 @@ class _CustomBlockedSitesScreenState
           padding:
               const EdgeInsets.symmetric(
             horizontal: 20,
-            vertical: 20,
+            vertical: 18,
           ),
 
           decoration: BoxDecoration(
@@ -422,12 +483,28 @@ class _CustomBlockedSitesScreenState
 
           child: Row(
             children: [
+              Container(
+                width: 48,
+                height: 48,
 
-              const Icon(
-                Icons.public,
+                decoration:
+                    BoxDecoration(
+                  color:
+                      AppColors.primary
+                          .withOpacity(
+                    0.1,
+                  ),
 
-                color:
-                    AppColors.primary,
+                  shape:
+                      BoxShape.circle,
+                ),
+
+                child: const Icon(
+                  Icons.public,
+
+                  color:
+                      AppColors.primary,
+                ),
               ),
 
               const SizedBox(
@@ -435,15 +512,43 @@ class _CustomBlockedSitesScreenState
               ),
 
               Expanded(
-                child: Text(
-                  site,
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
 
-                  style:
-                      const TextStyle(
-                    fontSize: 18,
-                    fontWeight:
-                        FontWeight.w600,
-                  ),
+                  children: [
+                    Text(
+                      site,
+
+                      style:
+                          const TextStyle(
+                        fontSize: 18,
+                        fontWeight:
+                            FontWeight.w600,
+
+                        color:
+                            AppColors
+                                .textPrimary,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 4,
+                    ),
+
+                    const Text(
+                      'Protected website',
+
+                      style: TextStyle(
+                        fontSize: 14,
+
+                        color:
+                            AppColors
+                                .textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -452,7 +557,6 @@ class _CustomBlockedSitesScreenState
                     MainAxisSize.min,
 
                 children: [
-
                   if (protectionActive)
                     const Icon(
                       Icons.lock,
@@ -485,7 +589,7 @@ class _CustomBlockedSitesScreenState
                     ),
 
                   const SizedBox(
-                    width: 12,
+                    width: 14,
                   ),
 
                   GestureDetector(

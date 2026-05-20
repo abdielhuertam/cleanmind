@@ -32,105 +32,28 @@ class AccountScreen extends StatelessWidget {
             ? 1
             : 0;
 
-    final hasSupport =
-        isPremium;
-
-    return Scaffold(
-      backgroundColor:
-          AppColors.background,
-
-      body: SafeArea(
-        child: Padding(
-          padding:
-              const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 20,
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildProfileCard(
+            isPremium,
           ),
 
-          child: Column(
-            children: [
-              Container(
-                height: 42,
+          const SizedBox(height: 18),
 
-                decoration:
-                    const BoxDecoration(
-                  color:
-                      AppColors.primary,
-
-                  borderRadius:
-                      BorderRadius.only(
-                    bottomLeft:
-                        Radius.circular(
-                      22,
-                    ),
-
-                    bottomRight:
-                        Radius.circular(
-                      22,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              const Text(
-                'Account',
-
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight:
-                      FontWeight.bold,
-
-                  color:
-                      AppColors.primary,
-                ),
-              ),
-
-              const SizedBox(height: 22),
-
-              Expanded(
-                child: ListView(
-                  children: [
-                    _buildProfileCard(
-                      isPremium,
-                    ),
-
-                    const SizedBox(
-                      height: 18,
-                    ),
-
-                    _buildSupportCard(
-                      isPremium,
-                      hasSupport,
-                    ),
-
-                    const SizedBox(
-                      height: 18,
-                    ),
-
-                    _buildStatsCard(
-                      focusedDays,
-                      unlockCount,
-                    ),
-
-                    const SizedBox(
-                      height: 18,
-                    ),
-
-                    _buildSubscriptionCard(
-                      isPremium,
-                    ),
-
-                    const SizedBox(
-                      height: 12,
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          _buildStatsCard(
+            focusedDays,
+            unlockCount,
           ),
-        ),
+
+          const SizedBox(height: 18),
+
+          _buildSubscriptionCard(
+            isPremium,
+          ),
+
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }
@@ -139,6 +62,8 @@ class AccountScreen extends StatelessWidget {
     bool isPremium,
   ) {
     return Container(
+      width: double.infinity,
+
       padding:
           const EdgeInsets.symmetric(
         horizontal: 20,
@@ -238,208 +163,6 @@ class AccountScreen extends StatelessWidget {
               ],
             ),
           ),
-
-          const SizedBox(width: 10),
-
-          Container(
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 7,
-            ),
-
-            decoration:
-                BoxDecoration(
-              color:
-                  isPremium
-                      ? Colors.amber
-                          .shade100
-                      : Colors.grey
-                          .shade200,
-
-              borderRadius:
-                  BorderRadius.circular(
-                16,
-              ),
-            ),
-
-            child: Text(
-              isPremium
-                  ? 'PREMIUM'
-                  : 'FREE',
-
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight:
-                    FontWeight.bold,
-
-                color:
-                    isPremium
-                        ? Colors
-                            .orange
-                            .shade800
-                        : Colors.grey
-                            .shade700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSupportCard(
-    bool isPremium,
-    bool hasSupport,
-  ) {
-    return Container(
-      padding:
-          const EdgeInsets.all(
-        24,
-      ),
-
-      decoration: BoxDecoration(
-        color: Colors.white,
-
-        borderRadius:
-            BorderRadius.circular(
-          30,
-        ),
-
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.sms,
-
-                color:
-                    AppColors.primary,
-              ),
-
-              const SizedBox(width: 10),
-
-              const Expanded(
-                child: Text(
-                  'Support Contact',
-
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight:
-                        FontWeight.bold,
-
-                    color:
-                        AppColors
-                            .textPrimary,
-                  ),
-                ),
-              ),
-
-              if (isPremium)
-                Icon(
-                  Icons.workspace_premium,
-
-                  color:
-                      Colors.amber
-                          .shade700,
-                ),
-            ],
-          ),
-
-          const SizedBox(height: 18),
-
-          Text(
-            hasSupport
-                ? '+52 •••••• 0062'
-                : 'No Support Added',
-
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight:
-                  FontWeight.bold,
-
-              color:
-                  hasSupport
-                      ? AppColors.primary
-                      : Colors.grey,
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          Text(
-            hasSupport
-                ? 'Verification codes and unlock approvals are sent to your Support.'
-                : 'Add a trusted person to receive verification codes and unlock approvals.',
-
-            style: const TextStyle(
-              fontSize: 16,
-              height: 1.4,
-
-              color:
-                  AppColors
-                      .textSecondary,
-            ),
-          ),
-
-          const SizedBox(height: 18),
-
-          SizedBox(
-            width: double.infinity,
-
-            height: 52,
-
-            child: ElevatedButton(
-              style:
-                  ElevatedButton.styleFrom(
-                backgroundColor:
-                    isPremium
-                        ? AppColors
-                            .primary
-                        : Colors.grey
-                            .shade400,
-
-                foregroundColor:
-                    Colors.white,
-
-                shape:
-                    RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(
-                    20,
-                  ),
-                ),
-              ),
-
-              onPressed: () {},
-
-              child: Text(
-                !isPremium
-                    ? 'Premium Required'
-                    : hasSupport
-                    ? 'Change Support'
-                    : 'Add Support',
-
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -450,6 +173,8 @@ class AccountScreen extends StatelessWidget {
     int unlockCount,
   ) {
     return Container(
+      width: double.infinity,
+
       padding:
           const EdgeInsets.all(
         24,
@@ -561,6 +286,8 @@ class AccountScreen extends StatelessWidget {
     bool isPremium,
   ) {
     return Container(
+      width: double.infinity,
+
       padding:
           const EdgeInsets.all(
         24,
@@ -615,50 +342,6 @@ class AccountScreen extends StatelessWidget {
               color:
                   AppColors
                       .textSecondary,
-            ),
-          ),
-
-          const SizedBox(height: 22),
-
-          SizedBox(
-            width: double.infinity,
-
-            height: 54,
-
-            child: ElevatedButton(
-              style:
-                  ElevatedButton.styleFrom(
-                backgroundColor:
-                    isPremium
-                        ? Colors.green
-                        : AppColors
-                            .primary,
-
-                foregroundColor:
-                    Colors.white,
-
-                shape:
-                    RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(
-                    20,
-                  ),
-                ),
-              ),
-
-              onPressed: () {},
-
-              child: Text(
-                isPremium
-                    ? 'Manage Subscription'
-                    : 'Upgrade to Premium',
-
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
             ),
           ),
         ],

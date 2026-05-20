@@ -9,6 +9,10 @@ class StorageService {
       'blocked_sites';
 
   static const String
+  blockedAppsKey =
+      'blocked_apps';
+
+  static const String
   supportPhoneKey =
       'support_phone';
 
@@ -51,6 +55,43 @@ class StorageService {
     final raw =
         prefs.getString(
       blockedSitesKey,
+    );
+
+    if (raw == null) {
+      return [];
+    }
+
+    final decoded =
+        jsonDecode(raw);
+
+    return List<String>.from(
+      decoded,
+    );
+  }
+
+  static Future<void>
+  saveBlockedApps(
+    List<String> apps,
+  ) async {
+
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    await prefs.setString(
+      blockedAppsKey,
+      jsonEncode(apps),
+    );
+  }
+
+  static Future<List<String>>
+  loadBlockedApps() async {
+
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    final raw =
+        prefs.getString(
+      blockedAppsKey,
     );
 
     if (raw == null) {

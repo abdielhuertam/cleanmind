@@ -7,6 +7,8 @@ import '../theme/app_colors.dart';
 import 'home_screen.dart';
 import 'protection_screen.dart';
 import 'account_screen.dart';
+import 'pending_requests_screen.dart';
+import 'community_screen.dart';
 
 class MainShellScreen
     extends StatefulWidget {
@@ -21,6 +23,14 @@ class MainShellScreen
     required this.onPlanChanged,
   });
 
+  static _MainShellScreenState? of(
+    BuildContext context,
+  ) {
+    return context
+        .findAncestorStateOfType<
+            _MainShellScreenState>();
+  }
+
   @override
   State<MainShellScreen> createState() =>
       _MainShellScreenState();
@@ -28,19 +38,30 @@ class MainShellScreen
 
 class _MainShellScreenState
     extends State<MainShellScreen> {
-  int _selectedIndex = 1;
+
+  int _selectedIndex = 0;
+
+  void changeTab(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+
     final screens = [
+
       HomeScreen(
         plan: widget.plan,
+
         onPlanChanged:
             widget.onPlanChanged,
       ),
 
       ProtectionScreen(
         plan: widget.plan,
+
         onPlanChanged:
             widget.onPlanChanged,
       ),
@@ -49,8 +70,8 @@ class _MainShellScreenState
         plan: widget.plan,
       ),
 
-      const _PlaceholderScreen(
-        title: 'Community',
+      CommunityScreen(
+        plan: widget.plan,
       ),
     ];
 
@@ -58,22 +79,166 @@ class _MainShellScreenState
       backgroundColor:
           AppColors.background,
 
-      body: screens[_selectedIndex],
+      body: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding:
+              const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 20,
+          ),
 
-      bottomNavigationBar:
-          Container(
-        margin: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+
+              Container(
+                height: 18,
+
+                decoration:
+                    const BoxDecoration(
+                  color:
+                      AppColors.primary,
+
+                  borderRadius:
+                      BorderRadius.only(
+                    bottomLeft:
+                        Radius.circular(
+                      22,
+                    ),
+
+                    bottomRight:
+                        Radius.circular(
+                      14,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment
+                        .spaceBetween,
+
+                children: [
+
+                  Text(
+                    _selectedIndex == 0
+                        ? 'Home'
+                        : _selectedIndex == 1
+                        ? 'Protection'
+                        : _selectedIndex == 2
+                        ? 'Account'
+                        : 'Community',
+
+                    style: const TextStyle(
+                      fontSize: 34,
+
+                      fontWeight:
+                          FontWeight.bold,
+
+                      color:
+                          AppColors.primary,
+                    ),
+                  ),
+
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+
+                        MaterialPageRoute(
+                          builder:
+                              (_) =>
+                                  PendingRequestsScreen(
+                                    plan:
+                                        widget.plan,
+
+                                    onPlanChanged:
+                                        widget
+                                            .onPlanChanged,
+                                  ),
+                        ),
+                      );
+                    },
+
+                    child: Stack(
+                      children: [
+
+                        const Icon(
+                          Icons.notifications,
+
+                          size: 34,
+
+                          color:
+                              AppColors.primary,
+                        ),
+
+                        Positioned(
+                          right: 0,
+
+                          child: Container(
+                            width: 14,
+                            height: 14,
+
+                            decoration:
+                                BoxDecoration(
+                              color:
+                                  widget
+                                          .plan
+                                          .unlockRequest
+                                          .isPending
+                                      ? Colors.red
+                                      : Colors.grey,
+
+                              shape:
+                                  BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+
+              Expanded(
+                child:
+                    screens[_selectedIndex],
+              ),
+            ],
+          ),
+        ),
+      ),
+
+    bottomNavigationBar:
+        SafeArea(
+          top: false,
+
+          child: Container(
+          margin:
+              const EdgeInsets.fromLTRB(
+            16,
+            8,
+            16,
+            10,
+          ),
 
         padding:
             const EdgeInsets.symmetric(
-          vertical: 10,
+          vertical: 8,
         ),
 
         decoration: BoxDecoration(
           color: Colors.white,
 
           borderRadius:
-              BorderRadius.circular(28),
+              BorderRadius.circular(
+            28,
+          ),
 
           boxShadow: const [
             BoxShadow(
@@ -90,32 +255,41 @@ class _MainShellScreenState
                   .spaceEvenly,
 
           children: [
+
             _navItem(
               icon: Icons.home,
+
               label: 'Home',
+
               index: 0,
             ),
 
             _navItem(
               icon: Icons.shield,
+
               label: 'Protection',
+
               index: 1,
             ),
 
             _navItem(
               icon: Icons.person,
+
               label: 'Account',
+
               index: 2,
             ),
 
             _navItem(
               icon: Icons.groups,
+
               label: 'Community',
+
               index: 3,
-              disabled: true,
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -124,83 +298,45 @@ class _MainShellScreenState
     required IconData icon,
     required String label,
     required int index,
-    bool disabled = false,
   }) {
+
     final active =
         _selectedIndex == index;
 
     final color =
-        disabled
-            ? Colors.grey.shade400
-            : active
+        active
             ? AppColors.primary
             : AppColors.textSecondary;
 
     return GestureDetector(
-      onTap:
-          disabled
-              ? null
-              : () {
-                setState(() {
-                  _selectedIndex =
-                      index;
-                });
-              },
+      onTap: () {
+        changeTab(index);
+      },
 
-      child: Opacity(
-        opacity: disabled ? 0.5 : 1,
+      child: Column(
+        mainAxisSize:
+            MainAxisSize.min,
 
-        child: Column(
-          mainAxisSize:
-              MainAxisSize.min,
+        children: [
 
-          children: [
-            Icon(
-              icon,
+          Icon(
+            icon,
+            color: color,
+          ),
+
+          const SizedBox(
+            height: 4,
+          ),
+
+          Text(
+            label,
+
+            style: TextStyle(
+              fontSize: 11,
               color: color,
             ),
-
-            const SizedBox(height: 4),
-
-            Text(
-              label,
-
-              style: TextStyle(
-                fontSize: 11,
-                color: color,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PlaceholderScreen
-    extends StatelessWidget {
-  final String title;
-
-  const _PlaceholderScreen({
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor:
-          AppColors.background,
-
-      body: Center(
-        child: Text(
-          title,
-
-          style: const TextStyle(
-            fontSize: 32,
-            fontWeight:
-                FontWeight.bold,
           ),
-        ),
+        ],
       ),
     );
   }

@@ -9,12 +9,11 @@ import '../theme/app_colors.dart';
 
 import 'protection_settings_screen.dart';
 
-import '../services/storage_service.dart';
-
 class ProtectionScreen extends StatefulWidget {
   final PlanState plan;
 
-  final ValueChanged<PlanState> onPlanChanged;
+  final ValueChanged<PlanState>
+      onPlanChanged;
 
   const ProtectionScreen({
     super.key,
@@ -40,33 +39,21 @@ class _ProtectionScreenState
   void _startLifecycleTimer() {
     _timer = Timer.periodic(
       const Duration(seconds: 1),
-      (_) async {
+      (_) {
         if (!mounted) return;
 
-        final protection =
-            widget.plan.protection;
+        final refreshedPlan =
+            widget.plan
+                .refreshLifecycle();
 
-        if (protection.status ==
-            ProtectionStatus.waitingPeriod) {
-          if (protection
-              .isDeactivationExpired()) {
-
-            await StorageService
-                .saveProtectionEnabled(
-              false,
-            );
-
-            final updatedPlan =
-                widget.plan
-                    .unlockSucceeded();
-
-            widget.onPlanChanged(
-              updatedPlan,
-            );
-          } else {
-            setState(() {});
-          }
+        if (refreshedPlan !=
+            widget.plan) {
+          widget.onPlanChanged(
+            refreshedPlan,
+          );
         }
+
+        setState(() {});
       },
     );
   }
@@ -77,11 +64,32 @@ class _ProtectionScreenState
     super.dispose();
   }
 
-  String _formatDuration(
+  String _formatCountdown(
     Duration duration,
   ) {
     final hours =
         duration.inHours
+            .toString()
+            .padLeft(2, '0');
+
+    final minutes =
+        (duration.inMinutes % 60)
+            .toString()
+            .padLeft(2, '0');
+
+    final seconds =
+        (duration.inSeconds % 60)
+            .toString()
+            .padLeft(2, '0');
+
+    return '$hours:$minutes:$seconds';
+  }
+
+  String _formatFocusTime(
+    Duration duration,
+  ) {
+    final hours =
+        (duration.inHours % 24)
             .toString()
             .padLeft(2, '0');
 
@@ -103,7 +111,8 @@ class _ProtectionScreenState
     final protection =
         widget.plan.protection;
 
-    final status = protection.status;
+    final status =
+        protection.status;
 
     final focusedDays =
         protection
@@ -115,94 +124,37 @@ class _ProtectionScreenState
             ProtectionStatus
                 .protectionDisabled ||
         status ==
-            ProtectionStatus.inactive;
+            ProtectionStatus
+                .inactive;
 
     final isWaiting =
         status ==
             ProtectionStatus
                 .waitingPeriod;
 
-    final isAwaitingApproval =
-        status ==
-            ProtectionStatus
-                .awaitingApproval;
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          AnimatedSwitcher(
+            duration:
+                const Duration(
+              milliseconds: 250,
+            ),
 
-    return Scaffold(
-      backgroundColor:
-          AppColors.background,
-
-      body: SafeArea(
-        child: Padding(
-          padding:
-              const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 20,
+            child:
+                isWaiting
+                    ? _buildWaitingPeriod()
+                    : isDisabled
+                        ? _buildDisabledState()
+                        : _buildActiveState(
+                            focusedDays,
+                          ),
           ),
 
-          child: Column(
-            children: [
-              Container(
-                height: 42,
-
-                decoration:
-                    const BoxDecoration(
-                  color:
-                      AppColors.primary,
-
-                  borderRadius:
-                      BorderRadius.only(
-                    bottomLeft:
-                        Radius.circular(
-                      22,
-                    ),
-
-                    bottomRight:
-                        Radius.circular(
-                      22,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 26),
-
-              const Text(
-                'Clean Mind',
-
-                style: TextStyle(
-                  fontSize: 34,
-                  fontWeight:
-                      FontWeight.bold,
-
-                  color:
-                      AppColors.primary,
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration:
-                      const Duration(
-                    milliseconds: 250,
-                  ),
-
-                  child:
-                      isWaiting
-                          ? _buildWaitingPeriod()
-                          : isAwaitingApproval
-                              ? _buildAwaitingApproval()
-                              : isDisabled
-                                  ? _buildDisabledState()
-                                  : _buildActiveState(
-                                      focusedDays,
-                                    ),
-                ),
-              ),
-            ],
+          const SizedBox(
+            height: 20,
           ),
-        ),
+        ],
       ),
     );
   }
@@ -211,95 +163,26 @@ class _ProtectionScreenState
     int focusedDays,
   ) {
     return Column(
-      key: const ValueKey(
-        'active_state',
-      ),
-
       children: [
-        Container(
-          width: double.infinity,
+        _buildMainCard(
+          icon: Icons.shield,
 
-          padding:
-              const EdgeInsets.all(
-            26,
-          ),
+          iconColor:
+              AppColors.primary,
 
-          decoration: BoxDecoration(
-            color: Colors.white,
+          title:
+              'Protection Active',
 
-            borderRadius:
-                BorderRadius.circular(
-              30,
-            ),
+          dotColor:
+              Colors.green,
 
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-
-          child: Column(
+          content: Column(
             children: [
-              const Icon(
-                Icons.shield,
-
-                size: 82,
-
-                color:
-                    AppColors.primary,
-              ),
-
-              const SizedBox(height: 20),
-
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment
-                        .center,
-
-                children: [
-                  const Text(
-                    'Protection Active',
-
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight:
-                          FontWeight.bold,
-
-                      color:
-                          AppColors
-                              .textPrimary,
-                    ),
-                  ),
-
-                  const SizedBox(
-                    width: 10,
-                  ),
-
-                  Container(
-                    width: 16,
-                    height: 16,
-
-                    decoration:
-                        const BoxDecoration(
-                      color: Colors.green,
-
-                      shape:
-                          BoxShape.circle,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
               Text(
                 '$focusedDays',
 
                 style: const TextStyle(
-                  fontSize: 62,
+                  fontSize: 40,
                   fontWeight:
                       FontWeight.bold,
 
@@ -308,145 +191,122 @@ class _ProtectionScreenState
                 ),
               ),
 
+              const SizedBox(
+                height: 4,
+              ),
+
               const Text(
                 'days focused',
 
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 17,
 
                   color:
                       AppColors
                           .textSecondary,
                 ),
               ),
+
+              const SizedBox(
+                height: 14,
+              ),
+
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 8,
+                ),
+
+                decoration: BoxDecoration(
+                  color:
+                      AppColors.primary
+                          .withOpacity(
+                    0.08,
+                  ),
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    18,
+                  ),
+                ),
+
+                child: Text(
+                  _formatFocusTime(
+                    widget.plan.protection
+                        .getActiveDuration(),
+                  ),
+
+                  style:
+                      const TextStyle(
+                    fontSize: 18,
+
+                    fontWeight:
+                        FontWeight.w700,
+
+                    letterSpacing: 1.1,
+
+                    color:
+                        AppColors.primary,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
 
-        const Spacer(),
-
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder:
-                    (_) =>
-                        const ProtectionSettingsScreen(),
-              ),
-            );
-          },
-
-          child: Container(
-            width: double.infinity,
-
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 22,
-              vertical: 18,
-            ),
-
-            decoration: BoxDecoration(
-              color: Colors.white,
-
-              borderRadius:
-                  BorderRadius.circular(
-                24,
-              ),
-
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-
-            child: Row(
-              children: const [
-                Icon(
-                  Icons.settings,
-
-                  size: 34,
-
-                  color:
-                      AppColors.primary,
-                ),
-
-                SizedBox(width: 18),
-
-                Expanded(
-                  child: Text(
-                    'Protection Settings',
-
-                    style: TextStyle(
-                      fontSize: 21,
-                      fontWeight:
-                          FontWeight.bold,
-
-                      color:
-                          AppColors
-                              .textPrimary,
-                    ),
-                  ),
-                ),
-
-                Icon(
-                  Icons.arrow_forward_ios,
-
-                  color:
-                      AppColors.primary,
-                ),
-              ],
-            ),
-          ),
+        const SizedBox(
+          height: 16,
         ),
 
-        const SizedBox(height: 18),
+        _buildSettingsButton(),
 
-        ElevatedButton(
-          style:
-              ElevatedButton.styleFrom(
-            backgroundColor:
-                AppColors.primary,
+        const SizedBox(
+          height: 16,
+        ),
 
-            foregroundColor:
-                Colors.white,
+        SizedBox(
+          width: double.infinity,
 
-            minimumSize:
-                const Size(
-              double.infinity,
-              62,
-            ),
+          height: 56,
 
-            shape:
-                RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(
-                22,
+          child: ElevatedButton(
+            style:
+                ElevatedButton.styleFrom(
+              backgroundColor:
+                  AppColors.primary,
+
+              foregroundColor:
+                  Colors.white,
+
+              shape:
+                  RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(
+                  20,
+                ),
               ),
             ),
-          ),
 
-          onPressed: () async {
-            await Navigator.pushNamed(
-              context,
-              '/unlock-methods',
-            );
+            onPressed: () async {
+              await Navigator.pushNamed(
+                context,
+                '/unlock-methods',
+              );
 
-            if (!mounted) return;
+              if (!mounted) return;
 
-            setState(() {});
-          },
+              setState(() {});
+            },
 
-          child: const Text(
-            'Request Unlock',
+            child: const Text(
+              'Request Unlock',
 
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight:
-                  FontWeight.bold,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight:
+                    FontWeight.bold,
+              ),
             ),
           ),
         ),
@@ -460,77 +320,29 @@ class _ProtectionScreenState
             .getRemainingDeactivationTime();
 
     return Column(
-      key: const ValueKey(
-        'waiting_state',
-      ),
-
       children: [
-        Container(
-          width: double.infinity,
+        _buildMainCard(
+          icon: Icons.schedule,
 
-          padding:
-              const EdgeInsets.symmetric(
-            horizontal: 26,
-            vertical: 24,
-          ),
+          iconColor:
+              AppColors.primary,
 
-          decoration: BoxDecoration(
-            color: Colors.white,
+          title:
+              'Waiting Period',
 
-            borderRadius:
-                BorderRadius.circular(
-              30,
-            ),
+          dotColor:
+              Colors.orange,
 
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-
-          child: Column(
+          content: Column(
             children: [
-              const Icon(
-                Icons.schedule,
-
-                size: 72,
-
-                color:
-                    AppColors.primary,
-              ),
-
-              const SizedBox(height: 20),
-
               const Text(
-                'Waiting Period Active',
+                'Protection remains active during the countdown.',
 
                 textAlign:
                     TextAlign.center,
 
                 style: TextStyle(
-                  fontSize: 26,
-                  fontWeight:
-                      FontWeight.bold,
-
-                  color:
-                      AppColors
-                          .textPrimary,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              const Text(
-                'Protection is still active during the countdown.',
-
-                textAlign:
-                    TextAlign.center,
-
-                style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 15,
                   height: 1.35,
 
                   color:
@@ -539,17 +351,19 @@ class _ProtectionScreenState
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(
+                height: 22,
+              ),
 
               Text(
                 remaining == null
                     ? '--:--:--'
-                    : _formatDuration(
+                    : _formatCountdown(
                         remaining,
                       ),
 
                 style: const TextStyle(
-                  fontSize: 46,
+                  fontSize: 38,
                   fontWeight:
                       FontWeight.bold,
 
@@ -558,12 +372,14 @@ class _ProtectionScreenState
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(
+                height: 22,
+              ),
 
               SizedBox(
                 width: double.infinity,
 
-                height: 56,
+                height: 52,
 
                 child: ElevatedButton(
                   style:
@@ -583,13 +399,7 @@ class _ProtectionScreenState
                     ),
                   ),
 
-                  onPressed: () async {
-
-                    await StorageService
-                        .saveProtectionEnabled(
-                      true,
-                    );
-
+                  onPressed: () {
                     final updatedPlan =
                         widget.plan
                             .cancelDeactivation();
@@ -604,7 +414,7 @@ class _ProtectionScreenState
                     'Cancel Deactivation',
 
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight:
                           FontWeight.bold,
                     ),
@@ -615,334 +425,284 @@ class _ProtectionScreenState
           ),
         ),
 
-        const Spacer(),
-
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder:
-                    (_) =>
-                        const ProtectionSettingsScreen(),
-              ),
-            );
-          },
-
-          child: Container(
-            width: double.infinity,
-
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 22,
-              vertical: 18,
-            ),
-
-            decoration: BoxDecoration(
-              color: Colors.white,
-
-              borderRadius:
-                  BorderRadius.circular(
-                24,
-              ),
-
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-
-            child: Row(
-              children: const [
-                Icon(
-                  Icons.settings,
-
-                  size: 34,
-
-                  color:
-                      AppColors.primary,
-                ),
-
-                SizedBox(width: 18),
-
-                Expanded(
-                  child: Text(
-                    'Protection Settings',
-
-                    style: TextStyle(
-                      fontSize: 21,
-                      fontWeight:
-                          FontWeight.bold,
-
-                      color:
-                          AppColors
-                              .textPrimary,
-                    ),
-                  ),
-                ),
-
-                Icon(
-                  Icons.arrow_forward_ios,
-
-                  color:
-                      AppColors.primary,
-                ),
-              ],
-            ),
-          ),
+        const SizedBox(
+          height: 16,
         ),
+
+        _buildSettingsButton(),
       ],
     );
-  }
-
-  Widget _buildAwaitingApproval() {
-    return const SizedBox();
   }
 
   Widget _buildDisabledState() {
-
-    StorageService
-        .saveProtectionEnabled(
-      false,
-    );
-    
     return Column(
-      key: const ValueKey(
-        'disabled_state',
-      ),
-
       children: [
-        Container(
+        _buildMainCard(
+          icon:
+              Icons.shield_outlined,
+
+          iconColor:
+              Colors.red,
+
+          title:
+              'Protection Disabled',
+
+          dotColor:
+              Colors.red,
+
+          content: const Padding(
+            padding:
+                EdgeInsets.only(
+              top: 8,
+            ),
+
+            child: Text(
+              'Protection is currently turned off.',
+
+              textAlign:
+                  TextAlign.center,
+
+              style: TextStyle(
+                fontSize: 17,
+
+                color:
+                    AppColors
+                        .textSecondary,
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(
+          height: 16,
+        ),
+
+        _buildSettingsButton(),
+
+        const SizedBox(
+          height: 16,
+        ),
+
+        SizedBox(
           width: double.infinity,
 
-          padding:
-              const EdgeInsets.all(
-            26,
-          ),
+          height: 56,
 
-          decoration: BoxDecoration(
-            color: Colors.white,
+          child: ElevatedButton(
+            style:
+                ElevatedButton.styleFrom(
+              backgroundColor:
+                  Colors.green,
 
-            borderRadius:
-                BorderRadius.circular(
-              30,
-            ),
+              foregroundColor:
+                  Colors.white,
 
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-
-          child: Column(
-            children: [
-              const Icon(
-                Icons.shield_outlined,
-
-                size: 82,
-
-                color: Colors.red,
-              ),
-
-              const SizedBox(height: 20),
-
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment
-                        .center,
-
-                children: [
-                  const Text(
-                    'Protection Disabled',
-
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight:
-                          FontWeight.bold,
-
-                      color:
-                          AppColors
-                              .textPrimary,
-                    ),
-                  ),
-
-                  const SizedBox(
-                    width: 10,
-                  ),
-
-                  Container(
-                    width: 16,
-                    height: 16,
-
-                    decoration:
-                        const BoxDecoration(
-                      color: Colors.red,
-
-                      shape:
-                          BoxShape.circle,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              const Text(
-                'Protection is currently turned off.',
-
-                textAlign:
-                    TextAlign.center,
-
-                style: TextStyle(
-                  fontSize: 18,
-                  color:
-                      AppColors
-                          .textSecondary,
+              shape:
+                  RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(
+                  20,
                 ),
               ),
-            ],
-          ),
-        ),
+            ),
 
-        const Spacer(),
+            onPressed: () {
+              final updatedPlan =
+                  widget.plan
+                      .manualReactivate();
 
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder:
-                    (_) =>
-                        const ProtectionSettingsScreen(),
+              widget.onPlanChanged(
+                updatedPlan,
+              );
+            },
+
+            child: const Text(
+              'Activate Protection',
+
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight:
+                    FontWeight.bold,
               ),
-            );
-          },
-
-          child: Container(
-            width: double.infinity,
-
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 22,
-              vertical: 18,
-            ),
-
-            decoration: BoxDecoration(
-              color: Colors.white,
-
-              borderRadius:
-                  BorderRadius.circular(
-                24,
-              ),
-
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-
-            child: Row(
-              children: const [
-                Icon(
-                  Icons.settings,
-
-                  size: 34,
-
-                  color:
-                      AppColors.primary,
-                ),
-
-                SizedBox(width: 18),
-
-                Expanded(
-                  child: Text(
-                    'Protection Settings',
-
-                    style: TextStyle(
-                      fontSize: 21,
-                      fontWeight:
-                          FontWeight.bold,
-
-                      color:
-                          AppColors
-                              .textPrimary,
-                    ),
-                  ),
-                ),
-
-                Icon(
-                  Icons.arrow_forward_ios,
-
-                  color:
-                      AppColors.primary,
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 18),
-
-        ElevatedButton(
-          style:
-              ElevatedButton.styleFrom(
-            backgroundColor:
-                Colors.green,
-
-            foregroundColor:
-                Colors.white,
-
-            minimumSize:
-                const Size(
-              double.infinity,
-              62,
-            ),
-
-            shape:
-                RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(
-                22,
-              ),
-            ),
-          ),
-
-          onPressed: () async {
-
-            await StorageService
-                .saveProtectionEnabled(
-              true,
-            );
-
-            final updatedPlan =
-                widget.plan
-                    .manualReactivate();
-
-            widget.onPlanChanged(
-              updatedPlan,
-            );
-          },
-
-          child: const Text(
-            'Activate Protection',
-
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight:
-                  FontWeight.bold,
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildMainCard({
+  required IconData icon,
+  required Color iconColor,
+  required String title,
+  required Color dotColor,
+  required Widget content,
+}) {
+  return Container(
+    width: double.infinity,
+
+    padding: const EdgeInsets.symmetric(
+      horizontal: 20,
+      vertical: 16,
+    ),
+
+    decoration: BoxDecoration(
+      color: Colors.white,
+
+      borderRadius: BorderRadius.circular(
+        26,
+      ),
+
+      boxShadow: const [
+        BoxShadow(
+          color: Colors.black12,
+          blurRadius: 10,
+          offset: Offset(0, 4),
+        ),
+      ],
+    ),
+
+    child: Column(
+      children: [
+        Icon(
+          icon,
+          size: 44,
+          color: iconColor,
+        ),
+
+        const SizedBox(
+          height: 10,
+        ),
+
+        Row(
+          mainAxisAlignment:
+              MainAxisAlignment.center,
+
+          children: [
+            Text(
+              title,
+
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight:
+                    FontWeight.bold,
+
+                color:
+                    AppColors
+                        .textPrimary,
+              ),
+            ),
+
+            const SizedBox(
+              width: 8,
+            ),
+
+            Container(
+              width: 12,
+              height: 12,
+
+              decoration:
+                  BoxDecoration(
+                color: dotColor,
+
+                shape:
+                    BoxShape.circle,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(
+          height: 14,
+        ),
+
+        content,
+      ],
+    ),
+  );
+}
+
+  Widget _buildSettingsButton() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (_) =>
+                    ProtectionSettingsScreen(
+                      plan: widget.plan,
+                    ),
+          ),
+        );
+      },
+
+      child: Container(
+        width: double.infinity,
+
+        padding:
+            const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
+
+        decoration: BoxDecoration(
+          color: Colors.white,
+
+          borderRadius:
+              BorderRadius.circular(
+            22,
+          ),
+
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+
+        child: Row(
+          children: const [
+            Icon(
+              Icons.settings,
+
+              size: 30,
+
+              color:
+                  AppColors.primary,
+            ),
+
+            SizedBox(width: 16),
+
+            Expanded(
+              child: Text(
+                'Protection Settings',
+
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight:
+                      FontWeight.bold,
+
+                  color:
+                      AppColors
+                          .textPrimary,
+                ),
+              ),
+            ),
+
+            Icon(
+              Icons.arrow_forward_ios,
+
+              size: 18,
+
+              color:
+                  AppColors.primary,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

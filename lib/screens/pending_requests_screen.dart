@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../state/plan_state.dart';
+import '../state/unlock_request_state.dart';
+
 import '../theme/app_colors.dart';
 
 import '../widgets/request_card.dart';
@@ -20,8 +22,8 @@ class PendingRequestsScreen
 
   @override
   Widget build(BuildContext context) {
-    final hasRequest =
-        plan.unlockRequest.isPending;
+    final request =
+        plan.unlockRequest;
 
     return Scaffold(
       backgroundColor:
@@ -45,72 +47,274 @@ class PendingRequestsScreen
         padding:
             const EdgeInsets.all(24),
 
-        child: hasRequest
-            ? Column(
-                children: [
-                  const SizedBox(
-                    height: 24,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+
+              if (request.status ==
+                  UnlockRequestStatus
+                      .pending)
+                RequestCard(
+                  userName:
+                      '<Usuario>',
+
+                  onApprove: () {
+                    final updatedPlan =
+                        plan
+                            .approvePushRequest();
+
+                    onPlanChanged(
+                      updatedPlan,
+                    );
+                  },
+
+                  onReject: () {
+                    final updatedPlan =
+                        plan
+                            .rejectPushRequest();
+
+                    onPlanChanged(
+                      updatedPlan,
+                    );
+                  },
+                ),
+
+              if (request.status ==
+                  UnlockRequestStatus
+                      .approved)
+                _statusCard(
+                  icon:
+                      Icons.check_circle,
+
+                  iconColor:
+                      Colors.green,
+
+                  title:
+                      'Request Approved',
+
+                  message:
+                      'Protection has been disabled successfully.',
+
+                  background:
+                      Colors.green
+                          .shade50,
+                ),
+
+              if (request.status ==
+                  UnlockRequestStatus
+                      .rejected)
+                _statusCard(
+                  icon: Icons.cancel,
+
+                  iconColor:
+                      AppColors.danger,
+
+                  title:
+                      'Request Rejected',
+
+                  message:
+                      'Protection remains active and the unlock request was denied.',
+
+                  background:
+                      Colors.red
+                          .shade50,
+                ),
+
+              if (request.status ==
+                  UnlockRequestStatus
+                      .expired)
+                _statusCard(
+                  icon:
+                      Icons.schedule,
+
+                  iconColor:
+                      Colors.orange,
+
+                  title:
+                      'Request Expired',
+
+                  message:
+                      'No approval was received before the request expired.',
+
+                  background:
+                      Colors.orange
+                          .shade50,
+                ),
+
+              if (request.status ==
+                  UnlockRequestStatus
+                      .none)
+                Container(
+                  width: double.infinity,
+
+                  padding:
+                      const EdgeInsets.all(
+                    28,
                   ),
 
-                  RequestCard(
-                    userName:
-                        '<Usuario>',
+                  decoration:
+                      BoxDecoration(
+                    color: Colors.white,
 
-                    onApprove: () {
-                      final updatedPlan =
-                          plan
-                              .approvePushRequest();
+                    borderRadius:
+                        BorderRadius.circular(
+                      28,
+                    ),
 
-                      onPlanChanged(
-                        updatedPlan,
-                      );
+                    boxShadow: const [
+                      BoxShadow(
+                        color:
+                            Colors.black12,
 
-                      if (!context.mounted) {
-                        return;
-                      }
+                        blurRadius: 10,
 
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/',
-                        (route) => false,
-                      );
-                    },
-
-                    onReject: () {
-                      final updatedPlan =
-                          plan
-                              .rejectPushRequest();
-
-                      onPlanChanged(
-                        updatedPlan,
-                      );
-
-                      if (!context.mounted) {
-                        return;
-                      }
-
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/',
-                        (route) => false,
-                      );
-                    },
+                        offset:
+                            Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ],
-              )
-            : const Center(
-                child: Text(
-                  'No pending requests.',
 
-                  style: TextStyle(
-                    fontSize: 18,
+                  child: Column(
+                    children: const [
+                      Icon(
+                        Icons.notifications_off,
 
-                    color:
-                        AppColors
-                            .textSecondary,
+                        size: 64,
+
+                        color:
+                            AppColors
+                                .textSecondary,
+                      ),
+
+                      SizedBox(
+                        height: 18,
+                      ),
+
+                      Text(
+                        'No Pending Requests',
+
+                        style:
+                            TextStyle(
+                          fontSize: 22,
+                          fontWeight:
+                              FontWeight
+                                  .bold,
+
+                          color:
+                              AppColors
+                                  .textPrimary,
+                        ),
+                      ),
+
+                      SizedBox(
+                        height: 10,
+                      ),
+
+                      Text(
+                        'New unlock approval requests will appear here.',
+
+                        textAlign:
+                            TextAlign.center,
+
+                        style:
+                            TextStyle(
+                          fontSize: 16,
+
+                          height: 1.4,
+
+                          color:
+                              AppColors
+                                  .textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _statusCard({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String message,
+    required Color background,
+  }) {
+    return Container(
+      width: double.infinity,
+
+      padding:
+          const EdgeInsets.all(
+        28,
+      ),
+
+      decoration: BoxDecoration(
+        color: background,
+
+        borderRadius:
+            BorderRadius.circular(
+          28,
+        ),
+
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+
+      child: Column(
+        children: [
+          Icon(
+            icon,
+
+            size: 72,
+
+            color: iconColor,
+          ),
+
+          const SizedBox(height: 22),
+
+          Text(
+            title,
+
+            textAlign:
+                TextAlign.center,
+
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight:
+                  FontWeight.bold,
+
+              color: iconColor,
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          Text(
+            message,
+
+            textAlign:
+                TextAlign.center,
+
+            style: const TextStyle(
+              fontSize: 17,
+              height: 1.45,
+
+              color:
+                  AppColors
+                      .textSecondary,
+            ),
+          ),
+        ],
       ),
     );
   }

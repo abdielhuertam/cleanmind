@@ -282,4 +282,20 @@ This document reflects CLOSED MVP behavior including backend-based approval and 
 
 Any future changes must be logged in Development_Log.md.
 
+## Android Enforcement Behavior (MVP Addition)
 
+On Android devices:
+
+- CleanMind monitors foreground applications using AccessibilityService.
+- If a blocked application is opened:
+  - CleanMind interrupts access
+  - User is automatically returned to the launcher/home screen
+
+Current enforcement behavior is interruption-based only.
+
+Future planned behavior includes:
+
+- intentional pause overlays
+- breathing delays
+- countdown friction
+- unlock confirmation UX

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'state/plan_state.dart';
+
 import 'services/local_storage_service.dart';
-import 'state/protection_state.dart';
 
 import 'screens/main_shell_screen.dart';
 
@@ -16,20 +16,17 @@ void main() async {
   PlanState loadedPlan =
       await LocalStorageService.loadPlan();
 
-  if (loadedPlan.protection.status ==
-          ProtectionStatus.waitingPeriod &&
-      loadedPlan.protection
-          .isDeactivationExpired()) {
-    loadedPlan =
-        loadedPlan.unlockSucceeded();
+  loadedPlan =
+      loadedPlan.refreshLifecycle();
 
-    await LocalStorageService.savePlan(
-      loadedPlan,
-    );
-  }
+  await LocalStorageService.savePlan(
+    loadedPlan,
+  );
 
   runApp(
-    MyApp(initialPlan: loadedPlan),
+    MyApp(
+      initialPlan: loadedPlan,
+    ),
   );
 }
 
@@ -46,21 +43,64 @@ class MyApp extends StatefulWidget {
       _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState
+    extends State<MyApp>
+    with WidgetsBindingObserver {
+
   late PlanState _plan;
 
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance
+        .addObserver(this);
+
     _plan = widget.initialPlan;
   }
 
-  void _onPlanChanged(
+  @override
+  void dispose() {
+
+    WidgetsBinding.instance
+        .removeObserver(this);
+
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(
+    AppLifecycleState state,
+  ) async {
+
+    if (state ==
+        AppLifecycleState.resumed) {
+
+      final refreshedPlan =
+          _plan.refreshLifecycle();
+
+      await LocalStorageService
+          .savePlan(
+        refreshedPlan,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _plan = refreshedPlan;
+      });
+    }
+  }
+
+  Future<void> _onPlanChanged(
     PlanState updatedPlan,
   ) async {
+
     await LocalStorageService.savePlan(
       updatedPlan,
     );
+
+    if (!mounted) return;
 
     setState(() {
       _plan = updatedPlan;
@@ -70,36 +110,44 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner:
+          false,
 
       home: MainShellScreen(
         plan: _plan,
+
         onPlanChanged:
             _onPlanChanged,
       ),
 
       routes: {
-        '/copy-challenge': (context) =>
-            CopyChallengeScreen(
-              plan: _plan,
-              onPlanChanged:
-                  _onPlanChanged,
-            ),
+
+        '/copy-challenge':
+            (context) =>
+                CopyChallengeScreen(
+                  plan: _plan,
+
+                  onPlanChanged:
+                      _onPlanChanged,
+                ),
 
         '/accountability-code':
             (context) =>
                 AccountabilityCodeScreen(
                   plan: _plan,
+
                   onPlanChanged:
                       _onPlanChanged,
                 ),
 
-        '/unlock-methods': (context) =>
-            UnlockMethodsScreen(
-              plan: _plan,
-              onPlanChanged:
-                  _onPlanChanged,
-            ),
+        '/unlock-methods':
+            (context) =>
+                UnlockMethodsScreen(
+                  plan: _plan,
+
+                  onPlanChanged:
+                      _onPlanChanged,
+                ),
       },
     );
   }

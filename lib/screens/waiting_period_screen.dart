@@ -278,7 +278,7 @@ class _WaitingPeriodScreenState
                 ),
               ),
 
-              const SizedBox(height: 26),
+              const SizedBox(height: 24),
 
               Row(
                 children: [
@@ -306,7 +306,7 @@ class _WaitingPeriodScreenState
                           TextAlign.center,
 
                       style: TextStyle(
-                        fontSize: 30,
+                        fontSize: 26,
                         fontWeight:
                             FontWeight.bold,
 
@@ -323,12 +323,12 @@ class _WaitingPeriodScreenState
                 ],
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 24),
 
               Container(
                 padding:
                     const EdgeInsets.all(
-                  8,
+                  6,
                 ),
 
                 decoration: BoxDecoration(
@@ -336,7 +336,7 @@ class _WaitingPeriodScreenState
 
                   borderRadius:
                       BorderRadius.circular(
-                    24,
+                    22,
                   ),
 
                   boxShadow: const [
@@ -360,11 +360,16 @@ class _WaitingPeriodScreenState
                           });
                         },
 
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration:
+                              const Duration(
+                            milliseconds: 200,
+                          ),
+
                           padding:
                               const EdgeInsets.symmetric(
                             vertical:
-                                14,
+                                12,
                           ),
 
                           decoration:
@@ -388,7 +393,7 @@ class _WaitingPeriodScreenState
 
                             style: TextStyle(
                               fontSize:
-                                  17,
+                                  16,
 
                               fontWeight:
                                   FontWeight.bold,
@@ -413,11 +418,16 @@ class _WaitingPeriodScreenState
                           });
                         },
 
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration:
+                              const Duration(
+                            milliseconds: 200,
+                          ),
+
                           padding:
                               const EdgeInsets.symmetric(
                             vertical:
-                                14,
+                                12,
                           ),
 
                           decoration:
@@ -441,7 +451,7 @@ class _WaitingPeriodScreenState
 
                             style: TextStyle(
                               fontSize:
-                                  17,
+                                  16,
 
                               fontWeight:
                                   FontWeight.bold,
@@ -459,7 +469,7 @@ class _WaitingPeriodScreenState
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 24),
 
               Expanded(
                 child:
@@ -483,11 +493,11 @@ class _WaitingPeriodScreenState
           const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
 
-        crossAxisSpacing: 14,
+        crossAxisSpacing: 12,
 
-        mainAxisSpacing: 14,
+        mainAxisSpacing: 12,
 
-        childAspectRatio: 2.2,
+        childAspectRatio: 2.4,
       ),
 
       itemBuilder: (
@@ -518,7 +528,7 @@ class _WaitingPeriodScreenState
 
               borderRadius:
                   BorderRadius.circular(
-                24,
+                22,
               ),
 
               boxShadow: const [
@@ -534,14 +544,14 @@ class _WaitingPeriodScreenState
               children: [
                 if (option.premium)
                   Positioned(
-                    top: 10,
-                    right: 10,
+                    top: 8,
+                    right: 8,
 
                     child: Container(
                       padding:
                           const EdgeInsets.symmetric(
                         horizontal: 8,
-                        vertical: 4,
+                        vertical: 3,
                       ),
 
                       decoration:
@@ -551,7 +561,7 @@ class _WaitingPeriodScreenState
 
                         borderRadius:
                             BorderRadius.circular(
-                          20,
+                          18,
                         ),
                       ),
 
@@ -559,7 +569,7 @@ class _WaitingPeriodScreenState
                         'PRO',
 
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 9,
                           fontWeight:
                               FontWeight.bold,
 
@@ -571,23 +581,30 @@ class _WaitingPeriodScreenState
                   ),
 
                 Center(
-                  child: Text(
-                    option.label,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(
+                      horizontal: 8,
+                    ),
 
-                    textAlign:
-                        TextAlign.center,
+                    child: Text(
+                      option.label,
 
-                    style: TextStyle(
-                      fontSize: 18,
+                      textAlign:
+                          TextAlign.center,
 
-                      fontWeight:
-                          FontWeight.bold,
+                      style: TextStyle(
+                        fontSize: 16,
 
-                      color:
-                          selected
-                              ? Colors.white
-                              : AppColors
-                                  .textPrimary,
+                        fontWeight:
+                            FontWeight.bold,
+
+                        color:
+                            selected
+                                ? Colors.white
+                                : AppColors
+                                    .textPrimary,
+                      ),
                     ),
                   ),
                 ),
@@ -607,7 +624,7 @@ class _WaitingPeriodScreenState
 
           padding:
               const EdgeInsets.all(
-            28,
+            26,
           ),
 
           decoration: BoxDecoration(
@@ -615,7 +632,7 @@ class _WaitingPeriodScreenState
 
             borderRadius:
                 BorderRadius.circular(
-              30,
+              28,
             ),
 
             boxShadow: const [
@@ -632,13 +649,13 @@ class _WaitingPeriodScreenState
               const Icon(
                 Icons.event,
 
-                size: 64,
+                size: 58,
 
                 color:
                     AppColors.primary,
               ),
 
-              const SizedBox(height: 22),
+              const SizedBox(height: 20),
 
               Text(
                 _formattedDate(),
@@ -647,7 +664,7 @@ class _WaitingPeriodScreenState
                     TextAlign.center,
 
                 style: const TextStyle(
-                  fontSize: 24,
+                  fontSize: 22,
                   fontWeight:
                       FontWeight.bold,
 
@@ -656,7 +673,7 @@ class _WaitingPeriodScreenState
                 ),
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
 
               const Text(
                 'Custom dates must be at least 24 hours in the future.',
@@ -665,7 +682,7 @@ class _WaitingPeriodScreenState
                     TextAlign.center,
 
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   height: 1.4,
 
                   color:
@@ -674,12 +691,12 @@ class _WaitingPeriodScreenState
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
 
               SizedBox(
                 width: double.infinity,
 
-                height: 56,
+                height: 54,
 
                 child: ElevatedButton(
                   style:
@@ -706,7 +723,7 @@ class _WaitingPeriodScreenState
                     'Choose Date & Time',
 
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight:
                           FontWeight.bold,
                     ),

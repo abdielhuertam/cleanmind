@@ -294,3 +294,33 @@ Future architecture cleanup is still required to consolidate:
 - unlock lifecycle restoration
 - protection-state synchronization
 into a single authoritative state source.
+
+## 11. Android Accessibility Enforcement Layer (MVP)
+
+Android MVP now includes a native AccessibilityService enforcement layer.
+
+Responsibilities:
+
+- Detect foreground applications
+- Validate blocked application package names
+- Interrupt access to blocked applications
+- Return user to launcher/home screen
+
+Current implementation characteristics:
+
+- Behavioral interruption only
+- No overlay enforcement yet
+- Package-based validation
+- Local enforcement execution
+- Compatible with Samsung OneUI physical-device testing
+
+Current blocked-app enforcement is implemented natively in:
+
+- CleanMindAccessibilityService.kt
+
+Future architecture work will include:
+
+- Flutter ↔ Android synchronization bridge
+- Dynamic blocked-app synchronization
+- Overlay interruption UX
+- Intentional friction workflows

@@ -669,3 +669,157 @@ Before committing:
 - Activity log system
 - Settings/onboarding completion
 - Store readiness
+
+## 2026-05-20 — Android Enforcement & Physical Device Validation
+
+### Completed
+
+- Installed and configured Android Studio environment for physical-device testing.
+- Installed and validated adb tooling on macOS.
+- Successfully connected Samsung physical Android device via USB debugging.
+- Resolved malformed Android NDK installation issue.
+- Validated Flutter Android deployment pipeline on physical device.
+- Implemented native Android AccessibilityService architecture.
+- Implemented foreground application detection using AccessibilityEvent listeners.
+- Added blocked-app package detection for:
+  - Instagram
+  - YouTube
+  - TikTok
+  - X/Twitter
+  - Reddit
+- Implemented Android enforcement behavior using:
+  - GLOBAL_ACTION_HOME
+- Validated automatic interruption and return-to-home behavior on Samsung OneUI.
+- Confirmed real Android enforcement behavior through adb logcat validation.
+- Added debounce/delay stabilization for AccessibilityService event handling.
+- Stabilized Android Accessibility permissions and service activation flow.
+- Improved Android ProtectionScreen visual density:
+  - reduced top blue bar height
+  - reduced excessive card spacing
+  - improved bottom navigation spacing
+  - corrected Android footer SafeArea behavior
+- Fixed Android overflow issues in:
+  - Copy Challenge screen
+  - Accountability Code screen
+- Added keyboard-safe scroll behavior to unlock screens.
+- Confirmed:
+  - Copy Challenge flow functional
+  - Accountability Code flow functional
+  - Android enforcement operational on physical device
+
+### Status
+
+Android enforcement layer is now functionally operational on physical hardware.
+
+Current verified behavior:
+
+1. User opens blocked app.
+2. AccessibilityService detects foreground package.
+3. CleanMind validates blocked package.
+4. User is automatically returned to Android launcher/home screen.
+
+Current enforcement is behavioral/interruption-based only.
+No overlay interruption UX exists yet.
+
+The following Android components are now validated:
+
+- adb/device pipeline
+- AccessibilityService lifecycle
+- foreground app detection
+- enforcement execution
+- Samsung OneUI compatibility
+- Flutter ↔ native Android coexistence
+
+UI stabilization also improved Android usability significantly.
+
+### Next Session Focus
+
+- Refactor Pending Requests state handling.
+- Fix rejected/approved request persistence issues.
+- Remove stale request states after resolution.
+- Implement Flutter → Android blocked-app synchronization bridge.
+- Replace hardcoded Kotlin blocked-app list with dynamic Flutter-driven configuration.
+- Begin overlay/interruption UX architecture:
+  - intentional pause screen
+  - breathing delay
+  - countdown friction
+  - confirmation UX
+- Continue Android visual consistency cleanup.
+
+### Technical Notes
+
+- Major debugging time originated from Android logcat cache confusion.
+- adb logcat required manual clearing using:
+  - adb logcat -c
+- Android AccessibilityService was initially recompiling incorrectly due to stale logs creating false validation assumptions.
+- Physical-device validation proved essential; simulator-only validation would not have exposed enforcement behavior correctly.
+- Samsung OneUI required delayed GLOBAL_ACTION_HOME execution for stable enforcement behavior.
+- AccessibilityService permissions may become disabled after reinstall/update and require manual reactivation.
+- Full-file replacement strategy again proved significantly safer than partial nested Flutter widget modifications.
+
+### Documentation Alignment Required Before Commit
+
+#### Architecture.md
+
+Architecture should later be expanded to include:
+
+- Android Accessibility Enforcement Layer
+- foreground application monitoring
+- behavioral interruption enforcement
+- Flutter ↔ native Android bridge responsibilities
+
+#### Product_Flow.md
+
+Product flow should later reflect:
+
+Blocked-app behavior on Android:
+- user opens blocked application
+- CleanMind interrupts access
+- user is returned to launcher/home
+
+#### Working_Agreements.md
+
+This session further validated:
+
+- physical-device testing is mandatory for enforcement-layer work
+- full-file replacement remains safer than partial nested Flutter patches
+- Android native-layer debugging must always validate real logcat output before architectural assumptions are made
+
+### Pre-Commit Validation Checklist
+
+Before committing:
+
+- Confirm AccessibilityService activates correctly after reinstall.
+- Confirm blocked apps return user to launcher/home.
+- Confirm adb logcat displays blocked-app detection correctly.
+- Confirm Copy Challenge screen no longer overflows.
+- Confirm Accountability Code screen no longer overflows.
+- Confirm bottom navigation no longer collides with Android footer area.
+- Confirm ProtectionScreen compact layout renders correctly on Android.
+- Confirm project compiles successfully on Android physical device.
+
+### Delivery Tracking
+
+### Blocks Completed This Session
+
+- Android Studio environment setup
+- adb/device configuration
+- Android NDK recovery
+- AccessibilityService implementation
+- foreground-app detection
+- Android enforcement stabilization
+- physical-device enforcement validation
+- Android UI stabilization
+
+### Estimated Remaining Major Blocks
+
+- Pending request state cleanup
+- Flutter ↔ Android synchronization bridge
+- Overlay interruption UX
+- Waiting-period engine hardening
+- Authentication layer
+- Backend integration
+- VPN/DNS enforcement
+- Activity log persistence
+- Settings/onboarding completion
+- Store readiness

@@ -3,11 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../state/plan_state.dart';
+import '../state/protection_state.dart';
+
 import '../theme/app_colors.dart';
 
 import '../widgets/protection_status_banner.dart';
 import '../widgets/request_pending_banner.dart';
 
+import 'main_shell_screen.dart';
 import 'pending_requests_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,6 +32,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState
     extends State<HomeScreen> {
+
   Timer? _timer;
 
   @override
@@ -41,24 +45,22 @@ class _HomeScreenState
     _timer = Timer.periodic(
       const Duration(seconds: 1),
       (_) {
+
         if (!mounted) return;
 
-        final request =
-            widget.plan.unlockRequest;
+        final refreshedPlan =
+            widget.plan
+                .refreshLifecycle();
 
-        if (request.isPending) {
-          if (request.isExpired()) {
-            final updatedPlan =
-                widget.plan
-                    .expirePushRequest();
+        if (refreshedPlan !=
+            widget.plan) {
 
-            widget.onPlanChanged(
-              updatedPlan,
-            );
-          } else {
-            setState(() {});
-          }
+          widget.onPlanChanged(
+            refreshedPlan,
+          );
         }
+
+        setState(() {});
       },
     );
   }
@@ -69,8 +71,31 @@ class _HomeScreenState
     super.dispose();
   }
 
+  String _formatDuration(
+    Duration duration,
+  ) {
+
+    final hours =
+        duration.inHours
+            .toString()
+            .padLeft(2, '0');
+
+    final minutes =
+        (duration.inMinutes % 60)
+            .toString()
+            .padLeft(2, '0');
+
+    final seconds =
+        (duration.inSeconds % 60)
+            .toString()
+            .padLeft(2, '0');
+
+    return '$hours:$minutes:$seconds';
+  }
+
   @override
   Widget build(BuildContext context) {
+
     final status =
         widget.plan.protection.status;
 
@@ -88,116 +113,143 @@ class _HomeScreenState
         widget.plan.unlockRequest
             .isPending;
 
-    return Scaffold(
-      backgroundColor:
-          AppColors.background,
+    final waitingPeriodActive =
+        status ==
+            ProtectionStatus
+                .waitingPeriod;
 
-      body: SafeArea(
-        child: Padding(
-          padding:
-              const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 20,
-          ),
+    final remainingWaitingTime =
+        widget.plan.protection
+            .getRemainingDeactivationTime();
 
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
 
-            children: [
-              Container(
-                height: 42,
+        children: [
 
-                decoration:
-                    const BoxDecoration(
-                  color:
-                      AppColors.primary,
+          if (waitingPeriodActive &&
+              remainingWaitingTime !=
+                  null)
+            Container(
+              width: double.infinity,
 
-                  borderRadius:
-                      BorderRadius.only(
-                    bottomLeft:
-                        Radius.circular(
-                      22,
-                    ),
-
-                    bottomRight:
-                        Radius.circular(
-                      22,
-                    ),
-                  ),
-                ),
+              margin:
+                  const EdgeInsets.only(
+                bottom: 22,
               ),
 
-              const SizedBox(height: 26),
+              padding:
+                  const EdgeInsets.all(
+                20,
+              ),
 
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment
-                        .spaceBetween,
+              decoration:
+                  BoxDecoration(
+                color:
+                    Colors.orange
+                        .shade50,
 
+                borderRadius:
+                    BorderRadius.circular(
+                  26,
+                ),
+
+                border: Border.all(
+                  color:
+                      Colors.orange
+                          .shade300,
+                ),
+
+                boxShadow: const [
+                  BoxShadow(
+                    color:
+                        Colors.black12,
+
+                    blurRadius: 8,
+
+                    offset:
+                        Offset(0, 4),
+                  ),
+                ],
+              ),
+
+              child: Row(
                 children: [
-                  const Text(
-                    'Clean Mind',
 
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight:
-                          FontWeight.bold,
+                  Container(
+                    width: 56,
+                    height: 56,
+
+                    decoration:
+                        BoxDecoration(
+                      color:
+                          Colors.orange
+                              .shade100,
+
+                      shape:
+                          BoxShape.circle,
+                    ),
+
+                    child: Icon(
+                      Icons.hourglass_bottom,
 
                       color:
-                          AppColors.primary,
+                          Colors.orange
+                              .shade700,
+
+                      size: 30,
                     ),
                   ),
 
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (_) =>
-                                  PendingRequestsScreen(
-                                    plan:
-                                        widget
-                                            .plan,
+                  const SizedBox(
+                    width: 18,
+                  ),
 
-                                    onPlanChanged:
-                                        widget
-                                            .onPlanChanged,
-                                  ),
-                        ),
-                      );
-                    },
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment
+                              .start,
 
-                    child: Stack(
                       children: [
-                        const Icon(
-                          Icons.notifications,
 
-                          size: 34,
+                        Text(
+                          'Waiting Period Active',
 
-                          color:
-                              AppColors
-                                  .primary,
+                          style:
+                              TextStyle(
+                            fontSize: 18,
+
+                            fontWeight:
+                                FontWeight
+                                    .bold,
+
+                            color:
+                                Colors.orange
+                                    .shade800,
+                          ),
                         ),
 
-                        Positioned(
-                          right: 0,
+                        const SizedBox(
+                          height: 6,
+                        ),
 
-                          child: Container(
-                            width: 14,
-                            height: 14,
+                        Text(
+                          '${_formatDuration(remainingWaitingTime)} remaining',
 
-                            decoration:
-                                BoxDecoration(
-                              color:
-                                  hasPendingRequest
-                                      ? Colors.red
-                                      : Colors.grey,
+                          style:
+                              TextStyle(
+                            fontSize: 16,
 
-                              shape:
-                                  BoxShape.circle,
-                            ),
+                            fontWeight:
+                                FontWeight
+                                    .w600,
+
+                            color:
+                                Colors.orange
+                                    .shade700,
                           ),
                         ),
                       ],
@@ -205,196 +257,211 @@ class _HomeScreenState
                   ),
                 ],
               ),
+            ),
 
-              const SizedBox(height: 28),
+          GestureDetector(
+            onTap: () {
 
-              ProtectionStatusBanner(
-                isActive:
-                    isProtectionActive,
+              MainShellScreen.of(
+                context,
+              )?.changeTab(1);
+            },
 
-                focusedDays:
-                    focusedDays,
-              ),
+            child: ProtectionStatusBanner(
+              isActive:
+                  isProtectionActive,
 
-              const SizedBox(height: 24),
+              focusedDays:
+                  focusedDays,
+            ),
+          ),
 
-              if (hasPendingRequest)
-                RequestPendingBanner(
-                  remaining:
-                      widget
-                          .plan
-                          .unlockRequest
-                          .getRemainingTime(),
+          const SizedBox(height: 22),
 
-                  onCancel: () {
-                    final updatedPlan =
-                        widget.plan
-                            .cancelPushRequest();
+          if (hasPendingRequest)
+            RequestPendingBanner(
+              remaining:
+                  widget
+                      .plan
+                      .unlockRequest
+                      .getRemainingTime(),
 
-                    widget
-                        .onPlanChanged(
-                      updatedPlan,
-                    );
-                  },
+              onCancel: () {
+
+                final updatedPlan =
+                    widget.plan
+                        .cancelPushRequest();
+
+                widget.onPlanChanged(
+                  updatedPlan,
+                );
+              },
+            ),
+
+          if (!isProtectionActive)
+            Column(
+              children: [
+
+                const SizedBox(
+                  height: 22,
                 ),
 
-              if (!isProtectionActive)
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 24,
-                    ),
-
-                    SizedBox(
-                      width: double.infinity,
-
-                      height: 64,
-
-                      child: ElevatedButton(
-                        style:
-                            ElevatedButton
-                                .styleFrom(
-                          backgroundColor:
-                              Colors.green,
-
-                          foregroundColor:
-                              Colors.white,
-
-                          elevation: 4,
-
-                          shape:
-                              RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                              22,
-                            ),
-                          ),
-                        ),
-
-                        onPressed: () {
-                          final updatedPlan =
-                              widget.plan
-                                  .manualReactivate();
-
-                          widget
-                              .onPlanChanged(
-                            updatedPlan,
-                          );
-                        },
-
-                        child: const Text(
-                          'Activate Protection',
-
-                          style:
-                              TextStyle(
-                            fontSize: 22,
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-              const SizedBox(height: 22),
-
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (_) =>
-                              PendingRequestsScreen(
-                                plan:
-                                    widget.plan,
-
-                                onPlanChanged:
-                                    widget
-                                        .onPlanChanged,
-                              ),
-                    ),
-                  );
-                },
-
-                child: Container(
+                SizedBox(
                   width: double.infinity,
 
-                  padding:
-                      const EdgeInsets.all(
-                    22,
-                  ),
+                  height: 60,
 
-                  decoration:
-                      BoxDecoration(
-                    color: Colors.white,
+                  child: ElevatedButton(
+                    style:
+                        ElevatedButton
+                            .styleFrom(
+                      backgroundColor:
+                          Colors.green,
 
-                    borderRadius:
-                        BorderRadius.circular(
-                      26,
-                    ),
+                      foregroundColor:
+                          Colors.white,
 
-                    boxShadow: const [
-                      BoxShadow(
-                        color:
-                            Colors.black12,
+                      elevation: 4,
 
-                        blurRadius: 8,
-
-                        offset:
-                            Offset(0, 4),
-                      ),
-                    ],
-                  ),
-
-                  child: Row(
-                    children: const [
-                      Icon(
-                        Icons.touch_app,
-
-                        size: 42,
-
-                        color:
-                            AppColors
-                                .primary,
-                      ),
-
-                      SizedBox(width: 18),
-
-                      Expanded(
-                        child: Text(
-                          'Pending Requests',
-
-                          style:
-                              TextStyle(
-                            fontSize: 22,
-                            fontWeight:
-                                FontWeight
-                                    .bold,
-
-                            color:
-                                AppColors
-                                    .textPrimary,
-                          ),
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                          22,
                         ),
                       ),
+                    ),
 
-                      Icon(
-                        Icons
-                            .arrow_forward_ios,
+                    onPressed: () {
+
+                      final updatedPlan =
+                          widget.plan
+                              .manualReactivate();
+
+                      widget
+                          .onPlanChanged(
+                        updatedPlan,
+                      );
+                    },
+
+                    child: const Text(
+                      'Activate Protection',
+
+                      style:
+                          TextStyle(
+                        fontSize: 20,
+
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+          const SizedBox(height: 22),
+
+          GestureDetector(
+            onTap: () {
+
+              Navigator.push(
+                context,
+
+                MaterialPageRoute(
+                  builder:
+                      (_) =>
+                          PendingRequestsScreen(
+                            plan:
+                                widget.plan,
+
+                            onPlanChanged:
+                                widget
+                                    .onPlanChanged,
+                          ),
+                ),
+              );
+            },
+
+            child: Container(
+              width: double.infinity,
+
+              padding:
+                  const EdgeInsets.all(
+                22,
+              ),
+
+              decoration:
+                  BoxDecoration(
+                color: Colors.white,
+
+                borderRadius:
+                    BorderRadius.circular(
+                  26,
+                ),
+
+                boxShadow: const [
+                  BoxShadow(
+                    color:
+                        Colors.black12,
+
+                    blurRadius: 8,
+
+                    offset:
+                        Offset(0, 4),
+                  ),
+                ],
+              ),
+
+              child: Row(
+                children: const [
+
+                  Icon(
+                    Icons.touch_app,
+
+                    size: 42,
+
+                    color:
+                        AppColors
+                            .primary,
+                  ),
+
+                  SizedBox(width: 18),
+
+                  Expanded(
+                    child: Text(
+                      'Pending Requests',
+
+                      style:
+                          TextStyle(
+                        fontSize: 22,
+
+                        fontWeight:
+                            FontWeight
+                                .bold,
 
                         color:
                             AppColors
-                                .primary,
+                                .textPrimary,
                       ),
-                    ],
+                    ),
                   ),
-                ),
+
+                  Icon(
+                    Icons
+                        .arrow_forward_ios,
+
+                    color:
+                        AppColors
+                            .primary,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }

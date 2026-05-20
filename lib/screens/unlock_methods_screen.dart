@@ -42,6 +42,7 @@ class UnlockMethodsScreen
             style: const TextStyle(
               fontWeight:
                   FontWeight.bold,
+
               color:
                   AppColors.textPrimary,
             ),
@@ -64,7 +65,7 @@ class UnlockMethodsScreen
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
               Container(
                 width: double.infinity,
@@ -92,6 +93,7 @@ class UnlockMethodsScreen
                     height: 1.4,
                     color:
                         Colors.red.shade700,
+
                     fontWeight:
                         FontWeight.w600,
                   ),
@@ -172,7 +174,7 @@ class UnlockMethodsScreen
         padding:
             const EdgeInsets.symmetric(
           horizontal: 24,
-          vertical: 28,
+          vertical: 22,
         ),
 
         child: Column(
@@ -184,7 +186,7 @@ class UnlockMethodsScreen
               'Choose how to disable protection',
 
               style: TextStyle(
-                fontSize: 28,
+                fontSize: 24,
                 fontWeight:
                     FontWeight.bold,
 
@@ -193,21 +195,23 @@ class UnlockMethodsScreen
               ),
             ),
 
-            const SizedBox(height: 36),
+            const SizedBox(height: 22),
 
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
 
-                crossAxisSpacing: 18,
-                mainAxisSpacing: 18,
+                crossAxisSpacing: 14,
+                mainAxisSpacing: 14,
 
-                childAspectRatio: 0.82,
+                childAspectRatio: 0.92,
 
                 children: [
                   _MethodCard(
                     icon: Icons.edit_note,
-                    label: 'Challenge',
+
+                    label:
+                        'Challenge',
 
                     enabled:
                         !requestPending,
@@ -309,7 +313,9 @@ class UnlockMethodsScreen
 
                   _MethodCard(
                     icon: Icons.sms,
-                    label: 'SMS Code',
+
+                    label:
+                        'SMS Code',
 
                     enabled:
                         isPro &&
@@ -434,9 +440,13 @@ class UnlockMethodsScreen
 
 class _MethodCard extends StatelessWidget {
   final IconData icon;
+
   final String label;
+
   final bool enabled;
+
   final bool premiumFeature;
+
   final VoidCallback onTap;
 
   const _MethodCard({
@@ -468,12 +478,13 @@ class _MethodCard extends StatelessWidget {
       onTap: onTap,
 
       child: Opacity(
-        opacity: enabled ? 1 : 0.65,
+        opacity:
+            enabled ? 1 : 0.5,
 
         child: Container(
           padding:
               const EdgeInsets.all(
-            20,
+            16,
           ),
 
           decoration: BoxDecoration(
@@ -481,7 +492,7 @@ class _MethodCard extends StatelessWidget {
 
             borderRadius:
                 BorderRadius.circular(
-              28,
+              26,
             ),
 
             boxShadow: const [
@@ -505,7 +516,45 @@ class _MethodCard extends StatelessWidget {
                     color:
                         Colors.amber.shade700,
 
-                    size: 28,
+                    size: 24,
+                  ),
+                ),
+
+              if (!enabled)
+                Positioned(
+                  left: 0,
+                  top: 0,
+
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+
+                    decoration:
+                        BoxDecoration(
+                      color:
+                          Colors.orange,
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        12,
+                      ),
+                    ),
+
+                    child: const Text(
+                      'Pending',
+
+                      style: TextStyle(
+                        color: Colors.white,
+
+                        fontSize: 11,
+
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
 
@@ -519,13 +568,13 @@ class _MethodCard extends StatelessWidget {
                     Icon(
                       icon,
 
-                      size: 72,
+                      size: 58,
 
                       color: iconColor,
                     ),
 
                     const SizedBox(
-                      height: 20,
+                      height: 14,
                     ),
 
                     Text(
@@ -535,7 +584,7 @@ class _MethodCard extends StatelessWidget {
                           TextAlign.center,
 
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         height: 1.2,
 
                         fontWeight:
