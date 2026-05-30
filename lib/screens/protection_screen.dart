@@ -106,6 +106,21 @@ class _ProtectionScreenState
     return '$hours:$minutes:$seconds';
   }
 
+  String _formatRemainingTime(
+    Duration duration,
+  ) {
+    final hours =
+        duration.inHours;
+
+    final minutes =
+        duration.inMinutes % 60;
+
+    final seconds =
+        duration.inSeconds % 60;
+
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final protection =
@@ -162,6 +177,16 @@ class _ProtectionScreenState
   Widget _buildActiveState(
     int focusedDays,
   ) {
+      final protection =
+          widget.plan.protection;
+
+      final isPartial =
+          protection.mode ==
+              ProtectionMode.partial;
+
+      final remaining =
+          protection
+              .getRemainingPartialTime();
     return Column(
       children: [
         _buildMainCard(
@@ -179,7 +204,12 @@ class _ProtectionScreenState
           content: Column(
             children: [
               Text(
-                '$focusedDays',
+                isPartial
+                    ? _formatRemainingTime(
+                        remaining ??
+                            Duration.zero,
+                      )
+                    : '$focusedDays',
 
                 style: const TextStyle(
                   fontSize: 40,
@@ -195,8 +225,10 @@ class _ProtectionScreenState
                 height: 4,
               ),
 
-              const Text(
-                'days focused',
+              Text(
+                isPartial
+                    ? 'time remaining'
+                    : 'days focused',
 
                 style: TextStyle(
                   fontSize: 17,
@@ -211,6 +243,41 @@ class _ProtectionScreenState
                 height: 14,
               ),
 
+if (isPartial &&
+    protection.expiresAt != null)
+  Container(
+    padding:
+        const EdgeInsets.symmetric(
+      horizontal: 18,
+      vertical: 8,
+    ),
+
+    decoration: BoxDecoration(
+      color:
+          AppColors.primary
+              .withOpacity(
+        0.08,
+      ),
+
+      borderRadius:
+          BorderRadius.circular(
+        18,
+      ),
+    ),
+
+    child: Text(
+      'Ends ${protection.expiresAt!.day}/${protection.expiresAt!.month}/${protection.expiresAt!.year}',
+      style:
+          const TextStyle(
+        fontSize: 16,
+        fontWeight:
+            FontWeight.w600,
+        color:
+            AppColors.primary,
+      ),
+    ),
+  )
+else
               Container(
                 padding:
                     const EdgeInsets.symmetric(
@@ -240,12 +307,9 @@ class _ProtectionScreenState
                   style:
                       const TextStyle(
                     fontSize: 18,
-
                     fontWeight:
                         FontWeight.w700,
-
                     letterSpacing: 1.1,
-
                     color:
                         AppColors.primary,
                   ),
@@ -507,12 +571,9 @@ class _ProtectionScreenState
             ),
 
             onPressed: () {
-              final updatedPlan =
-                  widget.plan
-                      .manualReactivate();
-
-              widget.onPlanChanged(
-                updatedPlan,
+              Navigator.pushNamed(
+                context,
+                '/protection-mode',
               );
             },
 

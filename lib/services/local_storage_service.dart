@@ -86,22 +86,22 @@ class LocalStorageService {
       hasSupport:
           map['hasSupport'] ?? false,
 
-      protection: ProtectionState(
+        protection: ProtectionState(
         status: protectionStatus,
 
+        mode: ProtectionMode.permanent,
+
         activatedAt: DateTime.parse(
-          map['activatedAt'],
+            map['activatedAt'],
         ),
 
         deactivationScheduledAt:
-            map['deactivationScheduledAt'] !=
-                    null
+            map['deactivationScheduledAt'] != null
                 ? DateTime.parse(
-                    map[
-                        'deactivationScheduledAt'],
-                  )
+                    map['deactivationScheduledAt'],
+                    )
                 : null,
-      ),
+        ),
 
       unlockRequest: UnlockRequestState(
         status: unlockRequestStatus,

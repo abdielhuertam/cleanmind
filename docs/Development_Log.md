@@ -823,3 +823,254 @@ Before committing:
 - Activity log persistence
 - Settings/onboarding completion
 - Store readiness
+
+## 2026-05-29 — Protection Modes, Progression System & UX Redesign Foundation
+
+### Completed
+
+- Approved new Home UX direction based on Home Alt 3 mockup.
+- Defined Protection Mode Selection as the new activation entry point.
+- Introduced Permanent Protection mode.
+- Introduced Partial Protection mode.
+- Defined Free vs Pro restrictions for Partial Protection durations.
+- Defined automatic expiration behavior for Partial Protection.
+- Defined expiration notification requirement for Partial Protection.
+- Defined XP-based progression system.
+- Defined hourly XP accumulation model.
+- Defined Permanent Protection as the primary progression path.
+- Defined reduced XP generation for Partial Protection.
+- Defined medal milestone system:
+  - 7 Days
+  - 30 Days
+  - 90 Days
+  - 180 Days
+  - 365 Days
+- Defined 365+ Club milestone behavior.
+- Defined preservation of historical medals.
+- Defined streak reset behavior after protection deactivation.
+- Defined global ranking logic:
+  - Current streak
+  - Total XP (tie breaker)
+- Approved future Community architecture direction:
+  - user profiles
+  - rankings
+  - achievement visibility
+  - activity feed
+  - reactions and comments
+- Defined first-launch language detection behavior.
+- Defined fallback language behavior (English).
+- Updated Product_Flow.md.
+- Updated Business_Rules.md.
+- Updated CleanMind_MVP.md.
+
+### Status
+
+Product documentation is now aligned with the new protection model.
+
+Permanent Protection is established as the primary long-term commitment mode.
+
+Partial Protection is established as a flexible focus-session mode with reduced progression rewards.
+
+Community functionality remains out of scope for active development but foundational progression requirements are now documented.
+
+### Next Session Focus
+
+- Update activation flow UI.
+- Implement Protection Mode Selection screen.
+- Refactor activation workflow to support:
+  - Permanent Protection
+  - Partial Protection
+- Persist protection mode selection.
+- Design XP persistence architecture.
+- Begin Home Alt 3 UI implementation.
+
+### Technical Notes
+
+- Progression system requirements are now documented but not implemented.
+- XP values remain intentionally undefined and configurable.
+- Ranking calculations remain documentation-level only.
+- Community backend architecture remains undefined.
+- Existing persistence architecture will require future expansion to support:
+  - XP
+  - levels
+  - medals
+  - ranking metadata
+  - protection mode state
+
+### Documentation Alignment Required Before Commit
+
+### Product_Flow.md
+
+Updated to include:
+
+- Protection Mode Selection
+- Permanent Protection
+- Partial Protection
+- Progression System
+- Ranking
+- Medal milestones
+- Language auto-detection
+
+### Business_Rules.md
+
+Updated to include:
+
+- Protection Modes
+- XP Rules
+- Medal Rules
+- Ranking Rules
+- Streak Reset Rules
+
+### CleanMind_MVP.md
+
+Updated to include:
+
+- Protection Modes
+- Progression System
+- Updated Free vs Pro model
+- Ranking and medal foundation
+
+### Pre-Commit Validation Checklist
+
+Before committing:
+
+- Confirm Product_Flow.md is finalized.
+- Confirm Business_Rules.md is finalized.
+- Confirm CleanMind_MVP.md is finalized.
+- Confirm numbering remains consistent in all updated documents.
+- Confirm Permanent Protection and Partial Protection rules match across all documents.
+- Confirm ranking and medal rules remain aligned.
+
+### Delivery Tracking
+
+### Blocks Completed This Session
+
+- Protection model redesign
+- Progression system definition
+- Ranking definition
+- Medal system definition
+- Language detection definition
+- Product documentation alignment
+
+### Estimated Remaining Major Blocks
+
+- Protection Mode Selection UI
+- Home Alt 3 implementation
+- Protection mode persistence
+- XP architecture
+- Authentication layer
+- Backend integration
+- Flutter ↔ Android synchronization bridge
+- Overlay interruption UX
+- VPN/DNS enforcement
+- Activity log persistence
+- Settings/onboarding completion
+- Store readiness
+
+## 2026-05-30 — Partial Protection Completion & Home Dashboard Improvements
+
+### Completed
+
+* Implemented Partial Protection activation flow.
+* Implemented Custom Duration selection flow.
+* Added confirmation screen before starting a focus session.
+* Fixed activation timing so protection begins when the user confirms the session.
+* Implemented countdown display in Protection screen.
+* Implemented countdown display in Home screen.
+* Added automatic Partial Protection expiration handling.
+* Added automatic transition to Protection Disabled when Partial Protection expires.
+* Added Accountability section divider in Home screen.
+* Improved Home dashboard organization and visual hierarchy.
+* Validated synchronization between:
+
+  * Custom Duration
+  * Confirmation Screen
+  * Home Screen
+  * Protection Screen
+
+### Status
+
+Partial Protection is now functional end-to-end.
+
+Validated flow:
+
+1. User selects Partial Protection.
+2. User selects a predefined or custom duration.
+3. User confirms the session.
+4. Protection activates successfully.
+5. Countdown appears in Home.
+6. Countdown appears in Protection.
+7. Protection automatically expires.
+8. Protection transitions to Disabled state.
+
+### Next Session Focus
+
+* Remove remaining countdown text after protection expires.
+* Clean Pending Requests state after Approve or Reject.
+* Ensure Pending Requests displays "No pending requests" after resolution.
+* Implement local notifications for:
+
+  * Partial Protection expiration
+  * Waiting Period expiration
+  * Future unlock-related events
+* Implement expiration alert while:
+
+  * App is open
+  * App is minimized
+  * Device is locked
+* Continue Home redesign using approved Home ALT 3 mockup.
+* Add progression foundations:
+
+  * XP
+  * Level
+  * Ranking
+  * Statistics
+
+### Technical Notes
+
+* Partial Protection countdown now starts when the user confirms the session instead of when the duration is selected.
+* Home and Protection screens are synchronized with Partial Protection state.
+* Accountability section was introduced as a visual separation between protection controls and request-related actions.
+* Home dashboard remains an intermediate implementation and does not yet match the final approved Home ALT 3 design.
+
+### Documentation Alignment Required Before Commit
+
+### Product_Flow.md
+
+Verify future updates remain aligned with:
+
+* Partial Protection expiration behavior.
+* Expiration notification requirement.
+* Home dashboard countdown visibility during Partial Protection.
+
+### Pre-Commit Validation Checklist
+
+* Confirm Partial Protection activation works.
+* Confirm countdown appears in Home.
+* Confirm countdown appears in Protection.
+* Confirm automatic expiration disables protection.
+* Confirm disabled state does not display countdown.
+* Confirm Pending Requests behavior after resolution.
+* Confirm successful iOS build.
+
+### Delivery Tracking
+
+### Blocks Completed This Session
+
+* Partial Protection completion
+* Countdown integration
+* Home dashboard improvements
+* Accountability section integration
+
+### Estimated Remaining Major Blocks
+
+* Pending Requests cleanup
+* Local notifications
+* Home ALT 3 redesign
+* XP system
+* Level system
+* Ranking system
+* Statistics dashboard
+* Backend integration
+* VPN enforcement integration
+* Store readiness

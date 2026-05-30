@@ -10,63 +10,162 @@ Business_Rules.md and the codebase.
 
 ## 1. First Launch & Language Selection
 
-- On first launch, the user is prompted to select a language.
-- Supported languages (MVP):
-  - English
-  - Spanish
-  - French
-  - Portuguese
-- The selected language:
-  - Is stored locally
-  - Applies to all UI copy and motivational messages
-  - Can be changed later from Settings
+- On first launch, CleanMind detects the device language automatically.
+- If the detected language is supported, it is preselected for the user.
+- If the detected language is not supported, English is selected by default.
+- If the device language is not supported, English is selected automatically.
 
+Supported languages (MVP):
+
+- English
+- Spanish
+- French
+- Portuguese
+
+The user is presented with a language selection screen where they may:
+
+- Keep the detected language
+- Select a different supported language
+
+The selected language:
+
+- Is stored locally
+- Applies to all UI copy and motivational messages
+- Applies to onboarding and notifications
+- Can be changed later from Settings
+
+Language selection occurs only during first launch unless changed manually by the user.
 ---
 
 ## 2. Initial State (Protection Inactive)
 
 - The app always starts with protection **OFF**.
 - No blocking is applied until the user activates protection.
-- No counters are running.
+- No XP is generated.
+- No streak is active.
+- No protection timer is running.
 
 Primary CTA:
-> Activate Protection
+> Choose Protection Mode
 
 ---
 
-## 3. Protection Active State
+## 3. Protection Mode Selection
+
+When the user chooses to activate protection, CleanMind presents two protection modes.
+
+### Permanent Protection
+
+Characteristics:
+
+- No expiration date.
+- Protection remains active until the user requests deactivation.
+- Generates full XP.
+- Contributes to streak progression.
+- Contributes to level progression.
+- Contributes to ranking progression.
+- Eligible for milestone medals.
+
+Protection can only be disabled through the available unlock methods based on the user's plan and Support configuration.
+
+### Partial Protection
+
+Characteristics:
+
+- User selects a predefined duration or custom duration.
+- Protection automatically disables when the selected duration expires.
+- Generates reduced XP.
+- Does not contribute to medal progression.
+- Sends an expiration notification when protection ends automatically.
+
+### Free Plan
+
+Available durations:
+
+- 8 hours
+- 12 hours
+- 24 hours
+
+### Pro Plan
+
+Available durations:
+
+- 1 hour
+- 2 hours
+- 3 hours
+- 8 hours
+- 12 hours
+- 24 hours
+- Custom date and time
+
+---
+
+## 4. Protection Active State
 
 When protection is active:
 
-- Content blocking is enforced
-- Progress counters increment daily
+- Content blocking is enforced.
+- XP is generated while protection remains active.
 - The Home screen clearly displays:
   - Protection status: ON
-  - Current streak (days of consistency)
+  - Current streak
+  - Current level
+  - XP progress
 
 Primary actions:
+
 - Request Temporary Unlock
-- View progress
+- View Progress
 
 Additional MVP UX behavior:
 
-- Home screen prioritizes pending unlock approval state visually.
+- Home screen prioritizes progress visibility.
+- Home screen functions primarily as a dashboard/status view.
 - A notification bell provides fast access to Pending Requests.
 - Pending unlock requests display an active countdown banner.
 - Protection actions are centralized inside the Protection screen.
-- Home screen functions primarily as a dashboard/status view.
 
-- Users may manually add custom blocked websites/domains.
-- Blocked sites remain visible regardless of protection state.
-- While protection is ACTIVE:
-  - blocked sites cannot be edited
-  - blocked sites cannot be deleted
-- While protection is DISABLED:
-  - blocked sites may be edited
-  - blocked sites may be removed
+Users may manually add custom blocked websites/domains.
+
+Blocked sites remain visible regardless of protection state.
+
+While protection is ACTIVE:
+
+- blocked sites cannot be edited
+- blocked sites cannot be deleted
+
+While protection is DISABLED:
+
+- blocked sites may be edited
+- blocked sites may be removed
+
+### Permanent Protection
+
+While Permanent Protection is active:
+
+- Full XP is generated.
+- Streak progression is active.
+- Ranking progression is active.
+- Medal milestones may be earned.
+
+### Partial Protection
+
+While Partial Protection is active:
+
+- Reduced XP is generated.
+- Protection remains active until the selected duration expires.
+- Protection automatically disables when the selected duration ends.
+- Medal progression is not awarded.
+- The remaining protection time is displayed in both:
+  - Home dashboard
+  - Protection screen
+- A countdown is visible while Partial Protection is active.
+- When the countdown reaches zero:
+  - Protection automatically transitions to the Disabled state
+  - An expiration notification is sent (implementation pending)
 ---
 
-## 4. Request Temporary Unlock — Entry Point
+## 5. Request Temporary Unlock — Entry Point
 
 When the user taps **Request Temporary Unlock**:
 
@@ -80,7 +179,7 @@ When the user taps **Request Temporary Unlock**:
 
 ---
 
-## 5. Unlock Methods Overview
+## 6. Unlock Methods Overview
 
 Unlock behavior depends on the user’s plan and whether a Support is configured.
 
@@ -132,7 +231,7 @@ Protection remains ACTIVE until approval is completed.
 
 ---
 
-## 6. Accountability Code Flow (Pro — No Support or SMS-Based Support)
+## 7. Accountability Code Flow (Pro — No Support or SMS-Based Support)
 
 - The user requests immediate unlock.
 - The backend generates a temporary verification code.
@@ -154,7 +253,7 @@ Notes:
 
 ---
 
-## 7. Support Approval Flow (Pro — Support Configured)
+## 8. Support Approval Flow (Pro — Support Configured)
 
 When a Support is configured:
 
@@ -196,28 +295,41 @@ All events are logged.
 
 ---
 
-## 8. Protection Disabled State
+## 9. Protection Disabled State
 
 When protection is disabled:
 
-- Blocking is fully off
-- Progress counters are paused
+- Blocking is fully off.
+- XP generation stops.
 - The Home screen displays:
   - Protection status: OFF
   - Time since deactivation
 
-  Additional disabled-state behavior:
+Additional disabled-state behavior:
 
 - Users may modify custom blocked sites.
 - Users may remove previously blocked sites.
 - Protection remains fully manual and does not reactivate automatically.
 
+If protection was disabled from Permanent Protection mode:
+
+- Current streak resets.
+- Ranking progression may be affected.
+- Previously earned medals remain visible in the user's profile.
+- Historical achievements are preserved.
+
+If protection was disabled from Partial Protection mode:
+
+- XP earned during the completed protection period is preserved.
+- No medal progression is awarded.
+
 Primary CTA:
-> Activate Protection
+
+> Choose Protection Mode
 
 ---
 
-## 9. Motivational Reminders
+## 10. Motivational Reminders
 
 While protection is disabled:
 
@@ -235,48 +347,189 @@ While protection is disabled:
 
 ---
 
-## 10. Manual Reactivation Flow
+## 11. Manual Reactivation Flow
 
-- The user manually activates protection.
-- Upon activation:
-  - Blocking resumes
-  - Progress tracking restarts
-  - If Support is configured, activation is logged in history
+- The user manually chooses to reactivate protection.
+- CleanMind presents the Protection Mode Selection screen.
+
+Available options:
+
+1. Permanent Protection
+2. Partial Protection
+
+If Permanent Protection is selected:
+
+- Blocking resumes immediately.
+- Full XP generation begins.
+- Streak progression resumes.
+- Ranking progression resumes.
+
+If Partial Protection is selected:
+
+- User selects a duration.
+- Blocking resumes immediately.
+- Reduced XP generation begins.
+- Protection automatically disables when the selected duration expires.
+
+If Support is configured:
+
+- Reactivation events may be recorded in history.
 
 ---
 
-## 11. User Core Loop (Updated)
+## 12. User Core Loop (Updated)
 
-### Free
+### Permanent Protection Loop
 
 1. Protection OFF
-2. User activates protection
+2. User selects Permanent Protection
 3. Protection ON
-4. User requests unlock (friction or waiting period)
-5. Protection OFF
-6. User manually reactivates protection
+4. XP is generated at the full rate
+5. Streak progression advances
+6. Medal milestones may be earned
+7. Ranking progression advances
+8. User requests unlock
+9. Protection OFF
+10. Current streak resets
+11. User manually selects a protection mode again
 
 ---
 
-### Pro without Support
+### Partial Protection Loop
 
-1. Protection ON
-2. User requests unlock
-3. Waiting Period or SMS code verification
-4. Protection OFF
-
----
-
-### Pro with Support
-
-1. Protection ON
-2. User requests unlock
-3. Support approval required
-4. Protection OFF only after approval
+1. Protection OFF
+2. User selects Partial Protection
+3. User selects a duration
+4. Protection ON
+5. XP is generated at a reduced rate
+6. Protection remains active until expiration
+7. Protection automatically disables
+8. Expiration notification is sent (implementation pending)
+9. Protection OFF
+10. User manually selects a protection mode again
 
 ---
 
-## 12. Versioning
+### Free Plan
+
+1. Protection OFF
+2. User selects:
+   - Permanent Protection
+   - Partial Protection (8h, 12h, 24h)
+3. Protection ON
+4. User requests unlock
+5. Copy Challenge or 8-hour Waiting Period
+6. Protection OFF
+7. User manually selects a protection mode again
+
+---
+
+### Pro Plan (No Support)
+
+1. Protection OFF
+2. User selects:
+   - Permanent Protection
+   - Partial Protection
+3. Protection ON
+4. User requests unlock
+5. Waiting Period or SMS Code verification
+6. Protection OFF
+7. User manually selects a protection mode again
+
+---
+
+### Pro Plan (Support Configured)
+
+1. Protection OFF
+2. User selects:
+   - Permanent Protection
+   - Partial Protection
+3. Protection ON
+4. User requests unlock
+5. Support approval required
+6. Protection OFF only after approval
+7. User manually selects a protection mode again
+
+---
+
+## 13. Progression System (MVP Foundation)
+
+CleanMind includes a progression system designed to reward consistency and intentional focus.
+
+### XP Generation
+
+- XP is earned while protection is active.
+- XP values may vary between Permanent Protection and Partial Protection.
+- Exact XP values are configurable and may be adjusted in future releases without changing progression rules.
+
+### Permanent Protection
+
+- Generates full XP.
+- XP is accumulated hourly.
+- Contributes to streak progression.
+- Contributes to ranking progression.
+- Eligible for medal milestones.
+
+### Partial Protection
+
+- Generates reduced XP.
+- XP is accumulated hourly.
+- Contributes to level progression.
+- Does not contribute to medal milestones.
+
+### Medal Milestones
+
+Users may earn milestone medals for maintaining consecutive protection streaks.
+
+Current milestones:
+
+- 7 Days
+- 30 Days
+- 90 Days
+- 180 Days
+- 365 Days
+
+### 365+ Club
+
+After reaching 365 consecutive days:
+
+- The medal remains visible permanently.
+- The streak counter continues increasing.
+- Additional recognition may be added in future releases.
+
+### Historical Achievements
+
+Previously earned medals are never removed.
+
+If protection is deactivated:
+
+- Current streak resets.
+- Ranking progression may be affected.
+- Previously earned medals remain visible in the user's profile.
+
+### Ranking
+
+The global ranking is ordered by:
+
+1. Current streak
+2. Total XP (used as a tie breaker)
+
+This approach prioritizes consistency while still rewarding long-term commitment.
+
+### Future Community Integration
+
+The progression system is designed to support future community features including:
+
+- User profiles
+- Levels
+- Rankings
+- Activity feeds
+- Achievement visibility
+- Social interactions
+
+---
+
+## 14. Versioning
 
 This document reflects CLOSED MVP behavior including backend-based approval and SMS verification.
 

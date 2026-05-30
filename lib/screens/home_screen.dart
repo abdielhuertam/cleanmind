@@ -74,7 +74,6 @@ class _HomeScreenState
   String _formatDuration(
     Duration duration,
   ) {
-
     final hours =
         duration.inHours
             .toString()
@@ -92,7 +91,18 @@ class _HomeScreenState
 
     return '$hours:$minutes:$seconds';
   }
+  
+  String _formatRemainingTime(
+    Duration duration,
+  ) {
+    final minutes =
+        duration.inMinutes;
 
+    final seconds =
+        duration.inSeconds % 60;
+
+    return '${minutes}m ${seconds.toString().padLeft(2, '0')}s';
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -266,13 +276,21 @@ class _HomeScreenState
                 context,
               )?.changeTab(1);
             },
-
             child: ProtectionStatusBanner(
-              isActive:
-                  isProtectionActive,
+              isActive: isProtectionActive,
+              focusedDays: focusedDays,
 
-              focusedDays:
-                  focusedDays,
+              subtitle:
+                  widget.plan.protection.mode ==
+                              ProtectionMode.partial &&
+                          widget.plan.protection.status ==
+                              ProtectionStatus.active
+                      ? '${_formatRemainingTime(
+                          widget.plan.protection
+                                  .getRemainingPartialTime() ??
+                              Duration.zero,
+                        )} remaining'
+                      : null,
             ),
           ),
 
@@ -334,13 +352,9 @@ class _HomeScreenState
 
                     onPressed: () {
 
-                      final updatedPlan =
-                          widget.plan
-                              .manualReactivate();
-
-                      widget
-                          .onPlanChanged(
-                        updatedPlan,
+                      Navigator.pushNamed(
+                        context,
+                        '/protection-mode',
                       );
                     },
 
@@ -360,9 +374,45 @@ class _HomeScreenState
               ],
             ),
 
-          const SizedBox(height: 22),
+            const SizedBox(height: 22),
 
-          GestureDetector(
+            Row(
+              children: [
+
+                Expanded(
+                  child: Divider(
+                    thickness: 1,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+
+                const Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                  ),
+                  child: Text(
+                    'ACCOUNTABILITY',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+
+                Expanded(
+                  child: Divider(
+                    thickness: 1,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            GestureDetector(
             onTap: () {
 
               Navigator.push(

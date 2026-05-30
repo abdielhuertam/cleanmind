@@ -44,22 +44,29 @@ Tablets, iPads, web dashboards, and desktop clients are out of scope for the MVP
 ## 5. Core Features (MVP)
 
 - VPN/DNS-based content blocking
-- Explicit protection activation
+- Permanent Protection mode
+- Partial Protection mode
 - Backend-validated unlock flows
 - SMS-based verification codes
 - Optional Support approval system
 - Activity logging for approval events
+- XP, levels, medals, and ranking foundation
 - Free and Pro subscription tiers
 
 ---
 
 ## 6. Protection Model
 
-- Protection is NOT activated automatically after installation
-- The user must explicitly activate protection
-- Once activated, protection remains ON by default
-- Protection can only be disabled through intentional, validated actions
-- Unlock transitions are validated server-side when required
+- Protection is NOT activated automatically after installation.
+- The user must explicitly choose a protection mode.
+- Two protection modes are available:
+  - Permanent Protection
+  - Partial Protection
+- Once activated, protection remains ON according to the selected mode.
+- Permanent Protection remains active until a validated deactivation occurs.
+- Partial Protection automatically disables when the selected duration expires.
+- Protection can only be disabled through intentional, validated actions.
+- Unlock transitions are validated server-side when required.
 
 ---
 
@@ -87,11 +94,19 @@ There is no automatic reactivation.
 
 ### Free Plan
 
+Includes:
+
+- Permanent Protection
+- Partial Protection:
+  - 8 hours
+  - 12 hours
+  - 24 hours
 - Pornographic content blocking
 - Blocking of one social media platform
 - Copy Challenge
 - Fixed 8-hour waiting period for protection deactivation
-- Basic progress tracking
+- XP progression
+- Basic ranking participation
 - No Support configuration
 - No automatic SMS sending
 
@@ -99,6 +114,11 @@ There is no automatic reactivation.
 
 Includes everything in Free, plus:
 
+- Partial Protection:
+  - 1 hour
+  - 2 hours
+  - 3 hours
+  - Custom date and time
 - Configurable waiting period (minimum 1 hour) when no Support is configured
 - SMS-based verification codes
 - Optional Support configuration
@@ -135,7 +155,55 @@ Support approval is mandatory in this configuration.
 
 ---
 
-## 10. Privacy & Legal (MVP)
+## 10. Progression System
+
+CleanMind includes a progression system designed to reward consistency and intentional focus.
+
+### XP
+
+- XP is earned hourly while protection remains active.
+- Permanent Protection generates full XP.
+- Partial Protection generates reduced XP.
+- XP contributes to level progression and ranking.
+
+### Medals
+
+Medals are awarded for consecutive protection streak milestones:
+
+- 7 Days
+- 30 Days
+- 90 Days
+- 180 Days
+- 365 Days
+
+### 365+ Club
+
+After reaching 365 consecutive days:
+
+- The medal remains permanently visible.
+- The streak counter continues increasing.
+- Additional recognition may be added in future releases.
+
+Previously earned medals are never removed.
+
+### Ranking
+
+The global ranking is ordered by:
+
+1. Current streak
+2. Total XP (tie breaker)
+
+This ranking system prioritizes consistency while still rewarding long-term commitment.
+
+If protection is deactivated:
+
+- Current streak resets.
+- Ranking position may be affected.
+- Previously earned medals remain visible.
+
+---
+
+## 11. Privacy & Legal (MVP)
 
 - CleanMind does not inspect browsing content
 - CleanMind does not log specific URLs
@@ -146,7 +214,7 @@ Support approval is mandatory in this configuration.
 
 ---
 
-## 11. Out of Scope (Post-MVP)
+## 12. Out of Scope (Post-MVP)
 
 - Tablet and iPad support
 - Advanced analytics dashboards
@@ -156,7 +224,7 @@ Support approval is mandatory in this configuration.
 
 ---
 
-## 12. Versioning
+## 13. Versioning
 
 - This document version: v2.0 (Backend-Validated MVP)
 - Any product scope changes require a new version

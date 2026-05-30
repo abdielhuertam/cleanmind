@@ -9,6 +9,7 @@ import 'screens/main_shell_screen.dart';
 import 'screens/copy_challenge_screen.dart';
 import 'screens/accountability_code_screen.dart';
 import 'screens/unlock_methods_screen.dart';
+import 'screens/protection_mode_selection_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -121,6 +122,14 @@ class _MyAppState
       ),
 
       routes: {
+
+        '/protection-mode':
+            (context) =>
+                ProtectionModeSelectionScreen(
+                  plan: _plan,
+                  onPlanChanged:
+                      _onPlanChanged,
+                ),
 
         '/copy-challenge':
             (context) =>

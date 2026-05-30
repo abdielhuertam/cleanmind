@@ -7,11 +7,13 @@ class ProtectionStatusBanner
   final bool isActive;
 
   final int focusedDays;
+  final String? subtitle;
 
   const ProtectionStatusBanner({
     super.key,
     required this.isActive,
     required this.focusedDays,
+    this.subtitle,
   });
 
   @override
@@ -106,7 +108,8 @@ class ProtectionStatusBanner
                 const SizedBox(height: 6),
 
                 Text(
-                  '$focusedDays days focused',
+                  subtitle ??
+                      '$focusedDays days focused',
 
                   style: const TextStyle(
                     fontSize: 16,

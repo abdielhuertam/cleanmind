@@ -13,17 +13,53 @@ and the codebase.
 CleanMind MVP supports two plans:
 
 ### Free Plan
-- Fixed 8-hour waiting period required for full deactivation.
-- Copy Challenge available.
+
+Available protection modes:
+
+- Permanent Protection
+- Partial Protection
+
+Partial Protection durations:
+
+- 8 hours
+- 12 hours
+- 24 hours
+
+Unlock methods:
+
+- Fixed 8-hour Waiting Period
+- Copy Challenge
+
+Restrictions:
+
 - No automatic SMS sending.
 - No Support role available.
 - No remote approval.
 
 ### Pro Plan
-- Configurable waiting period (minimum 1 hour) when no Support is configured.
-- Accountability Code via automatic SMS.
-- Optional Support role.
-- Backend validation required for SMS and approval flows.
+
+Available protection modes:
+
+- Permanent Protection
+- Partial Protection
+
+Partial Protection durations:
+
+- 1 hour
+- 2 hours
+- 3 hours
+- 8 hours
+- 12 hours
+- 24 hours
+- Custom date and time
+
+Unlock methods:
+
+- Configurable Waiting Period
+- Accountability Code via SMS
+- Optional Support approval
+
+Backend validation is required for SMS and approval flows.
 
 ---
 
@@ -41,7 +77,35 @@ State transitions must be deterministic and backend-validated where required.
 
 ---
 
-## 3. Unlock Rules — Free Plan
+## 3. Protection Modes
+
+CleanMind supports two protection modes.
+
+### Permanent Protection
+
+Characteristics:
+
+- No expiration date.
+- Remains active until deactivation is requested.
+- Generates full XP.
+- Contributes to streak progression.
+- Contributes to ranking progression.
+- Eligible for medal milestones.
+
+### Partial Protection
+
+Characteristics:
+
+- User selects a duration.
+- Automatically disables when the selected duration expires.
+- Generates reduced XP.
+- Contributes to level progression.
+- Does not contribute to medal milestones.
+- Sends an expiration notification when protection ends.
+
+---
+
+## 4. Unlock Rules — Free Plan
 
 When a Free user requests deactivation:
 
@@ -51,13 +115,15 @@ When a Free user requests deactivation:
 4. User may cancel at any time.
 5. When the waiting period expires:
    - Protection transitions to protectionDisabled.
-   - Progress resets.
+   - Current streak resets.
+   - Ranking progression may be affected.
+   - Previously earned medals remain preserved.
 
 No external notifications are sent.
 
 ---
 
-## 4. Unlock Rules — Pro Plan (No Support Configured)
+## 5. Unlock Rules — Pro Plan (No Support Configured)
 
 Available methods:
 
@@ -79,7 +145,7 @@ Available methods:
 
 ---
 
-## 5. Unlock Rules — Pro Plan (Support Configured)
+## 6. Unlock Rules — Pro Plan (Support Configured)
 
 When a Support is configured:
 
@@ -92,7 +158,7 @@ Two approval paths are supported.
 
 ---
 
-### 5.1 Support With App Installed
+### 6.1 Support With App Installed
 
 - Unlock request is stored in backend.
 - Support receives push notification.
@@ -112,7 +178,7 @@ If rejected:
 
 ---
 
-### 5.2 Support Without App (SMS Code)
+### 6.2 Support Without App (SMS Code)
 
 - Backend generates a temporary verification code.
 - Code expiration time is enforced.
@@ -124,7 +190,7 @@ If rejected:
 
 ---
 
-## 6. Code Validation Rules
+## 7. Code Validation Rules
 
 - All verification codes must be generated server-side.
 - Codes must:
@@ -135,7 +201,7 @@ If rejected:
 
 ---
 
-## 7. Activity Logging
+## 8. Activity Logging
 
 For Pro users with Support:
 
@@ -151,7 +217,7 @@ Logs must be accessible to Support when using the app.
 
 ---
 
-## 8. SMS Rules
+## 9. SMS Rules
 
 - SMS must be sent only after explicit user confirmation.
 - SMS must contain neutral, non-incriminatory language.
@@ -161,7 +227,7 @@ Logs must be accessible to Support when using the app.
 
 ---
 
-## 9. Reactivation Rules
+## 10. Reactivation Rules
 
 - Protection can only be reactivated manually.
 - Automatic reactivation is not supported.
@@ -170,7 +236,7 @@ Logs must be accessible to Support when using the app.
 
 ---
 
-## 10. Motivational Reminders
+## 11. Motivational Reminders
 
 - Reminders are optional.
 - Reminders do not change protection state.
@@ -178,7 +244,7 @@ Logs must be accessible to Support when using the app.
 
 ---
 
-## 11. Backend Requirements (MVP)
+## 12. Backend Requirements (MVP)
 
 MVP requires:
 
@@ -190,7 +256,89 @@ MVP requires:
 
 ---
 
-## 12. Versioning
+## 13. XP Rules
+
+CleanMind uses an XP-based progression system.
+
+### Permanent Protection
+
+- Generates full XP.
+- XP is earned hourly while protection remains active.
+- Contributes to streak progression.
+- Contributes to ranking progression.
+- Contributes to medal progression.
+
+### Partial Protection
+
+- Generates reduced XP.
+- XP is earned hourly while protection remains active.
+- Contributes to level progression.
+- Does not contribute to medal progression.
+
+Exact XP values are configurable and may be adjusted in future releases without changing progression rules.
+
+---
+
+## 14. Medal Rules
+
+Medals are awarded for consecutive protection streak milestones.
+
+Current milestones:
+
+- 7 Days
+- 30 Days
+- 90 Days
+- 180 Days
+- 365 Days
+
+### 365+ Club
+
+After reaching 365 consecutive days:
+
+- The medal remains permanently visible.
+- The streak counter continues increasing.
+- Additional recognition may be added in future releases.
+
+Previously earned medals are never removed.
+
+---
+
+## 15. Ranking Rules
+
+The global ranking is ordered by:
+
+1. Current streak
+2. Total XP (tie breaker)
+
+Ranking is designed to prioritize consistency while still rewarding long-term commitment.
+
+If protection is deactivated:
+
+- Current streak resets.
+- Ranking position may be affected.
+- Previously earned medals remain visible.
+
+---
+
+## 16. Streak Reset Rules
+
+When protection is deactivated:
+
+- Current streak resets.
+- Current ranking progression may be affected.
+
+The following are preserved:
+
+- Historical achievements
+- Earned medals
+- User profile
+- Activity history
+
+Protection must be manually reactivated through the Protection Mode Selection flow.
+
+---
+
+## 17. Versioning
 
 This document reflects CLOSED MVP behavior including:
 

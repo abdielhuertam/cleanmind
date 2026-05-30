@@ -76,6 +76,22 @@ class PlanState {
           updated.unlockSucceeded();
     }
 
+    // Partial Protection Expiration
+
+    if (updated.protection.status ==
+            ProtectionStatus.active &&
+        updated.protection.mode ==
+            ProtectionMode.partial &&
+        updated.protection
+            .isPartialExpired()) {
+
+      updated = updated.copyWith(
+        protection:
+            updated.protection
+                .disableProtection(),
+      );
+    }
+
     // Push Request Expiration
 
     if (updated.unlockRequest.isPending &&
@@ -123,6 +139,21 @@ class PlanState {
           UnlockRequestState.none(),
     );
   }
+
+  PlanState activatePartialProtection(
+  DateTime expiresAt,
+) {
+  return copyWith(
+    protection:
+        ProtectionState.active(
+      mode:
+          ProtectionMode.partial,
+      expiresAt: expiresAt,
+    ),
+    unlockRequest:
+        UnlockRequestState.none(),
+  );
+}
 
   PlanState startPushRequest() {
     return copyWith(
