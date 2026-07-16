@@ -324,3 +324,26 @@ Future architecture work will include:
 - Dynamic blocked-app synchronization
 - Overlay interruption UX
 - Intentional friction workflows
+
+## 12. Local Notification Layer
+
+CleanMind includes a local notification layer responsible for delivering time-based notifications independently of the backend.
+
+Current implementation:
+
+- flutter_local_notifications
+- flutter_timezone
+
+Current responsibilities:
+
+- Waiting Period expiration notification
+
+Planned responsibilities:
+
+- Partial Protection expiration notification
+- Unlock-related reminders
+- Additional local reminders defined by the product
+
+Notification scheduling is performed locally on the device and uses the device's configured time zone.
+
+This layer is independent from future Push Notification infrastructure, which will require backend integration.

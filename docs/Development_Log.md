@@ -1074,3 +1074,543 @@ Verify future updates remain aligned with:
 * Backend integration
 * VPN enforcement integration
 * Store readiness
+
+Estado actual:
+- XP persistence implementada.
+- Level persistence implementada.
+- Streak persistence implementada.
+- Home ALT 3 en progreso.
+- Proyecto compila correctamente.
+
+Siguiente objetivo:
+- Validar XP.
+- Validar Streak.
+- Continuar Home ALT 3.
+
+## 2026-06-15 — UI Truth Pass Initiated
+
+### Completed
+
+* Reviewed current MVP documentation before continuing development.
+* Validated that the primary instability source is no longer backend uncertainty.
+* Identified that the current user-facing experience contains contradictory states across screens.
+* Confirmed that SMS remains an official MVP feature by Product Owner decision.
+* Suspended backend-first work until visible UX consistency is restored.
+* Defined the UI Truth Pass as the active development block.
+
+### Status
+
+Core engine behavior remains stable.
+
+Current instability is concentrated in user-facing state representation.
+
+The product is functionally advanced but visually inconsistent.
+
+Primary objective is now to ensure that all screens communicate a single source of truth to the user.
+
+### Next Session Focus
+
+Priority 1:
+
+* Fix HomeScreen inconsistency between:
+
+  * "days focused"
+  * Current Streak
+
+Priority 2:
+
+* Update ProtectionScreen to explicitly display:
+
+  * Permanent Protection
+  * Partial Protection
+    as appropriate.
+
+Priority 3:
+
+* Clean Pending Requests state after approval or rejection.
+* Remove notification indicators after resolution.
+
+Priority 4:
+
+* Restore Premium Partial Protection duration flows:
+
+  * 1 Hour
+  * 2 Hours
+  * 4 Hours
+  * Custom
+
+Priority 5:
+
+* Remove Waiting Period from Protection Settings.
+* Align Settings with the current product definition.
+
+### Technical Notes
+
+* Backend work is temporarily paused.
+* SMS implementation remains part of the official MVP scope.
+* Existing infrastructure should not be expanded until UI consistency is restored.
+* The next development block should prioritize repairing contradictions before introducing new capabilities.
+
+### Documentation Alignment Required Before Commit
+
+Verify that:
+
+* Development_Log.md reflects SMS as an active feature.
+* Product_Flow.md remains aligned with current protection behaviors.
+* Settings behavior matches documented product intent.
+
+### Pre-Commit Validation Checklist
+
+Before committing:
+
+* Confirm HomeScreen no longer displays contradictory progress values.
+* Confirm ProtectionScreen displays the active protection type.
+* Confirm Pending Requests clear correctly after resolution.
+* Confirm notification badges disappear after resolution.
+* Confirm Premium Partial Protection flows activate correctly.
+* Confirm Waiting Period has been removed from Settings.
+* Confirm project compiles successfully.
+
+### Delivery Tracking
+
+### Blocks Completed This Session
+
+* Documentation review
+* MVP state validation
+* UI inconsistency identification
+* Definition of UI Truth Pass priorities
+
+### Estimated Remaining Major Blocks
+
+* UI Truth Pass completion
+* SMS implementation
+* Push backend integration
+* Authentication layer
+* VPN/DNS integration
+* Activity log persistence
+* Settings completion
+* Store readiness
+
+# CleanMind – Session Incident Log
+
+**Date:** 2026-06-15
+**Platform:** ChatGPT Web
+**Project:** CleanMind (Flutter)
+
+## Session Objective
+
+Continue the CleanMind project from the previous conversation while reducing latency and focusing on direct implementation work.
+
+---
+
+## Completed Work
+
+### Point 1 – Home synchronization
+
+Status: ✅ Completed
+
+Changes made:
+
+* Home banner and circular streak indicator were synchronized.
+* Both now use the same source of truth:
+
+  * `streakDays`
+
+Outcome:
+
+* Banner:
+
+  * `0 days focused`
+* Circle:
+
+  * `0 DAYS`
+
+Both update consistently.
+
+---
+
+### Point 2 – Protection labels consistency
+
+Status: ✅ Completed
+
+Problem:
+
+Home and Protection screens displayed generic labels:
+
+* `Protection Active`
+
+even though Partial and Permanent protections already existed.
+
+Changes made:
+
+Protection screen:
+
+* Displays:
+
+  * `Partial Protection`
+  * `Permanent Protection`
+
+Home screen:
+
+* Updated banner title logic to display:
+
+  * `Partial Protection`
+  * `Permanent Protection`
+  * `Protection Disabled`
+
+Outcome:
+
+Protection status is now consistent across screens.
+
+---
+
+### Point 3 – Pending Requests cleanup
+
+Status: ✅ Completed
+
+Problem:
+
+After approving or rejecting unlock requests:
+
+* badges remained,
+* pending requests persisted,
+* UI did not return to an empty state.
+
+Changes made:
+
+Unlock requests now reset to:
+
+```dart
+UnlockRequestState.none()
+```
+
+instead of remaining in:
+
+```dart
+approved
+```
+
+or
+
+```dart
+rejected
+```
+
+Outcome:
+
+Approve:
+
+* protection disabled,
+* badge removed,
+* request removed.
+
+Reject:
+
+* protection preserved,
+* badge removed,
+* request removed.
+
+Pending Requests correctly display:
+
+```text
+No Pending Requests
+```
+
+---
+
+### Point 4 – Premium durations restoration
+
+Status: ✅ Completed
+
+Premium durations restored:
+
+Free:
+
+* 8 Hours
+* 12 Hours
+* 24 Hours
+
+Premium:
+
+* 1 Hour
+* 2 Hours
+* 4 Hours
+* Custom
+
+Outcome:
+
+Premium duration buttons are active again.
+
+---
+
+## Blocked Work
+
+### Custom Partial Protection redesign
+
+Status: ⛔ Blocked
+
+Objective:
+
+Replace:
+
+```text
+custom_duration_screen.dart
+partial_protection_confirmation_screen.dart
+```
+
+with screens matching the approved mockup.
+
+---
+
+## Approved Mockup
+
+The approved design contains two screens.
+
+### Screen 1
+
+Custom duration setup screen featuring:
+
+* blue header,
+* centered green icon,
+* title,
+* subtitle,
+* End date & time card,
+* duration section,
+* quick duration chips,
+* custom minutes row,
+* green informational card,
+* Continue button.
+
+---
+
+### Screen 2
+
+Confirmation screen featuring:
+
+* blue header,
+* centered green icon,
+* title,
+* subtitle,
+* summary card,
+* Ends on,
+* Ends at,
+* Duration,
+* green informational card,
+* Start Focus Session button,
+* Go Back button.
+
+---
+
+## Files Provided by User
+
+Multiple versions of:
+
+```text
+custom_duration_screen.dart
+partial_duration_selection_screen.dart
+partial_protection_confirmation_screen.dart
+```
+
+Project ZIP:
+
+```text
+lib.zip
+```
+
+Approved mockup image.
+
+---
+
+## Technical Incidents Observed
+
+### 1. Severe latency
+
+Observed even in a newly created conversation.
+
+Effects:
+
+* delayed responses,
+* repeated clarifications,
+* workflow disruption.
+
+---
+
+### 2. Goal drift
+
+Repeated deviation from:
+
+> "Generate the code for these two screens."
+
+toward:
+
+* architecture discussions,
+* redesign proposals,
+* additional confirmations.
+
+---
+
+### 3. Unintended image generation
+
+Image generation was triggered despite the user requesting code implementation.
+
+Effects:
+
+* wasted interactions,
+* additional confusion.
+
+---
+
+### 4. File processing failure
+
+Observed error:
+
+```text
+TransportTimeoutError
+Encountered exception:
+caas.internal.errors.TransportTimeoutError
+```
+
+Effects:
+
+* inability to inspect ZIP contents,
+* inability to consolidate project state.
+
+---
+
+### 5. Mockup reference inconsistency
+
+The assistant lost certainty regarding which approved image should be implemented.
+
+Effects:
+
+* repeated validation requests,
+* stalled implementation.
+
+---
+
+### 6. Failure to deliver requested artifacts
+
+Despite having:
+
+* approved designs,
+* source files,
+* project ZIP,
+* clarified requirements,
+
+the assistant failed to produce the complete replacement files requested.
+
+Effects:
+
+* development blockage,
+* significant loss of productivity.
+
+---
+
+## Final State of Project
+
+Completed:
+
+* Point 1
+* Point 2
+* Point 3
+* Point 4
+
+Blocked:
+custom_duration_screen.dart
+partial_protection_confirmation_screen.dart
+
+Objective remaining: 
+> Replace both screens so they match the approved mockup exactly while preserving the existing activation logic.
+
+## 2026-07-16 — SMS & Challenge UX Completion + Local Notifications
+
+### Completed
+
+- Completed the approved redesign of the SMS Code screen.
+- Completed the approved redesign of the Copy Challenge screen.
+- Updated the SMS flow so the confirmation dialog is displayed only after the user presses **Send Code**.
+- Updated the Challenge flow so the confirmation dialog is displayed only after the challenge has been successfully completed.
+- Fixed SMS unlock navigation to return directly to Home after a successful unlock.
+- Implemented the local notifications infrastructure using:
+  - flutter_local_notifications
+  - flutter_timezone
+- Configured local timezone initialization for scheduled notifications.
+- Implemented Waiting Period expiration notifications.
+- Validated local notifications on iOS simulator.
+- Verified notifications are delivered while the application is in the background.
+
+### Status
+
+SMS unlock flow is now aligned with the approved UX.
+
+Copy Challenge flow is now aligned with the approved UX.
+
+Local notification infrastructure is operational.
+
+Waiting Period expiration notifications are functioning correctly.
+
+### Next Session Focus
+
+- Implement local notifications for Partial Protection expiration.
+- Continue refactoring HomeScreen into smaller reusable components.
+- Align documentation and implementation naming (`deactivationPending` vs `waitingPeriod`).
+- Begin Login / Authentication implementation.
+- Continue Accountability backend implementation.
+- Begin real Push Notification integration.
+- Continue VPN/DNS enforcement implementation.
+
+### Technical Notes
+
+- Local notifications now use flutter_local_notifications together with flutter_timezone.
+- Waiting Period notifications are scheduled locally and do not require backend connectivity.
+- SMS and Challenge confirmation dialogs were moved to the final confirmation step to match the approved interaction flow.
+- Notification scheduling was validated successfully on iOS Simulator after timezone initialization.
+
+### Documentation Alignment Required Before Commit
+
+### Product_Flow.md
+
+Update:
+
+- SMS Code flow
+- Copy Challenge flow
+- Waiting Period notification behavior
+
+### Business_Rules.md
+
+Update Waiting Period rules to document local expiration notifications.
+
+### Architecture.md
+
+Document the Local Notification layer and timezone initialization.
+
+### Pre-Commit Validation Checklist
+
+Before committing:
+
+- Confirm SMS Code flow matches approved UX.
+- Confirm Copy Challenge flow matches approved UX.
+- Confirm Waiting Period notification is delivered.
+- Confirm project compiles successfully.
+- Confirm no temporary debug statements remain.
+
+### Delivery Tracking
+
+### Blocks Completed This Session
+
+- SMS Code redesign
+- Copy Challenge redesign
+- Local notification infrastructure
+- Waiting Period notifications
+
+### Estimated Remaining Major Blocks
+
+- Partial Protection notifications
+- HomeScreen refactor
+- Authentication layer
+- Accountability backend
+- Push notification backend
+- VPN/DNS enforcement
+- Activity log persistence
+- Settings completion
+- Store readiness

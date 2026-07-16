@@ -4,15 +4,17 @@ import '../theme/app_colors.dart';
 
 class ProtectionStatusBanner
     extends StatelessWidget {
-  final bool isActive;
 
+  final bool isActive;
   final int focusedDays;
   final String? subtitle;
+  final String title;
 
   const ProtectionStatusBanner({
     super.key,
     required this.isActive,
     required this.focusedDays,
+    required this.title,
     this.subtitle,
   });
 
@@ -68,9 +70,7 @@ class ProtectionStatusBanner
                 Row(
                   children: [
                     Text(
-                      isActive
-                          ? 'Protection Active'
-                          : 'Protection Disabled',
+                      title,
 
                       style:
                           const TextStyle(

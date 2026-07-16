@@ -156,6 +156,28 @@ This ensures that delivery expectations remain realistic and controlled.
 
 ---
 
+## 13. Fast Resume Protocol
+
+When CleanMind development resumes in a new conversation:
+
+* The Assistant must first review all uploaded .md project documents.
+
+* After reviewing documentation, the Assistant should request the following core technical files together in a single message:
+
+  * main.dart
+  * plan_state.dart
+  * protection_state.dart
+  * local_storage_service.dart
+  * home_screen.dart
+
+* These files are considered the minimum technical context package required to reconstruct the current implementation state.
+
+* Additional .dart files should only be requested after reviewing the core files and identifying a specific dependency, implementation gap, or feature under active development.
+
+* The Assistant should prioritize minimizing context-reconstruction time and avoiding long chains of sequential file requests.
+
+* The objective is to reach the active development block as quickly as possible while still validating the real code state.
+
 ## Canonical Project Documents (Source of Truth)
 
 The following documents define the complete context, objectives, scope, and constraints of the CleanMind MVP.

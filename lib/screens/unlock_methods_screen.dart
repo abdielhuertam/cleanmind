@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../state/plan_state.dart';
 import '../theme/app_colors.dart';
 
+import '../services/notification_service.dart';
+
 class UnlockMethodsScreen
     extends StatelessWidget {
   final PlanState plan;
@@ -60,7 +62,7 @@ class UnlockMethodsScreen
                 description,
 
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   height: 1.4,
                 ),
               ),
@@ -72,7 +74,7 @@ class UnlockMethodsScreen
 
                 padding:
                     const EdgeInsets.all(
-                  16,
+                  12,
                 ),
 
                 decoration: BoxDecoration(
@@ -186,7 +188,7 @@ class UnlockMethodsScreen
               'Choose how to disable protection',
 
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight:
                     FontWeight.bold,
 
@@ -195,7 +197,7 @@ class UnlockMethodsScreen
               ),
             ),
 
-            const SizedBox(height: 22),
+            const SizedBox(height: 16),
 
             Expanded(
               child: GridView.count(
@@ -204,7 +206,7 @@ class UnlockMethodsScreen
                 crossAxisSpacing: 14,
                 mainAxisSpacing: 14,
 
-                childAspectRatio: 0.92,
+                childAspectRatio: 1.10,
 
                 children: [
                   _MethodCard(
@@ -216,41 +218,20 @@ class UnlockMethodsScreen
                     enabled:
                         !requestPending,
 
-                    onTap: () async {
-                      if (requestPending) {
-                        return;
-                      }
+                      onTap: () async {
+                        if (requestPending) {
+                          return;
+                        }
 
-                      final confirmed =
-                          await _showConfirmationDialog(
-                        context: context,
+                        if (!context.mounted) {
+                          return;
+                        }
 
-                        title:
-                            'Start Challenge?',
-
-                        description:
-                            'You must complete the challenge before protection can be disabled.',
-
-                        warning:
-                            'If protection becomes disabled, your current progress streak will reset.',
-
-                        confirmText:
-                            'Continue',
-                      );
-
-                      if (!confirmed) {
-                        return;
-                      }
-
-                      if (!context.mounted) {
-                        return;
-                      }
-
-                      Navigator.pushNamed(
-                        context,
-                        '/copy-challenge',
-                      );
-                    },
+                        Navigator.pushNamed(
+                          context,
+                          '/copy-challenge',
+                        );
+                      },
                   ),
 
                   _MethodCard(
@@ -294,8 +275,13 @@ class UnlockMethodsScreen
                       }
 
                       final updatedPlan =
-                          plan
-                              .requestDeactivation();
+                          plan.requestDeactivation();
+
+                    await NotificationService.scheduleWaitingPeriod(
+                      duration: isPro
+                          ? const Duration(hours: 1)
+                          : const Duration(hours: 8),
+                    );
 
                       onPlanChanged(
                         updatedPlan,
@@ -324,32 +310,20 @@ class UnlockMethodsScreen
                     premiumFeature: true,
 
                     onTap: () async {
-                      if (!isPro ||
-                          requestPending) {
+                      if (!isPro) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Available in CleanMind Pro.',
+                            ),
+                          ),
+                        );
                         return;
                       }
 
-                      final confirmed =
-                          await _showConfirmationDialog(
-                        context: context,
-
-                        title:
-                            'Request SMS Code?',
-
-                        description:
-                            'A verification code will be sent to your accountability contact.',
-
-                        warning:
-                            'Protection will only disable after successful verification. Your progress streak will reset if protection is disabled.',
-
-                        confirmText:
-                            'Send Code',
-                      );
-
-                      if (!confirmed) {
+                      if (requestPending) {
                         return;
                       }
-
                       if (!context.mounted) {
                         return;
                       }
@@ -375,8 +349,18 @@ class UnlockMethodsScreen
                     premiumFeature: true,
 
                     onTap: () async {
-                      if (!isPro ||
-                          requestPending) {
+                      if (!isPro) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Available in CleanMind Pro.',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (requestPending) {
                         return;
                       }
 
@@ -484,7 +468,7 @@ class _MethodCard extends StatelessWidget {
         child: Container(
           padding:
               const EdgeInsets.all(
-            16,
+            12,
           ),
 
           decoration: BoxDecoration(
@@ -492,7 +476,7 @@ class _MethodCard extends StatelessWidget {
 
             borderRadius:
                 BorderRadius.circular(
-              26,
+              22,
             ),
 
             boxShadow: const [
@@ -520,7 +504,7 @@ class _MethodCard extends StatelessWidget {
                   ),
                 ),
 
-              if (!enabled)
+              if (!enabled && !premiumFeature)
                 Positioned(
                   left: 0,
                   top: 0,
@@ -557,7 +541,29 @@ class _MethodCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
+              if (premiumFeature && !enabled)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'PRO',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               Center(
                 child: Column(
                   mainAxisAlignment:
@@ -568,13 +574,13 @@ class _MethodCard extends StatelessWidget {
                     Icon(
                       icon,
 
-                      size: 58,
+                      size: 50,
 
                       color: iconColor,
                     ),
 
                     const SizedBox(
-                      height: 14,
+                      height: 10,
                     ),
 
                     Text(
@@ -584,7 +590,7 @@ class _MethodCard extends StatelessWidget {
                           TextAlign.center,
 
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         height: 1.2,
 
                         fontWeight:

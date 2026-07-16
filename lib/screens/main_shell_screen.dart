@@ -114,7 +114,7 @@ class _MainShellScreenState
                 ),
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 0),
 
               Row(
                 mainAxisAlignment:
@@ -203,7 +203,7 @@ class _MainShellScreenState
                 ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 10),
 
               Expanded(
                 child:

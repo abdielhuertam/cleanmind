@@ -7,123 +7,171 @@ import '../state/protection_state.dart';
 import '../state/unlock_request_state.dart';
 
 class LocalStorageService {
-  static const _planKey = 'plan_state';
+static const _planKey = 'plan_state';
 
-  static Future<void> savePlan(
-    PlanState plan,
-  ) async {
-    final prefs =
-        await SharedPreferences.getInstance();
+static Future<void> savePlan(
+PlanState plan,
+) async {
+final prefs =
+await SharedPreferences.getInstance();
 
-    final jsonMap = {
-      'isPro': plan.isPro,
-      'hasSupport': plan.hasSupport,
+final jsonMap = {
+  'isPro': plan.isPro,
+  'hasSupport': plan.hasSupport,
 
-      'protectionStatus':
-          plan.protection.status.name,
+    'xp': plan.xp,
+    'level': plan.level,
+    'streakDays': plan.streakDays,
 
-      'activatedAt':
-          plan.protection.activatedAt
-              .toIso8601String(),
+  'protectionStatus':
+      plan.protection.status.name,
 
-      'deactivationScheduledAt':
-          plan.protection
-              .deactivationScheduledAt
-              ?.toIso8601String(),
+  'protectionMode':
+      plan.protection.mode.name,
 
-      'unlockRequestStatus':
-          plan.unlockRequest.status.name,
+  'activatedAt':
+      plan.protection.activatedAt
+          .toIso8601String(),
 
-      'unlockRequestCreatedAt':
-          plan.unlockRequest.createdAt
-              ?.toIso8601String(),
+  'deactivationScheduledAt':
+      plan.protection
+          .deactivationScheduledAt
+          ?.toIso8601String(),
 
-      'unlockRequestExpiresAt':
-          plan.unlockRequest.expiresAt
-              ?.toIso8601String(),
-    };
+  'expiresAt':
+      plan.protection.expiresAt
+          ?.toIso8601String(),
 
-    await prefs.setString(
-      _planKey,
-      jsonEncode(jsonMap),
-    );
-  }
+  'unlockRequestStatus':
+      plan.unlockRequest.status.name,
 
-  static Future<PlanState> loadPlan()
-  async {
-    final prefs =
-        await SharedPreferences.getInstance();
+  'unlockRequestCreatedAt':
+      plan.unlockRequest.createdAt
+          ?.toIso8601String(),
 
-    final raw =
-        prefs.getString(_planKey);
+  'unlockRequestExpiresAt':
+      plan.unlockRequest.expiresAt
+          ?.toIso8601String(),
 
-    if (raw == null) {
-      return PlanState.pro();
-    }
+    'lastProgressAwardAt':
+        plan.lastProgressAwardAt
+            ?.toIso8601String(),
+};
 
-    final map = jsonDecode(raw);
+await prefs.setString(
+  _planKey,
+  jsonEncode(jsonMap),
+);
 
-    final protectionStatus =
-        ProtectionStatus.values.firstWhere(
-      (e) =>
-          e.name ==
-          map['protectionStatus'],
-    );
+}
 
-    final unlockRequestStatus =
-        UnlockRequestStatus.values
-            .firstWhere(
-      (e) =>
-          e.name ==
-          map['unlockRequestStatus'],
-      orElse: () =>
-          UnlockRequestStatus.none,
-    );
+static Future<PlanState> loadPlan()
+async {
+final prefs =
+await SharedPreferences.getInstance();
 
-    return PlanState(
-      isPro: map['isPro'] ?? false,
+final raw =
+    prefs.getString(_planKey);
 
-      hasSupport:
-          map['hasSupport'] ?? false,
+if (raw == null) {
+  return PlanState.pro();
+}
 
-        protection: ProtectionState(
-        status: protectionStatus,
+final map = jsonDecode(raw);
 
-        mode: ProtectionMode.permanent,
+final protectionStatus =
+    ProtectionStatus.values.firstWhere(
+  (e) =>
+      e.name ==
+      map['protectionStatus'],
+);
 
-        activatedAt: DateTime.parse(
-            map['activatedAt'],
-        ),
+final protectionMode =
+    ProtectionMode.values.firstWhere(
+  (e) =>
+      e.name ==
+      (map['protectionMode'] ??
+          'permanent'),
+  orElse: () =>
+      ProtectionMode.permanent,
+);
 
-        deactivationScheduledAt:
-            map['deactivationScheduledAt'] != null
-                ? DateTime.parse(
-                    map['deactivationScheduledAt'],
-                    )
-                : null,
-        ),
+final unlockRequestStatus =
+    UnlockRequestStatus.values
+        .firstWhere(
+  (e) =>
+      e.name ==
+      map['unlockRequestStatus'],
+  orElse: () =>
+      UnlockRequestStatus.none,
+);
 
-      unlockRequest: UnlockRequestState(
-        status: unlockRequestStatus,
+return PlanState(
+  isPro: map['isPro'] ?? false,
 
-        createdAt:
-            map['unlockRequestCreatedAt'] !=
-                    null
-                ? DateTime.parse(
-                    map[
-                        'unlockRequestCreatedAt'],
-                  )
-                : null,
+  hasSupport:
+      map['hasSupport'] ?? false,
 
-        expiresAt:
-            map['unlockRequestExpiresAt'] !=
-                    null
-                ? DateTime.parse(
-                    map[
-                        'unlockRequestExpiresAt'],
-                  )
-                : null,
-      ),
-    );
-  }
+    xp: map['xp'] ?? 0,
+
+    level: map['level'] ?? 1,
+
+    streakDays: map['streakDays'] ?? 0,
+
+  lastProgressAwardAt:
+    map['lastProgressAwardAt'] != null
+        ? DateTime.parse(
+            map['lastProgressAwardAt'],
+          )
+        : null,
+
+  protection: ProtectionState(
+    status: protectionStatus,
+
+    mode: protectionMode,
+
+    activatedAt: DateTime.parse(
+      map['activatedAt'],
+    ),
+
+    deactivationScheduledAt:
+        map['deactivationScheduledAt'] !=
+                null
+            ? DateTime.parse(
+                map[
+                    'deactivationScheduledAt'],
+              )
+            : null,
+
+    expiresAt:
+        map['expiresAt'] != null
+            ? DateTime.parse(
+                map['expiresAt'],
+              )
+            : null,
+  ),
+
+  unlockRequest: UnlockRequestState(
+    status: unlockRequestStatus,
+
+    createdAt:
+        map['unlockRequestCreatedAt'] !=
+                null
+            ? DateTime.parse(
+                map[
+                    'unlockRequestCreatedAt'],
+              )
+            : null,
+
+    expiresAt:
+        map['unlockRequestExpiresAt'] !=
+                null
+            ? DateTime.parse(
+                map[
+                    'unlockRequestExpiresAt'],
+              )
+            : null,
+  ),
+);
+}
 }

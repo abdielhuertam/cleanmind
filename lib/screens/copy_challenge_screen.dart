@@ -36,6 +36,76 @@ class _CopyChallengeScreenState
   bool get _isCorrect =>
       _controller.text.trim() == _requiredText;
 
+Future<bool> _showConfirmationDialog({
+  required BuildContext context,
+  required String title,
+  required String description,
+  required String warning,
+  required String confirmText,
+}) async {
+  return await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(28),
+            ),
+
+            title: Text(title),
+
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                Text(description),
+
+                const SizedBox(height: 20),
+
+                Container(
+                  width: double.infinity,
+
+                  padding: const EdgeInsets.all(16),
+
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(.08),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+
+                  child: Text(
+                    warning,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            actions: [
+
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context, false);
+                },
+                child: const Text("Cancel"),
+              ),
+
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context, true);
+                },
+                child: Text(confirmText),
+              ),
+            ],
+          );
+        },
+      ) ??
+      false;
+}
+
   @override
   void initState() {
     super.initState();
@@ -56,7 +126,10 @@ class _CopyChallengeScreenState
         if (_secondsRemaining <= 1) {
           _timer?.cancel();
 
-          Navigator.pop(context);
+          setState(() {
+            _secondsRemaining = 0;
+          });
+
           return;
         }
 
@@ -75,14 +148,15 @@ class _CopyChallengeScreenState
     super.dispose();
   }
 
-  void _unlock() {
-    final updatedPlan =
-        widget.plan.unlockSucceeded();
+void _unlock() {
+  final updatedPlan =
+      widget.plan.unlockSucceeded();
 
-    widget.onPlanChanged(updatedPlan);
+  widget.onPlanChanged(updatedPlan);
 
-    Navigator.pop(context);
-  }
+  Navigator.pop(context); // Challenge
+  Navigator.pop(context); // Unlock Methods
+}
 
   @override
   Widget build(BuildContext context) {
@@ -284,8 +358,29 @@ class _CopyChallengeScreenState
                           ),
                         ),
 
-                        onPressed:
-                            _isCorrect ? _unlock : null,
+                        onPressed: (_secondsRemaining == 0 || !_isCorrect)
+                            ? null
+                            : () async {
+                                _timer?.cancel();
+                                final confirmed =
+                                    await _showConfirmationDialog(
+                                  context: context,
+                                  title: 'Request Challenge?',
+                                  description:
+                                      'Protection will only be disabled after completing this challenge.',
+                                  warning:
+                                      'Your progress streak will reset if protection is disabled.',
+                                  confirmText: 'Unlock',
+                                );
+
+                                if (!confirmed) {
+                                  _startTimer();
+                                  return;
+                                }
+                                if (!mounted) return;
+
+                                _unlock();
+                              },
 
                         child: const Text(
                           'Unlock',

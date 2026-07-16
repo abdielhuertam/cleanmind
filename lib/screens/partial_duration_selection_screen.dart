@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../state/plan_state.dart';
 import '../theme/app_colors.dart';
 import 'custom_duration_screen.dart';
+import 'partial_protection_confirmation_screen.dart';
 
 
 class PartialDurationSelectionScreen
@@ -168,9 +169,41 @@ class PartialDurationSelectionScreen
               (option) =>
                   _durationCard(
                 label: option,
-                icon:
-                    Icons.schedule,
-                onTap: () {},
+                icon: Icons.schedule,
+                onTap: () {
+
+                  Duration selectedDuration;
+
+                  switch (option) {
+                    case '8 Hours':
+                      selectedDuration =
+                          const Duration(hours: 8);
+                      break;
+
+                    case '12 Hours':
+                      selectedDuration =
+                          const Duration(hours: 12);
+                      break;
+
+                    default:
+                      selectedDuration =
+                          const Duration(hours: 24);
+                  }
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          PartialProtectionConfirmationScreen(
+                            plan: plan,
+                            onPlanChanged:
+                                onPlanChanged,
+                            selectedDuration:
+                                selectedDuration,
+                          ),
+                    ),
+                  );
+                },
               ),
             ),
 
@@ -211,24 +244,44 @@ class PartialDurationSelectionScreen
                   }
 
                   if (option == 'Custom') {
-
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            CustomDurationScreen(
-                              plan: plan,
-                              onPlanChanged:
-                                  onPlanChanged,
-                            ),
+                        builder: (_) => CustomDurationScreen(
+                          plan: plan,
+                          onPlanChanged: onPlanChanged,
+                        ),
                       ),
                     );
-
                     return;
                   }
 
-                  // aquí conectaremos después
-                  // 1h, 2h y 4h
+                  Duration selectedDuration;
+
+                  switch (option) {
+                    case '1 Hour':
+                      selectedDuration = const Duration(hours: 1);
+                      break;
+
+                    case '2 Hours':
+                      selectedDuration = const Duration(hours: 2);
+                      break;
+
+                    default:
+                      selectedDuration = const Duration(hours: 4);
+                  }
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          PartialProtectionConfirmationScreen(
+                        plan: plan,
+                        onPlanChanged: onPlanChanged,
+                        selectedDuration: selectedDuration,
+                      ),
+                    ),
+                  );
                 },
               ),
             ),

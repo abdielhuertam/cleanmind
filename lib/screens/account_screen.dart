@@ -133,7 +133,7 @@ class AccountScreen extends StatelessWidget {
                           .ellipsis,
 
                   style: TextStyle(
-                    fontSize: 19,
+                    fontSize: 17,
                     fontWeight:
                         FontWeight.bold,
 
@@ -177,7 +177,7 @@ class AccountScreen extends StatelessWidget {
 
       padding:
           const EdgeInsets.all(
-        24,
+        20,
       ),
 
       decoration: BoxDecoration(
@@ -206,7 +206,7 @@ class AccountScreen extends StatelessWidget {
             'Protection Stats',
 
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 18,
               fontWeight:
                   FontWeight.bold,
 
@@ -253,7 +253,7 @@ class AccountScreen extends StatelessWidget {
           value,
 
           style: const TextStyle(
-            fontSize: 34,
+            fontSize: 30,
             fontWeight:
                 FontWeight.bold,
 
@@ -290,7 +290,7 @@ class AccountScreen extends StatelessWidget {
 
       padding:
           const EdgeInsets.all(
-        24,
+        20,
       ),
 
       decoration: BoxDecoration(
@@ -319,7 +319,7 @@ class AccountScreen extends StatelessWidget {
             'Subscription',
 
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 18,
               fontWeight:
                   FontWeight.bold,
 
@@ -336,7 +336,7 @@ class AccountScreen extends StatelessWidget {
                 : 'Upgrade to Premium to unlock SMS verification, Support approvals, and advanced protection features.',
 
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               height: 1.4,
 
               color:

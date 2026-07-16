@@ -115,6 +115,7 @@ When a Free user requests deactivation:
 4. User may cancel at any time.
 5. When the waiting period expires:
    - Protection transitions to protectionDisabled.
+   - A local notification is delivered to the user.
    - Current streak resets.
    - Ranking progression may be affected.
    - Previously earned medals remain preserved.
@@ -128,8 +129,10 @@ No external notifications are sent.
 Available methods:
 
 ### Waiting Period
+
 - Minimum duration: 1 hour.
 - Automatically disables protection upon expiration.
+- A local notification is delivered when the waiting period finishes.
 - No automatic reactivation.
 
 ### Accountability Code (SMS-Based)

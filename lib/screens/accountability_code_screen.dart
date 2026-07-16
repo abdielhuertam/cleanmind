@@ -1,7 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+import 'package:flutter/services.dart';
 
 import '../state/plan_state.dart';
 import '../theme/app_colors.dart';
+
+
+
 
 class AccountabilityCodeScreen
     extends StatefulWidget {
@@ -24,40 +31,218 @@ class AccountabilityCodeScreen
 
 class _AccountabilityCodeScreenState
     extends State<AccountabilityCodeScreen> {
-  final TextEditingController _controller =
-      TextEditingController();
+
+final List<TextEditingController> _controllers =
+    List.generate(
+  6,
+  (_) => TextEditingController(),
+);
+
+final List<FocusNode> _focusNodes =
+    List.generate(
+  6,
+  (_) => FocusNode(),
+);
 
   late final String _generatedCode;
 
-  bool get _isCorrect =>
-      _controller.text.trim() ==
-      _generatedCode;
+  Timer? _resendTimer;
+
+int _secondsRemaining = 180;
+
+bool _smsSent = false;
+
+bool get _canResend =>
+    _secondsRemaining == 0;
+
 
   @override
   void initState() {
     super.initState();
 
     _generatedCode = '676294';
-
-    _controller.addListener(() {
-      setState(() {});
-    });
   }
+
+
 
   @override
   void dispose() {
-    _controller.dispose();
+    _resendTimer?.cancel();
+    for (final controller in _controllers) {
+      controller.dispose();
+    }
+
+    for (final node in _focusNodes) {
+      node.dispose();
+    }
     super.dispose();
   }
 
-  void _unlock() {
-    final updatedPlan =
-        widget.plan.unlockSucceeded();
+void _unlock() {
+  final updatedPlan =
+      widget.plan.unlockSucceeded();
 
-    widget.onPlanChanged(updatedPlan);
+  widget.onPlanChanged(updatedPlan);
 
-    Navigator.pop(context);
+  Navigator.pop(context); // Cierra SMS Code
+  Navigator.pop(context); // Cierra Unlock Methods
+}
+
+void _startResendTimer() {
+
+  _resendTimer?.cancel();
+
+  _resendTimer = Timer.periodic(
+    const Duration(seconds: 1),
+    (_) {
+
+      if (!mounted) return;
+
+      if (_secondsRemaining > 0) {
+
+        setState(() {
+          _secondsRemaining--;
+        });
+
+      } else {
+
+        _resendTimer?.cancel();
+
+        setState(() {
+
+          _smsSent = false;
+
+          _secondsRemaining = 180;
+
+          for (final controller in _controllers) {
+            controller.clear();
+          }
+
+          FocusScope.of(context).unfocus();
+        });
+      }
+    },
+  );
+}
+
+void _onDigitChanged(
+  int index,
+  String value,
+) {
+  if (value.isNotEmpty &&
+      index < 5) {
+    _focusNodes[index + 1]
+        .requestFocus();
   }
+
+  if (value.isEmpty &&
+      index > 0) {
+    _focusNodes[index - 1]
+        .requestFocus();
+  }
+
+  final enteredCode =
+      _controllers
+          .map(
+            (c) => c.text,
+          )
+          .join();
+
+  if (enteredCode.length == 6 &&
+      enteredCode ==
+          _generatedCode) {
+    _unlock();
+  }
+}
+
+void _onKeyPressed(
+  int index,
+  KeyEvent event,
+) {
+  if (event is! KeyDownEvent) return;
+
+  if (event.logicalKey ==
+      LogicalKeyboardKey.backspace) {
+
+    if (_controllers[index].text.isEmpty &&
+        index > 0) {
+
+      _focusNodes[index - 1].requestFocus();
+
+      _controllers[index - 1].clear();
+    }
+  }
+}
+
+Future<bool> _showConfirmationDialog({
+  required BuildContext context,
+  required String title,
+  required String description,
+  required String warning,
+  required String confirmText,
+}) async {
+  return await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(28),
+            ),
+
+            title: Text(title),
+
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                Text(description),
+
+                const SizedBox(height: 20),
+
+                Container(
+                  width: double.infinity,
+
+                  padding: const EdgeInsets.all(16),
+
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(.08),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+
+                  child: Text(
+                    warning,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            actions: [
+
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context, false);
+                },
+                child: const Text("Cancel"),
+              ),
+
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context, true);
+                },
+                child: Text(confirmText),
+              ),
+            ],
+          );
+        },
+      ) ??
+      false;
+}
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +278,7 @@ class _AccountabilityCodeScreenState
               const SizedBox(height: 24),
 
               const Text(
-                'Verification Code',
+                'SMS Code',
 
                 style: TextStyle(
                   fontSize: 28,
@@ -126,69 +311,45 @@ class _AccountabilityCodeScreenState
 
                 child: Column(
                   children: [
-                    const Icon(
-                      Icons.sms,
-                      size: 60,
-                      color: AppColors.primary,
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    const Text(
-                      'A verification code was sent to your Support.',
-
-                      textAlign: TextAlign.center,
-
-                      style: TextStyle(
-                        fontSize: 16,
-                        height: 1.4,
-                        color:
-                            AppColors.textSecondary,
-                      ),
-                    ),
 
                     const SizedBox(height: 22),
 
                     Container(
                       width: double.infinity,
 
-                      padding: const EdgeInsets.all(22),
-
-                      decoration: BoxDecoration(
-                        color: AppColors.primary
-                            .withOpacity(0.08),
-
-                        borderRadius:
-                            BorderRadius.circular(24),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 18,
                       ),
 
-                      child: Column(
-                        children: const [
-                          Text(
-                            'Ask your Support for the verification code sent to',
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
 
-                            textAlign: TextAlign.center,
+                      child: Row(
+                        children: [
 
-                            style: TextStyle(
-                              fontSize: 15,
-                              height: 1.4,
-                              color:
-                                  AppColors
-                                      .textSecondary,
-                            ),
+                          const Icon(
+                            Icons.phone,
+                            color: AppColors.primary,
+                            size: 28,
                           ),
 
-                          SizedBox(height: 14),
+                          const SizedBox(width: 14),
 
-                          Text(
-                            '+52 •••• •••• 0062',
+                          const Expanded(
+                            child: Text(
+                              '+52 •••• •••• 0062',
 
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight:
-                                  FontWeight.bold,
-                              color:
-                                  AppColors.primary,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                           ),
                         ],
@@ -197,70 +358,219 @@ class _AccountabilityCodeScreenState
 
                     const SizedBox(height: 22),
 
-                    TextField(
-                      controller: _controller,
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
 
-                      keyboardType:
-                          TextInputType.number,
-
-                      decoration: InputDecoration(
-                        hintText:
-                            'Enter verification code',
-
-                        filled: true,
-
-                        fillColor: Colors.white,
-
-                        contentPadding:
-                            const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 16,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
+                      ),
+                      onPressed: _smsSent
+                          ? null
+                          : () async {
 
-                        border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(20),
-                        ),
+                            final confirmed =
+                                await _showConfirmationDialog(
+                              context: context,
+
+                              title: 'Request SMS Code?',
+
+                              description:
+                                  'A verification code will be sent to your accountability contact.',
+
+                              warning:
+                                  'Protection will only disable after successful verification. Your progress streak will reset if protection is disabled.',
+
+                              confirmText: 'Send Code',
+                            );
+
+                            if (!confirmed) {
+                              return;
+                            }
+
+                            if (!mounted) {
+                              return;
+                            }
+
+                            setState(() {
+                              _smsSent = true;
+                              _secondsRemaining = 180;
+
+                              for (final controller in _controllers) {
+                                controller.clear();
+                              }
+                            });
+
+                            _resendTimer?.cancel();
+                            _startResendTimer();
+                            _focusNodes.first.requestFocus();
+                          },
+                      child: const Text(
+                        'Send Code',
+                      ),
+                    ),
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    const Text(
+                      'Enter the received code',
+
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.textSecondary,
                       ),
                     ),
 
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 20),
 
-                    SizedBox(
-                      width: double.infinity,
-                      height: 54,
+                    IgnorePointer(
+                      ignoring: !_smsSent,
 
-                      child: ElevatedButton(
-                        style:
-                            ElevatedButton.styleFrom(
-                          backgroundColor: _isCorrect
-                              ? AppColors.primary
-                              : AppColors.disabled,
+                      child: Opacity(
+                        opacity: _smsSent ? 1 : .45,
 
-                          foregroundColor:
-                              Colors.white,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(
+                          6,
+                          (index) => SizedBox(
+                            width: 46,
+                            height: 56,
 
-                          shape:
-                              RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                              20,
+                            child: KeyboardListener(
+                              focusNode: FocusNode(),
+
+                              onKeyEvent: (event) {
+                                _onKeyPressed(
+                                  index,
+                                  event,
+                                );
+                              },
+
+                              child: TextField(
+                              controller: _controllers[index],
+                              focusNode: _focusNodes[index],
+
+                              enabled: _smsSent,
+
+                              keyboardType: TextInputType.number,
+
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(1),
+                              ],
+
+                              textAlign: TextAlign.center,
+
+                              maxLength: 1,
+
+                              decoration: InputDecoration(
+                                counterText: '',
+                                contentPadding: EdgeInsets.zero,
+
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade300,
+                                  ),
+                                ),
+
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: AppColors.primary,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+
+                              onChanged: (value) {
+                                if (value.length > 1) {
+                                  value = value.substring(0, 1);
+                                  _controllers[index].text = value;
+                                  _controllers[index].selection =
+                                      TextSelection.collapsed(
+                                    offset: value.length,
+                                  );
+                                }
+
+                                _onDigitChanged(
+                                  index,
+                                  value,
+                                );
+                              },
+                            ),
                             ),
                           ),
                         ),
+                    ),
+                    ),
+                    ),
 
-                        onPressed:
-                            _isCorrect ? _unlock : null,
+                    const SizedBox(height: 24),
 
-                        child: const Text(
-                          'Verify & Unlock',
+                    if (_smsSent)
+                      TextButton(
+                      onPressed: _canResend
+                          ? () {
+                              setState(() {
+                                _smsSent = true;
+                                _secondsRemaining = 180;
 
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight:
-                                FontWeight.bold,
+                                for (final controller in _controllers) {
+                                  controller.clear();
+                                }
+
+                                _focusNodes.first.requestFocus();
+                              });
+
+                              _startResendTimer();
+                            }
+                          : null,
+
+                      child: Text(
+                        _canResend
+                            ? 'Resend Code'
+                            : 'Resend Code (${(_secondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_secondsRemaining % 60).toString().padLeft(2, '0')})',
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    Container(
+                      width: double.infinity,
+
+                      padding: const EdgeInsets.all(14),
+
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(.06),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+
+                      child: Row(
+                        children: [
+
+                          const Icon(
+                            Icons.info_outline,
+                            size: 18,
                           ),
-                        ),
+
+                          const SizedBox(width: 8),
+
+                          Expanded(
+                            child: Text(
+                              _smsSent
+                                  ? 'The verification code expires in ${(_secondsRemaining ~/ 60).toString().padLeft(2, '0')}:${(_secondsRemaining % 60).toString().padLeft(2, '0')}.'
+                                  : 'Press "Send Code" to receive a verification code.',
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

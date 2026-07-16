@@ -13,6 +13,8 @@ import '../widgets/request_pending_banner.dart';
 import 'main_shell_screen.dart';
 import 'pending_requests_screen.dart';
 
+import '../widgets/streak_circle_card.dart';
+
 class HomeScreen extends StatefulWidget {
   final PlanState plan;
 
@@ -95,13 +97,24 @@ class _HomeScreenState
   String _formatRemainingTime(
     Duration duration,
   ) {
+
+    final days =
+        duration.inDays;
+
+    final hours =
+        duration.inHours % 24;
+
     final minutes =
-        duration.inMinutes;
+        duration.inMinutes % 60;
 
     final seconds =
         duration.inSeconds % 60;
 
-    return '${minutes}m ${seconds.toString().padLeft(2, '0')}s';
+    if (days > 0) {
+      return '${days}d ${hours.toString().padLeft(2, '0')}h ${minutes.toString().padLeft(2, '0')}m';
+    }
+
+    return '${hours.toString().padLeft(2, '0')}h ${minutes.toString().padLeft(2, '0')}m ${seconds.toString().padLeft(2, '0')}s';
   }
   @override
   Widget build(BuildContext context) {
@@ -115,9 +128,7 @@ class _HomeScreenState
         status.name != 'inactive';
 
     final focusedDays =
-        widget.plan.protection
-            .getActiveDuration()
-            .inDays;
+        widget.plan.streakDays;
 
     final hasPendingRequest =
         widget.plan.unlockRequest
@@ -134,10 +145,120 @@ class _HomeScreenState
 
     return SingleChildScrollView(
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
 
-        children: [
+              children: [
+
+          Container(
+            width: double.infinity,
+
+            margin: const EdgeInsets.only(
+              bottom: 12,
+            ),
+
+            padding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 12,
+            ),
+
+            decoration: BoxDecoration(
+              color: Colors.white,
+
+              borderRadius:
+                  BorderRadius.circular(
+                24,
+              ),
+
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+
+            child: Row(
+              children: [
+
+                Expanded(
+                  child: Column(
+                    children: [
+
+                      Text(
+                        '${widget.plan.xp}',
+                        style:
+                            const TextStyle(
+                          fontSize: 24,
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 4,
+                      ),
+
+                      const Text(
+                        'XP',
+                      ),
+                    ],
+                  ),
+                ),
+
+                Expanded(
+                  child: Column(
+                    children: [
+
+                      Text(
+                        '${widget.plan.level}',
+                        style:
+                            const TextStyle(
+                          fontSize: 24,
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 4,
+                      ),
+
+                      const Text(
+                        'Level',
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Expanded(
+                  child: Column(
+                    children: [
+
+                      Text(
+                        '--',
+                        style:
+                            TextStyle(
+                          fontSize: 24,
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      SizedBox(
+                        height: 4,
+                      ),
+
+                      Text(
+                        'Top',
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
 
           if (waitingPeriodActive &&
               remainingWaitingTime !=
@@ -151,8 +272,9 @@ class _HomeScreenState
               ),
 
               padding:
-                  const EdgeInsets.all(
-                20,
+                  const EdgeInsets.symmetric(
+                horizontal: 22,
+                vertical: 18,
               ),
 
               decoration:
@@ -230,7 +352,7 @@ class _HomeScreenState
 
                           style:
                               TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
 
                             fontWeight:
                                 FontWeight
@@ -280,6 +402,13 @@ class _HomeScreenState
               isActive: isProtectionActive,
               focusedDays: focusedDays,
 
+              title: !isProtectionActive
+                  ? 'Protection Disabled'
+                  : widget.plan.protection.mode ==
+                          ProtectionMode.partial
+                      ? 'Partial Protection'
+                      : 'Permanent Protection',
+
               subtitle:
                   widget.plan.protection.mode ==
                               ProtectionMode.partial &&
@@ -294,7 +423,14 @@ class _HomeScreenState
             ),
           ),
 
-          const SizedBox(height: 22),
+          const SizedBox(height: 12),
+
+          SizedBox(
+            height: 205,
+            child: StreakCircleCard(
+              streakDays: widget.plan.streakDays,
+            ),
+          ),
 
           if (hasPendingRequest)
             RequestPendingBanner(
@@ -321,7 +457,7 @@ class _HomeScreenState
               children: [
 
                 const SizedBox(
-                  height: 22,
+                  height: 2,
                 ),
 
                 SizedBox(
@@ -374,7 +510,7 @@ class _HomeScreenState
               ],
             ),
 
-            const SizedBox(height: 22),
+            const SizedBox(height: 4),
 
             Row(
               children: [
@@ -410,7 +546,7 @@ class _HomeScreenState
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
 
             GestureDetector(
             onTap: () {
@@ -437,8 +573,9 @@ class _HomeScreenState
               width: double.infinity,
 
               padding:
-                  const EdgeInsets.all(
-                22,
+                  const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 14,
               ),
 
               decoration:
@@ -464,12 +601,12 @@ class _HomeScreenState
               ),
 
               child: Row(
-                children: const [
+                children: [
 
                   Icon(
                     Icons.touch_app,
 
-                    size: 42,
+                    size: 28,
 
                     color:
                         AppColors
@@ -479,21 +616,45 @@ class _HomeScreenState
                   SizedBox(width: 18),
 
                   Expanded(
-                    child: Text(
-                      'Pending Requests',
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
 
-                      style:
-                          TextStyle(
-                        fontSize: 22,
+                      mainAxisSize:
+                          MainAxisSize.min,
 
-                        fontWeight:
-                            FontWeight
-                                .bold,
+                      children: [
 
-                        color:
-                            AppColors
-                                .textPrimary,
-                      ),
+                        const Text(
+                          'Pending Requests',
+
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight:
+                                FontWeight.bold,
+
+                            color:
+                                AppColors.textPrimary,
+                          ),
+                        ),
+
+                        const SizedBox(
+                          height: 4,
+                        ),
+
+                        Text(
+                          widget.plan.unlockRequest
+                                  .isPending
+                              ? '1 pending request'
+                              : 'No pending requests',
+
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color:
+                                AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -510,7 +671,7 @@ class _HomeScreenState
             ),
           ),
 
-          const SizedBox(height: 24),
+              const SizedBox(height: 24),
         ],
       ),
     );

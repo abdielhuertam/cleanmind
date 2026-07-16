@@ -195,8 +195,9 @@ class _ProtectionScreenState
           iconColor:
               AppColors.primary,
 
-          title:
-              'Protection Active',
+          title: isPartial
+              ? 'Partial Protection'
+              : 'Permanent Protection',
 
           dotColor:
               Colors.green,
@@ -212,7 +213,7 @@ class _ProtectionScreenState
                     : '$focusedDays',
 
                 style: const TextStyle(
-                  fontSize: 40,
+                  fontSize: 32,
                   fontWeight:
                       FontWeight.bold,
 
@@ -231,7 +232,7 @@ class _ProtectionScreenState
                     : 'days focused',
 
                 style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 15,
 
                   color:
                       AppColors
@@ -332,7 +333,7 @@ else
         SizedBox(
           width: double.infinity,
 
-          height: 56,
+          height: 52,
 
           child: ElevatedButton(
             style:
@@ -427,7 +428,7 @@ else
                       ),
 
                 style: const TextStyle(
-                  fontSize: 38,
+                  fontSize: 32,
                   fontWeight:
                       FontWeight.bold,
 
@@ -443,7 +444,7 @@ else
               SizedBox(
                 width: double.infinity,
 
-                height: 52,
+                height: 48,
 
                 child: ElevatedButton(
                   style:
@@ -478,7 +479,7 @@ else
                     'Cancel Deactivation',
 
                     style: TextStyle(
-                      fontSize: 17,
+                      fontSize: 15,
                       fontWeight:
                           FontWeight.bold,
                     ),
@@ -527,7 +528,7 @@ else
                   TextAlign.center,
 
               style: TextStyle(
-                fontSize: 17,
+                fontSize: 15,
 
                 color:
                     AppColors
@@ -550,7 +551,7 @@ else
         SizedBox(
           width: double.infinity,
 
-          height: 56,
+          height: 52,
 
           child: ElevatedButton(
             style:
@@ -581,7 +582,7 @@ else
               'Activate Protection',
 
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight:
                     FontWeight.bold,
               ),
@@ -627,7 +628,7 @@ else
       children: [
         Icon(
           icon,
-          size: 44,
+          size: 38,
           color: iconColor,
         ),
 
@@ -644,7 +645,7 @@ else
               title,
 
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight:
                     FontWeight.bold,
 
@@ -742,7 +743,7 @@ else
                 'Protection Settings',
 
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight:
                       FontWeight.bold,
 

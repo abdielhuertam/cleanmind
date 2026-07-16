@@ -143,7 +143,7 @@ class ProtectionSettingsScreen
             ),
 
             const SizedBox(
-              height: 26,
+              height: 18,
             ),
 
             _sectionTitle(
@@ -193,7 +193,7 @@ class ProtectionSettingsScreen
             ),
 
             const SizedBox(
-              height: 26,
+              height: 18,
             ),
 
             _sectionTitle(
@@ -223,7 +223,7 @@ class ProtectionSettingsScreen
             ),
 
             const SizedBox(
-              height: 24,
+              height: 18,
             ),
           ],
         ),
@@ -248,7 +248,7 @@ class ProtectionSettingsScreen
           title,
 
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight:
                 FontWeight.bold,
 
@@ -294,7 +294,7 @@ class ProtectionSettingsScreen
         contentPadding:
             const EdgeInsets.symmetric(
           horizontal: 20,
-          vertical: 8,
+          vertical: 4,
         ),
 
         leading: Icon(
@@ -308,7 +308,7 @@ class ProtectionSettingsScreen
           title,
 
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight:
                 FontWeight.w600,
           ),
@@ -317,7 +317,7 @@ class ProtectionSettingsScreen
         subtitle: Padding(
           padding:
               const EdgeInsets.only(
-            top: 6,
+            top: 2,
           ),
 
           child: Text(

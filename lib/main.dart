@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'state/plan_state.dart';
 
 import 'services/local_storage_service.dart';
+import 'services/notification_service.dart';
 
 import 'screens/main_shell_screen.dart';
 
@@ -11,8 +12,11 @@ import 'screens/accountability_code_screen.dart';
 import 'screens/unlock_methods_screen.dart';
 import 'screens/protection_mode_selection_screen.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await NotificationService.initialize();
 
   PlanState loadedPlan =
       await LocalStorageService.loadPlan();

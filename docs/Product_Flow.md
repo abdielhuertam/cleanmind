@@ -209,8 +209,7 @@ Available methods:
 Behavior:
 
 - Waiting Period automatically disables protection when it expires.
-- Accountability Code sends an automatic SMS containing a verification code.
-- Protection disables only after successful code validation.
+- A local notification is sent automatically when protection expires.
 
 ---
 
@@ -233,12 +232,16 @@ Protection remains ACTIVE until approval is completed.
 
 ## 7. Accountability Code Flow (Pro — No Support or SMS-Based Support)
 
-- The user requests immediate unlock.
-- The backend generates a temporary verification code.
-- An automatic SMS is sent to the configured contact.
-- The contact receives a discreet message with a verification code.
-- The user must enter the received code.
-- The backend validates the code.
+1. User selects **Accountability Code** from the available unlock methods.
+2. The SMS Code screen is displayed showing the configured accountability phone number.
+3. The user presses **Send Code**.
+4. A confirmation dialog explains the consequences of disabling protection.
+5. After confirmation:
+   - The verification code is requested.
+   - The SMS is sent.
+   - The code entry fields become enabled.
+6. The user enters the received verification code.
+7. The verification code is validated.
 
 Outcomes:
 
@@ -247,9 +250,10 @@ Outcomes:
 
 Notes:
 
-- Codes are generated server-side.
+- Verification codes are generated server-side.
 - Codes expire after a defined time window.
 - CleanMind does not read incoming messages.
+- SMS sending always requires explicit user confirmation before being requested.
 
 ---
 
@@ -418,7 +422,7 @@ If Support is configured:
    - Partial Protection (8h, 12h, 24h)
 3. Protection ON
 4. User requests unlock
-5. Copy Challenge or 8-hour Waiting Period
+5. Copy Challenge (confirmation is requested only after the challenge is completed successfully)
 6. Protection OFF
 7. User manually selects a protection mode again
 

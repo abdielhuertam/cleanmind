@@ -18,11 +18,20 @@ class PlanState {
 
   final UnlockRequestState unlockRequest;
 
+  final int xp;
+  final int level;
+  final int streakDays;
+  final DateTime? lastProgressAwardAt;
+
   const PlanState({
     required this.isPro,
     required this.hasSupport,
     required this.protection,
     required this.unlockRequest,
+    required this.xp,
+    required this.level,
+    required this.streakDays,
+    required this.lastProgressAwardAt,
   });
 
   factory PlanState.free() {
@@ -32,6 +41,10 @@ class PlanState {
       protection: ProtectionState.active(),
       unlockRequest:
           UnlockRequestState.none(),
+      xp: 0,
+      level: 1,
+      streakDays: 0,
+      lastProgressAwardAt: null,
     );
   }
 
@@ -42,6 +55,10 @@ class PlanState {
       protection: ProtectionState.active(),
       unlockRequest:
           UnlockRequestState.none(),
+      xp: 0,
+      level: 1,
+      streakDays: 0,
+      lastProgressAwardAt: null,
     );
   }
 
@@ -50,6 +67,10 @@ class PlanState {
     bool? hasSupport,
     ProtectionState? protection,
     UnlockRequestState? unlockRequest,
+    int? xp,
+    int? level,
+    int? streakDays,
+    DateTime? lastProgressAwardAt,
   }) {
     return PlanState(
       isPro: isPro ?? this.isPro,
@@ -59,6 +80,14 @@ class PlanState {
           protection ?? this.protection,
       unlockRequest:
           unlockRequest ?? this.unlockRequest,
+      xp: xp ?? this.xp,
+      level: level ?? this.level,
+      streakDays:
+          streakDays ?? this.streakDays,
+      lastProgressAwardAt:
+          lastProgressAwardAt ??
+          this.lastProgressAwardAt,    
+      
     );
   }
 
@@ -101,7 +130,96 @@ class PlanState {
           updated.expirePushRequest();
     }
 
-    return updated;
+    return updated.refreshProgress();
+  }
+
+  PlanState refreshProgress() {
+
+    if (protection.status !=
+        ProtectionStatus.active) {
+      return this;
+    }
+
+    final now = DateTime.now();
+
+    if (lastProgressAwardAt == null) {
+
+      return copyWith(
+        lastProgressAwardAt: now,
+      );
+    }
+
+    if (protection.mode ==
+        ProtectionMode.partial) {
+
+      final elapsedHours =
+          now
+              .difference(
+                lastProgressAwardAt!,
+              )
+              .inHours;
+
+      if (elapsedHours <= 0) {
+        return this;
+      }
+
+      final earnedXp =
+          elapsedHours * 3;
+
+      final newXp =
+          xp + earnedXp;
+
+      return copyWith(
+        xp: newXp,
+
+        level:
+            1 + (newXp ~/ 1000),
+
+        lastProgressAwardAt:
+            lastProgressAwardAt!.add(
+          Duration(
+            hours: elapsedHours,
+          ),
+        ),
+      );
+    }
+
+    if (protection.mode ==
+      ProtectionMode.permanent) {
+
+    final elapsedHours =
+        now
+            .difference(
+              lastProgressAwardAt!,
+            )
+            .inHours;
+
+    if (elapsedHours <= 0) {
+      return this;
+    }
+
+    final earnedXp =
+        elapsedHours * 4;
+
+    final newXp =
+        xp + earnedXp;
+
+    return copyWith(
+      xp: newXp,
+
+      level:
+          1 + (newXp ~/ 1000),
+
+      lastProgressAwardAt:
+          lastProgressAwardAt!.add(
+        Duration(
+          hours: elapsedHours,
+        ),
+      ),
+    );
+  }
+
+    return this;
   }
 
   PlanState requestDeactivation() {
@@ -177,14 +295,14 @@ class PlanState {
       protection:
           protection.disableProtection(),
       unlockRequest:
-          unlockRequest.approve(),
+          UnlockRequestState.none(),
     );
   }
-
+  
   PlanState rejectPushRequest() {
     return copyWith(
       unlockRequest:
-          unlockRequest.reject(),
+          UnlockRequestState.none(),
     );
   }
 
