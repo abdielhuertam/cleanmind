@@ -54,40 +54,36 @@ class NotificationService {
   static FlutterLocalNotificationsPlugin
       get instance => _notifications;
 
-    static Future<void> scheduleWaitingPeriod({
+
+    static Future<void> schedulePartialProtection({
     required Duration duration,
     }) async {
     await _notifications.zonedSchedule(
-
-        100,
-
-        'Waiting Period Finished',
-
-        'Protection has been disabled.',
-
+        101,
+        'Focus Session Finished',
+        'Your Partial Protection session has ended.',
         tz.TZDateTime.now(
         tz.local,
         ).add(duration),
-
         const NotificationDetails(
-
         iOS: DarwinNotificationDetails(),
-
         android: AndroidNotificationDetails(
-            'waiting_period',
-            'Waiting Period',
+            'partial_protection',
+            'Partial Protection',
             channelDescription:
-                'Waiting period notifications',
+                'Partial protection notifications',
             importance: Importance.high,
             priority: Priority.high,
         ),
         ),
-
         androidScheduleMode:
             AndroidScheduleMode.exactAllowWhileIdle,
-
         matchDateTimeComponents: null,
-        );
+    );
+    }
+
+    static Future<void> cancelPartialProtection() async {
+    await _notifications.cancel(101);
     }
 
 }

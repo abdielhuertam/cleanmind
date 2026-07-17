@@ -1,6 +1,5 @@
 enum ProtectionStatus {
   active,
-  waitingPeriod,
   awaitingApproval,
   protectionDisabled,
   inactive,
@@ -18,15 +17,12 @@ class ProtectionState {
 
   final DateTime activatedAt;
 
-  final DateTime? deactivationScheduledAt;
-
   final DateTime? expiresAt;
 
   const ProtectionState({
     required this.status,
     required this.mode,
     required this.activatedAt,
-    this.deactivationScheduledAt,
     this.expiresAt,
   });
 
@@ -53,29 +49,6 @@ class ProtectionState {
     );
   }
 
-  ProtectionState scheduleWaitingPeriod(
-    Duration duration,
-  ) {
-    return ProtectionState(
-      status:
-          ProtectionStatus.waitingPeriod,
-      mode: mode,
-      activatedAt: activatedAt,
-      expiresAt: expiresAt,
-      deactivationScheduledAt:
-          DateTime.now().add(duration),
-    );
-  }
-
-  ProtectionState cancelDeactivation() {
-    return ProtectionState(
-      status: ProtectionStatus.active,
-      mode: mode,
-      activatedAt: activatedAt,
-      expiresAt: expiresAt,
-    );
-  }
-
   ProtectionState disableProtection() {
     return ProtectionState(
       status:
@@ -83,17 +56,6 @@ class ProtectionState {
               .protectionDisabled,
       mode: mode,
       activatedAt: activatedAt,
-    );
-  }
-
-  bool isDeactivationExpired() {
-    if (deactivationScheduledAt ==
-        null) {
-      return false;
-    }
-
-    return DateTime.now().isAfter(
-      deactivationScheduledAt!,
     );
   }
 
@@ -121,23 +83,6 @@ class ProtectionState {
         expiresAt!.difference(
       DateTime.now(),
     );
-
-    if (difference.isNegative) {
-      return Duration.zero;
-    }
-
-    return difference;
-  }
-
-  Duration? getRemainingDeactivationTime() {
-    if (deactivationScheduledAt ==
-        null) {
-      return null;
-    }
-
-    final difference =
-        deactivationScheduledAt!
-            .difference(DateTime.now());
 
     if (difference.isNegative) {
       return Duration.zero;

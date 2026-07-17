@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../state/plan_state.dart';
 
+import '../widgets/protection_status_overlay.dart';
+
 class PermanentProtectionConfirmationScreen
     extends StatelessWidget {
 
@@ -150,13 +152,17 @@ class PermanentProtectionConfirmationScreen
                       Colors.white,
                 ),
 
-                onPressed: () {
+                onPressed: () async {
 
                   final updatedPlan =
                       plan.manualReactivate();
 
                   onPlanChanged(
                     updatedPlan,
+                  );
+
+                  await ProtectionStatusOverlay.showActivated(
+                    context,
                   );
 
                   Navigator.popUntil(

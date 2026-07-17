@@ -5,7 +5,11 @@ import '../theme/app_colors.dart';
 import '../theme/app_colors.dart';
 
 import '../state/plan_state.dart';
-import 'partial_protection_confirmation_screen.dart';
+
+import '../services/protection_service.dart';
+
+import '../widgets/protection_status_overlay.dart';
+
 
 class CustomDurationScreen extends StatefulWidget {
 
@@ -28,111 +32,28 @@ class CustomDurationScreen extends StatefulWidget {
 class _CustomDurationScreenState
     extends State<CustomDurationScreen> {
 
-  late DateTime _endDateTime;
+  int _selectedDays = 0;
+  int _selectedHours = 0;
+  int _selectedMinutes = 5;
 
-  @override
-  void initState() {
-    super.initState();
 
-      _endDateTime = DateTime.now().add(
-        const Duration(minutes: 5),
-      );
-  }
 
   Duration get duration {
-    final now = DateTime.now();
-
-    final diff =
-        _endDateTime.difference(
-      now,
+    return Duration(
+      days: _selectedDays,
+      hours: _selectedHours,
+      minutes: _selectedMinutes,
     );
-
-    if (diff.isNegative) {
-      return Duration.zero;
-    }
-
-    return diff;
   }
 
 bool get isValid =>
     duration.inSeconds >= 295;
 
-  bool get showPermanentSuggestion =>
-      duration.inHours > 24;
+bool get showPermanentSuggestion =>
+    _selectedDays >= 7;
 
-  Future<void> _pickDate() async {
 
-    final minimumDate =
-        DateTime.now().add(
-      const Duration(
-        minutes: 5,
-      ),
-    );
 
-    final date =
-        await showDatePicker(
-      context: context,
-      initialDate:
-          _endDateTime,
-      firstDate:
-          minimumDate,
-      lastDate:
-          DateTime.now().add(
-        const Duration(
-          days: 365,
-        ),
-      ),
-    );
-
-    if (date == null) return;
-    setState(() {
-
-      _endDateTime =
-          DateTime(
-        date.year,
-        date.month,
-        date.day,
-        _endDateTime.hour,
-        _endDateTime.minute,
-      );
-
-      final minimum =
-          DateTime.now().add(
-        const Duration(
-          minutes: 5,
-        ),
-      );
-
-      if (_endDateTime.isBefore(
-        minimum,
-      )) {
-
-        _endDateTime =
-            minimum;
-      }
-    });
-  }
-
-  Future<void> _pickTime() async {
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(
-        _endDateTime,
-      ),
-    );
-
-    if (time == null) return;
-
-    setState(() {
-      _endDateTime = DateTime(
-        _endDateTime.year,
-        _endDateTime.month,
-        _endDateTime.day,
-        time.hour,
-        time.minute,
-      );
-    });
-  }
 
  String get durationText {
 
@@ -159,6 +80,87 @@ bool get isValid =>
 
   return '$days days';
 }
+
+  Widget _numberPicker({
+    required String label,
+    required int value,
+    required int min,
+    required int max,
+    required ValueChanged<int> onChanged,
+  }) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 6,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+              ),
+            ],
+          ),
+
+          child: Row(
+            mainAxisAlignment:
+                MainAxisAlignment.spaceBetween,
+            children: [
+
+              SizedBox(
+                width: 32,
+                height: 32,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  iconSize: 18,
+                  icon: const Icon(Icons.remove),
+                onPressed:
+                    value > min
+                        ? () => onChanged(value - 1)
+                        : null,
+              ),
+              ),
+
+              Text(
+                value.toString(),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              SizedBox(
+                width: 32,
+                height: 32,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  iconSize: 18,
+                  icon: const Icon(Icons.add),
+                onPressed:
+                    value < max
+                        ? () => onChanged(value + 1)
+                        : null,
+              ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -204,92 +206,65 @@ bool get isValid =>
             ),
 
             const SizedBox(
-              height: 20,
-            ),
-
-            const SizedBox(
               height: 12,
             ),
 
-            InkWell(
-              onTap: () async {
-                await _pickDate();
+            Row(
+              children: [
 
-                if (!mounted) return;
-
-                await _pickTime();
-              },
-
-              borderRadius:
-                  BorderRadius.circular(
-                18,
-              ),
-
-              child: Container(
-                padding:
-                    const EdgeInsets.all(
-                  16,
-                ),
-
-                decoration:
-                    BoxDecoration(
-                  color: Colors.white,
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    18,
+                Expanded(
+                  child: _numberPicker(
+                    label: 'Days',
+                    value: _selectedDays,
+                    min: 0,
+                    max: 7,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedDays = value;
+                      });
+                    },
                   ),
-
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: Offset(
-                        0,
-                        3,
-                      ),
-                    ),
-                  ],
                 ),
 
-                child: Row(
-                  children: [
+                const SizedBox(width: 12),
 
-                    const Icon(
-                      Icons.schedule,
-                      color:
-                          AppColors.primary,
-                    ),
-
-                    const SizedBox(
-                      width: 12,
-                    ),
-
-                    Expanded(
-                      child: Text(
-                        '${_endDateTime.day}/${_endDateTime.month}/${_endDateTime.year} • ${TimeOfDay.fromDateTime(_endDateTime).format(context)}',
-
-                        style:
-                            const TextStyle(
-                          fontWeight:
-                              FontWeight.w600,
-                        ),
-                      ),
-                    ),
-
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 16,
-                      color:
-                          AppColors.primary,
-                    ),
-                  ],
+                Expanded(
+                  child: _numberPicker(
+                    label: 'Hours',
+                    value: _selectedHours,
+                    min: 0,
+                    max: 23,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedHours = value;
+                      });
+                    },
+                  ),
                 ),
-              ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: _numberPicker(
+                    label: 'Minutes',
+                    value: _selectedMinutes,
+                    min: 5,
+                    max: 59,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedMinutes = value;
+                      });
+                    },
+                  ),
+                ),
+
+              ],
             ),
+
             const SizedBox(
               height: 20,
             ),
+
             Card(
               color: Colors.white,
               elevation: 3,
@@ -302,7 +277,7 @@ bool get isValid =>
                   children: [
 
                     const Text(
-                      'Your Focus Session',
+                      'Selected Duration',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                       ),
@@ -335,16 +310,28 @@ bool get isValid =>
                 ),
               ),
             ),
-            if (!isValid)
-              const Padding(
-                padding:
-                    EdgeInsets.only(
-                  top: 12,
+            if (isValid) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(18),
                 ),
+                child: const Text(
+                  'Protection will start when you tap "Start Focus Session" and will automatically end after the selected duration.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 20),
+            ] else ...[
+              const Padding(
+                padding: EdgeInsets.only(top: 12),
                 child: Text(
                   'Protection duration must be at least 5 minutes.',
                 ),
               ),
+              const SizedBox(height: 20),
+            ],
 
             if (showPermanentSuggestion)
               Card(
@@ -356,7 +343,7 @@ bool get isValid =>
                     16,
                   ),
                   child: Text(
-                    'Planning a longer commitment?\n\nIf you are planning to stay focused for more than a day, Permanent Protection may be a better fit and will help you earn more rewards as you progress.',
+                    'Planning a longer commitment?\n\nIf you plan to stay protected for several days or longer, Permanent Protection is recommended. It offers full rewards, medal progression, and a stronger commitment experience.',
                   ),
                 ),
               ),
@@ -369,28 +356,33 @@ bool get isValid =>
                 foregroundColor:
                     Colors.white,
               ),
-              onPressed:
-                  isValid
-                      ? () {
+          onPressed:
+              isValid
+                  ? () async {
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) =>
-                                    PartialProtectionConfirmationScreen(
-                                      plan: widget.plan,
-                                      onPlanChanged:
-                                          widget.onPlanChanged,
-                                      selectedDuration:
-                                          duration,
-                                    ),
-                            ),
-                          );
-                        }
-        : null,
+                      final updatedPlan =
+                          await ProtectionService.activatePartialProtection(
+                        plan: widget.plan,
+                        expiresAt: DateTime.now().add(
+                          duration,
+                        ),
+                      );
+
+                      widget.onPlanChanged(
+                        updatedPlan,
+                      );
+
+                      await ProtectionStatusOverlay.showActivated(
+                        context,
+                      );
+
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    }
+                  : null,
               child: const Text(
-                'Activate Partial Protection',
+                'Start Focus Session',
               ),
             ),
           ],

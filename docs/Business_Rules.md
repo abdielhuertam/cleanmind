@@ -341,7 +341,48 @@ Protection must be manually reactivated through the Protection Mode Selection fl
 
 ---
 
-## 17. Versioning
+
+## 17. Protection Status Feedback
+
+Whenever the protection state changes immediately, CleanMind must provide clear visual confirmation to the user.
+
+### Activation
+
+The following actions must display a temporary **Protection Activated** confirmation:
+
+- Permanent Protection
+- Partial Protection (Free)
+- Partial Protection (Pro)
+- Partial Protection (Custom)
+
+Behavior:
+
+- Green shield icon
+- "Protection Activated"
+- Automatically disappears after approximately 3 seconds
+
+### Immediate Deactivation
+
+The following actions must display a temporary **Protection Disabled** confirmation:
+
+- Copy Challenge
+- SMS Code verification
+
+Behavior:
+
+- Gray shield icon
+- "Protection Disabled"
+- Automatically disappears after approximately 3 seconds
+
+### Pending Approval
+
+Support approval requests (Push Notification) do **not** display a disabled confirmation because protection remains active until the Support user approves the request.
+
+Visual confirmations must only be displayed after an actual protection state transition.
+
+---
+
+## 18. Versioning
 
 This document reflects CLOSED MVP behavior including:
 

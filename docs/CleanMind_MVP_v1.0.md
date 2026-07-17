@@ -224,6 +224,34 @@ If protection is deactivated:
 
 ---
 
+---
+
+## Protection State Feedback
+
+To improve user confidence and reduce ambiguity, every immediate protection state transition provides visual confirmation.
+
+### Protection Activated
+
+Displayed after:
+
+- Permanent Protection
+- Partial Protection (Free)
+- Partial Protection (Pro)
+- Partial Protection (Custom)
+
+### Protection Disabled
+
+Displayed after:
+
+- Copy Challenge
+- SMS Code verification
+
+Support approval requests do not display a disabled confirmation until protection has actually been disabled.
+
+After successful activation, the application always returns the user to the Protection screen, allowing immediate verification of the active protection status.
+
+---
+
 ## 13. Versioning
 
 - This document version: v2.0 (Backend-Validated MVP)

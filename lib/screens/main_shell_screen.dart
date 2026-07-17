@@ -17,10 +17,16 @@ class MainShellScreen
   final ValueChanged<PlanState>
       onPlanChanged;
 
+  final int selectedIndex;
+
+  final ValueChanged<int> onTabChanged;
+
   const MainShellScreen({
     super.key,
     required this.plan,
     required this.onPlanChanged,
+    required this.selectedIndex,
+    required this.onTabChanged,
   });
 
   static _MainShellScreenState? of(
@@ -39,17 +45,13 @@ class MainShellScreen
 class _MainShellScreenState
     extends State<MainShellScreen> {
 
-  int _selectedIndex = 0;
 
   void changeTab(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    widget.onTabChanged(index);
   }
 
   @override
   Widget build(BuildContext context) {
-
     final screens = [
 
       HomeScreen(
@@ -124,11 +126,11 @@ class _MainShellScreenState
                 children: [
 
                   Text(
-                    _selectedIndex == 0
+                    widget.selectedIndex == 0
                         ? 'Home'
-                        : _selectedIndex == 1
+                        : widget.selectedIndex == 1
                         ? 'Protection'
-                        : _selectedIndex == 2
+                        : widget.selectedIndex == 2
                         ? 'Account'
                         : 'Community',
 
@@ -207,7 +209,7 @@ class _MainShellScreenState
 
               Expanded(
                 child:
-                    screens[_selectedIndex],
+                    screens[widget.selectedIndex],
               ),
             ],
           ),
@@ -301,7 +303,7 @@ class _MainShellScreenState
   }) {
 
     final active =
-        _selectedIndex == index;
+        widget.selectedIndex == index;
 
     final color =
         active

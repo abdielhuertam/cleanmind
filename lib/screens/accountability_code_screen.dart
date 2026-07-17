@@ -7,6 +7,9 @@ import 'package:flutter/services.dart';
 import '../state/plan_state.dart';
 import '../theme/app_colors.dart';
 
+import '../services/protection_service.dart';
+
+import '../widgets/protection_status_overlay.dart';
 
 
 
@@ -78,14 +81,21 @@ bool get _canResend =>
     super.dispose();
   }
 
-void _unlock() {
+Future<void> _unlock() async {
+
   final updatedPlan =
-      widget.plan.unlockSucceeded();
+      await ProtectionService.unlockSucceeded(
+    plan: widget.plan,
+  );
 
   widget.onPlanChanged(updatedPlan);
 
-  Navigator.pop(context); // Cierra SMS Code
-  Navigator.pop(context); // Cierra Unlock Methods
+  await ProtectionStatusOverlay.showDisabled(
+    context,
+  );
+
+  Navigator.pop(context); // SMS Code
+  Navigator.pop(context); // Unlock Methods
 }
 
 void _startResendTimer() {

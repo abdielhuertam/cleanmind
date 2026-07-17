@@ -134,15 +134,6 @@ class _HomeScreenState
         widget.plan.unlockRequest
             .isPending;
 
-    final waitingPeriodActive =
-        status ==
-            ProtectionStatus
-                .waitingPeriod;
-
-    final remainingWaitingTime =
-        widget.plan.protection
-            .getRemainingDeactivationTime();
-
     return SingleChildScrollView(
       child: Column(
               crossAxisAlignment:
@@ -260,137 +251,6 @@ class _HomeScreenState
             ),
           ),
 
-          if (waitingPeriodActive &&
-              remainingWaitingTime !=
-                  null)
-            Container(
-              width: double.infinity,
-
-              margin:
-                  const EdgeInsets.only(
-                bottom: 22,
-              ),
-
-              padding:
-                  const EdgeInsets.symmetric(
-                horizontal: 22,
-                vertical: 18,
-              ),
-
-              decoration:
-                  BoxDecoration(
-                color:
-                    Colors.orange
-                        .shade50,
-
-                borderRadius:
-                    BorderRadius.circular(
-                  26,
-                ),
-
-                border: Border.all(
-                  color:
-                      Colors.orange
-                          .shade300,
-                ),
-
-                boxShadow: const [
-                  BoxShadow(
-                    color:
-                        Colors.black12,
-
-                    blurRadius: 8,
-
-                    offset:
-                        Offset(0, 4),
-                  ),
-                ],
-              ),
-
-              child: Row(
-                children: [
-
-                  Container(
-                    width: 56,
-                    height: 56,
-
-                    decoration:
-                        BoxDecoration(
-                      color:
-                          Colors.orange
-                              .shade100,
-
-                      shape:
-                          BoxShape.circle,
-                    ),
-
-                    child: Icon(
-                      Icons.hourglass_bottom,
-
-                      color:
-                          Colors.orange
-                              .shade700,
-
-                      size: 30,
-                    ),
-                  ),
-
-                  const SizedBox(
-                    width: 18,
-                  ),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
-
-                      children: [
-
-                        Text(
-                          'Waiting Period Active',
-
-                          style:
-                              TextStyle(
-                            fontSize: 16,
-
-                            fontWeight:
-                                FontWeight
-                                    .bold,
-
-                            color:
-                                Colors.orange
-                                    .shade800,
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 6,
-                        ),
-
-                        Text(
-                          '${_formatDuration(remainingWaitingTime)} remaining',
-
-                          style:
-                              TextStyle(
-                            fontSize: 16,
-
-                            fontWeight:
-                                FontWeight
-                                    .w600,
-
-                            color:
-                                Colors.orange
-                                    .shade700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
           GestureDetector(
             onTap: () {
 
@@ -486,12 +346,21 @@ class _HomeScreenState
                       ),
                     ),
 
-                    onPressed: () {
+                    onPressed: () async {
 
-                      Navigator.pushNamed(
+                      await Navigator.pushNamed(
                         context,
                         '/protection-mode',
                       );
+
+                      if (!mounted) return;
+
+                      if (widget.plan.protection.status !=
+                              ProtectionStatus.inactive &&
+                          widget.plan.protection.status !=
+                              ProtectionStatus.protectionDisabled) {
+                        MainShellScreen.of(context)?.changeTab(1);
+                      }
                     },
 
                     child: const Text(

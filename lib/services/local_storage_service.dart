@@ -33,11 +33,6 @@ final jsonMap = {
       plan.protection.activatedAt
           .toIso8601String(),
 
-  'deactivationScheduledAt':
-      plan.protection
-          .deactivationScheduledAt
-          ?.toIso8601String(),
-
   'expiresAt':
       plan.protection.expiresAt
           ?.toIso8601String(),
@@ -133,15 +128,6 @@ return PlanState(
     activatedAt: DateTime.parse(
       map['activatedAt'],
     ),
-
-    deactivationScheduledAt:
-        map['deactivationScheduledAt'] !=
-                null
-            ? DateTime.parse(
-                map[
-                    'deactivationScheduledAt'],
-              )
-            : null,
 
     expiresAt:
         map['expiresAt'] != null

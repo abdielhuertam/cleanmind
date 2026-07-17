@@ -7,6 +7,8 @@ import '../theme/app_colors.dart';
 
 import '../widgets/request_card.dart';
 
+import '../services/protection_service.dart';
+
 class PendingRequestsScreen
     extends StatelessWidget {
   final PlanState plan;
@@ -59,10 +61,11 @@ class PendingRequestsScreen
                   userName:
                       '<Usuario>',
 
-                  onApprove: () {
+                  onApprove: () async {
                     final updatedPlan =
-                        plan
-                            .approvePushRequest();
+                        await ProtectionService.unlockSucceeded(
+                      plan: plan,
+                    );
 
                     onPlanChanged(
                       updatedPlan,

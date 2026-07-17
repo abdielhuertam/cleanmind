@@ -1,12 +1,6 @@
 import 'protection_state.dart';
 import 'unlock_request_state.dart';
 
-const Duration kFreeWaitingDuration =
-    Duration(hours: 8);
-
-const Duration kProWaitingDuration =
-    Duration(hours: 1);
-
 const Duration kPushRequestDuration =
     Duration(minutes: 5);
 
@@ -93,17 +87,6 @@ class PlanState {
 
   PlanState refreshLifecycle() {
     PlanState updated = this;
-
-    // Waiting Period Expiration
-
-    if (updated.protection.status ==
-            ProtectionStatus
-                .waitingPeriod &&
-        updated.protection
-            .isDeactivationExpired()) {
-      updated =
-          updated.unlockSucceeded();
-    }
 
     // Partial Protection Expiration
 
@@ -220,24 +203,6 @@ class PlanState {
   }
 
     return this;
-  }
-
-  PlanState requestDeactivation() {
-    return copyWith(
-      protection:
-          protection.scheduleWaitingPeriod(
-        isPro
-            ? kProWaitingDuration
-            : kFreeWaitingDuration,
-      ),
-    );
-  }
-
-  PlanState cancelDeactivation() {
-    return copyWith(
-      protection:
-          protection.cancelDeactivation(),
-    );
   }
 
   PlanState unlockSucceeded() {

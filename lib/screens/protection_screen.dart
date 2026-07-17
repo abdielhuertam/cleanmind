@@ -142,11 +142,6 @@ class _ProtectionScreenState
             ProtectionStatus
                 .inactive;
 
-    final isWaiting =
-        status ==
-            ProtectionStatus
-                .waitingPeriod;
-
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -156,14 +151,11 @@ class _ProtectionScreenState
               milliseconds: 250,
             ),
 
-            child:
-                isWaiting
-                    ? _buildWaitingPeriod()
-                    : isDisabled
-                        ? _buildDisabledState()
-                        : _buildActiveState(
-                            focusedDays,
-                          ),
+            child: isDisabled
+                ? _buildDisabledState()
+                : _buildActiveState(
+                    focusedDays,
+                  ),
           ),
 
           const SizedBox(
@@ -375,126 +367,6 @@ else
             ),
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildWaitingPeriod() {
-    final remaining =
-        widget.plan.protection
-            .getRemainingDeactivationTime();
-
-    return Column(
-      children: [
-        _buildMainCard(
-          icon: Icons.schedule,
-
-          iconColor:
-              AppColors.primary,
-
-          title:
-              'Waiting Period',
-
-          dotColor:
-              Colors.orange,
-
-          content: Column(
-            children: [
-              const Text(
-                'Protection remains active during the countdown.',
-
-                textAlign:
-                    TextAlign.center,
-
-                style: TextStyle(
-                  fontSize: 15,
-                  height: 1.35,
-
-                  color:
-                      AppColors
-                          .textSecondary,
-                ),
-              ),
-
-              const SizedBox(
-                height: 22,
-              ),
-
-              Text(
-                remaining == null
-                    ? '--:--:--'
-                    : _formatCountdown(
-                        remaining,
-                      ),
-
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight:
-                      FontWeight.bold,
-
-                  color:
-                      AppColors.primary,
-                ),
-              ),
-
-              const SizedBox(
-                height: 22,
-              ),
-
-              SizedBox(
-                width: double.infinity,
-
-                height: 48,
-
-                child: ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(
-                    backgroundColor:
-                        AppColors.danger,
-
-                    foregroundColor:
-                        Colors.white,
-
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        18,
-                      ),
-                    ),
-                  ),
-
-                  onPressed: () {
-                    final updatedPlan =
-                        widget.plan
-                            .cancelDeactivation();
-
-                    widget
-                        .onPlanChanged(
-                      updatedPlan,
-                    );
-                  },
-
-                  child: const Text(
-                    'Cancel Deactivation',
-
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight:
-                          FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(
-          height: 16,
-        ),
-
-        _buildSettingsButton(),
       ],
     );
   }

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../state/plan_state.dart';
 import '../theme/app_colors.dart';
 import 'custom_duration_screen.dart';
+
+import '../services/protection_service.dart';
+
 import 'partial_protection_confirmation_screen.dart';
 
 
@@ -170,7 +173,7 @@ class PartialDurationSelectionScreen
                   _durationCard(
                 label: option,
                 icon: Icons.schedule,
-                onTap: () {
+                onTap: () async {
 
                   Duration selectedDuration;
 
@@ -196,10 +199,8 @@ class PartialDurationSelectionScreen
                       builder: (_) =>
                           PartialProtectionConfirmationScreen(
                             plan: plan,
-                            onPlanChanged:
-                                onPlanChanged,
-                            selectedDuration:
-                                selectedDuration,
+                            onPlanChanged: onPlanChanged,
+                            selectedDuration: selectedDuration,
                           ),
                     ),
                   );
@@ -234,7 +235,7 @@ class PartialDurationSelectionScreen
                 premium: true,
                 locked:
                     !plan.isPro,
-                onTap: () {
+                onTap: () async {
 
                   if (!plan.isPro) {
                     _showPremiumDialog(
@@ -276,10 +277,10 @@ class PartialDurationSelectionScreen
                     MaterialPageRoute(
                       builder: (_) =>
                           PartialProtectionConfirmationScreen(
-                        plan: plan,
-                        onPlanChanged: onPlanChanged,
-                        selectedDuration: selectedDuration,
-                      ),
+                            plan: plan,
+                            onPlanChanged: onPlanChanged,
+                            selectedDuration: selectedDuration,
+                          ),
                     ),
                   );
                 },

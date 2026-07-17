@@ -53,6 +53,7 @@ class _MyAppState
     with WidgetsBindingObserver {
 
   late PlanState _plan;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -112,6 +113,11 @@ class _MyAppState
     });
   }
 
+  void _onTabChanged(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -120,9 +126,9 @@ class _MyAppState
 
       home: MainShellScreen(
         plan: _plan,
-
-        onPlanChanged:
-            _onPlanChanged,
+        onPlanChanged: _onPlanChanged,
+        selectedIndex: _selectedIndex,
+        onTabChanged: _onTabChanged,
       ),
 
       routes: {

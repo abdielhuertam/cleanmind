@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import '../state/plan_state.dart';
 import '../theme/app_colors.dart';
 
+import '../services/protection_service.dart';
+
+import '../widgets/protection_status_overlay.dart';
+
 class CopyChallengeScreen extends StatefulWidget {
   final PlanState plan;
 
@@ -148,15 +152,22 @@ Future<bool> _showConfirmationDialog({
     super.dispose();
   }
 
-void _unlock() {
-  final updatedPlan =
-      widget.plan.unlockSucceeded();
+  Future<void> _unlock() async {
 
-  widget.onPlanChanged(updatedPlan);
+    final updatedPlan =
+        await ProtectionService.unlockSucceeded(
+      plan: widget.plan,
+    );
 
-  Navigator.pop(context); // Challenge
-  Navigator.pop(context); // Unlock Methods
-}
+    widget.onPlanChanged(updatedPlan);
+
+    await ProtectionStatusOverlay.showDisabled(
+      context,
+    );
+
+    Navigator.pop(context); // Challenge
+    Navigator.pop(context); // Unlock Methods
+  }
 
   @override
   Widget build(BuildContext context) {

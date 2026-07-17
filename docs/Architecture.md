@@ -295,7 +295,88 @@ Future architecture cleanup is still required to consolidate:
 - protection-state synchronization
 into a single authoritative state source.
 
-## 11. Android Accessibility Enforcement Layer (MVP)
+---
+
+---
+
+## 10. Main Navigation Architecture
+
+CleanMind uses a persistent shell-based navigation architecture.
+
+### MainShellScreen
+
+MainShellScreen is responsible only for rendering the primary application sections:
+
+- Home
+- Protection
+- Account
+- Community
+
+It no longer owns the selected navigation tab.
+
+### Navigation State Ownership
+
+The selected bottom-navigation index is now owned by `MyApp`.
+
+Responsibilities:
+
+- Preserve the current tab across application rebuilds.
+- Prevent unwanted navigation resets after protection state updates.
+- Maintain consistent navigation after activation and deactivation flows.
+
+This architecture guarantees that protection state changes do not unintentionally return the user to the Home tab.
+
+---
+
+---
+
+## 11. Protection Status Overlay
+
+CleanMind includes a reusable visual feedback component named:
+
+`ProtectionStatusOverlay`
+
+Purpose:
+
+Provide immediate confirmation whenever the protection state changes.
+
+Current supported events:
+
+### Protection Activated
+
+Displayed after:
+
+- Permanent Protection
+- Partial Protection (Free)
+- Partial Protection (Pro)
+- Partial Protection (Custom)
+
+Behavior:
+
+- Green shield icon
+- Temporary modal overlay
+- Automatically dismisses after approximately 3 seconds
+
+### Protection Disabled
+
+Displayed after:
+
+- Copy Challenge
+- SMS Code verification
+
+Behavior:
+
+- Gray shield icon
+- Temporary modal overlay
+- Automatically dismisses after approximately 3 seconds
+
+Push Notification approval is intentionally excluded until backend approval is completed because protection remains active while approval is pending.
+
+ProtectionStatusOverlay is implemented as a reusable UI component so all protection state transitions share a consistent visual experience.
+
+---
+
+## 12. Android Accessibility Enforcement Layer (MVP)
 
 Android MVP now includes a native AccessibilityService enforcement layer.
 
@@ -325,7 +406,7 @@ Future architecture work will include:
 - Overlay interruption UX
 - Intentional friction workflows
 
-## 12. Local Notification Layer
+## 13. Local Notification Layer
 
 CleanMind includes a local notification layer responsible for delivering time-based notifications independently of the backend.
 

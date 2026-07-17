@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../state/plan_state.dart';
 import '../theme/app_colors.dart';
 
-import '../services/notification_service.dart';
+import '../services/protection_service.dart';
 
 class UnlockMethodsScreen
     extends StatelessWidget {
@@ -235,69 +235,6 @@ class UnlockMethodsScreen
                   ),
 
                   _MethodCard(
-                    icon: Icons.schedule,
-
-                    label:
-                        'Waiting\nPeriod',
-
-                    enabled:
-                        !requestPending,
-
-                    onTap: () async {
-                      if (requestPending) {
-                        return;
-                      }
-
-                      final duration =
-                          isPro
-                              ? '1 hour'
-                              : '8 hours';
-
-                      final confirmed =
-                          await _showConfirmationDialog(
-                        context: context,
-
-                        title:
-                            'Start Waiting Period?',
-
-                        description:
-                            'Protection will remain active during the countdown.',
-
-                        warning:
-                            'When the waiting period ends, protection will disable automatically and your progress streak will reset.\n\nWaiting duration: $duration.',
-
-                        confirmText:
-                            'Start',
-                      );
-
-                      if (!confirmed) {
-                        return;
-                      }
-
-                      final updatedPlan =
-                          plan.requestDeactivation();
-
-                    await NotificationService.scheduleWaitingPeriod(
-                      duration: isPro
-                          ? const Duration(hours: 1)
-                          : const Duration(hours: 8),
-                    );
-
-                      onPlanChanged(
-                        updatedPlan,
-                      );
-
-                      if (!context.mounted) {
-                        return;
-                      }
-
-                      Navigator.pop(
-                        context,
-                      );
-                    },
-                  ),
-
-                  _MethodCard(
                     icon: Icons.sms,
 
                     label:
@@ -386,8 +323,9 @@ class UnlockMethodsScreen
                       }
 
                       final updatedPlan =
-                          plan
-                              .startPushRequest();
+                          await ProtectionService.startPushRequest(
+                        plan: plan,
+                      );
 
                       onPlanChanged(
                         updatedPlan,

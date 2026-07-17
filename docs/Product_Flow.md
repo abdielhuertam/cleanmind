@@ -315,6 +315,14 @@ Additional disabled-state behavior:
 - Users may remove previously blocked sites.
 - Protection remains fully manual and does not reactivate automatically.
 
+Whenever protection is disabled immediately (for example through Copy Challenge or SMS Code):
+
+- The app displays a temporary **Protection Disabled** confirmation overlay.
+- The overlay automatically disappears after approximately 3 seconds.
+- The user is then returned to the Protection screen.
+
+If protection is still pending external approval (Support Push Approval), no disabled confirmation is shown because protection remains active until approval is completed.
+
 If protection was disabled from Permanent Protection mode:
 
 - Current streak resets.
@@ -374,6 +382,12 @@ If Partial Protection is selected:
 - Blocking resumes immediately.
 - Reduced XP generation begins.
 - Protection automatically disables when the selected duration expires.
+
+Immediately after activation:
+
+- The app displays a temporary **Protection Activated** confirmation overlay.
+- The overlay automatically disappears after approximately 3 seconds.
+- After activation, the application always returns the user to the **Protection** tab, regardless of where the activation flow was started.
 
 If Support is configured:
 
@@ -556,3 +570,41 @@ Future planned behavior includes:
 - breathing delays
 - countdown friction
 - unlock confirmation UX
+
+---
+
+## 13. Protection Status Feedback
+
+CleanMind provides immediate visual feedback whenever the protection state changes.
+
+### Protection Activated
+
+Displayed after:
+
+- Permanent Protection activation.
+- Partial Protection activation (Free).
+- Partial Protection activation (Pro).
+- Partial Protection activation (Custom).
+
+Behavior:
+
+- Green shield icon.
+- "Protection Activated".
+- Automatically disappears after approximately 3 seconds.
+
+### Protection Disabled
+
+Displayed after:
+
+- Copy Challenge.
+- SMS Code verification.
+
+Behavior:
+
+- Gray shield icon.
+- "Protection Disabled".
+- Automatically disappears after approximately 3 seconds.
+
+### Pending Approval
+
+Support approval requests do not display a disabled confirmation because protection remains active until approval is received.

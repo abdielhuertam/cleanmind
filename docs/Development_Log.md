@@ -1614,3 +1614,112 @@ Before committing:
 - Activity log persistence
 - Settings completion
 - Store readiness
+
+---
+
+# 2026-07-16 — Protection Activation UX & Navigation Stabilization
+
+## Completed
+
+- Redesigned the Partial Protection activation flow.
+- Merged the duration selection and confirmation experience for Custom Partial Protection.
+- Eliminated the redundant confirmation screen for Custom durations.
+- Added inline activation information directly into the Custom Duration screen.
+- Fixed premature countdown start during Custom duration selection.
+- Countdown now begins only after user confirmation.
+
+- Fixed inconsistent navigation after protection activation.
+- MainShellScreen now preserves the selected tab across PlanState updates.
+- Moved selected tab state ownership from MainShellScreen to MyApp.
+- Home activation flow now automatically returns users to the Protection tab after successful activation.
+- Navigation behavior is now consistent regardless of activation entry point.
+
+- Implemented reusable ProtectionStatusOverlay component.
+- Added "Protection Activated" overlay to:
+  - Permanent Protection
+  - Partial Protection (Free)
+  - Partial Protection (Pro)
+  - Partial Protection (Custom)
+
+- Added "Protection Disabled" overlay to:
+  - Copy Challenge
+  - SMS Code
+
+- Confirmed Push Notification flow intentionally does not display the disabled overlay because protection remains active until Support approval.
+
+- Removed temporary debugging code used during navigation diagnosis.
+
+## Status
+
+Protection activation and deactivation UX is now visually consistent across all implemented activation and unlock methods.
+
+Navigation after activation is stable and always returns to the Protection screen.
+
+Protection state transitions now provide immediate visual confirmation.
+
+## Next Session Focus
+
+- Continue Push Notification backend implementation.
+- Implement Support approval flow.
+- Begin Login / Authentication module.
+- Continue VPN/DNS blocking implementation.
+- Continue HomeScreen component refactor after feature stabilization.
+
+## Technical Notes
+
+- MainShellScreen no longer owns the selected tab state.
+- Tab selection is now controlled by MyApp, preventing state loss during rebuilds.
+- ProtectionStatusOverlay is now the standard visual feedback mechanism for all protection state transitions.
+- Custom Partial Protection activation now starts only after explicit user confirmation.
+
+## Documentation Alignment Required Before Commit
+
+### Product_Flow.md
+
+Update:
+
+- Protection Activated overlay.
+- Protection Disabled overlay.
+- Automatic navigation to Protection after successful activation.
+
+### Business_Rules.md
+
+Document visual confirmation requirement for protection state transitions.
+
+### Architecture.md
+
+Document ProtectionStatusOverlay component and MainShell navigation architecture changes.
+
+## Pre-Commit Validation Checklist
+
+Before committing:
+
+- Confirm Permanent Protection overlay.
+- Confirm Partial Protection (Free) overlay.
+- Confirm Partial Protection (Pro) overlay.
+- Confirm Partial Protection (Custom) overlay.
+- Confirm Copy Challenge overlay.
+- Confirm SMS Code overlay.
+- Confirm activation always returns to Protection.
+- Confirm no debug statements remain.
+- Confirm Flutter project compiles successfully.
+
+## Delivery Tracking
+
+### Blocks Completed This Session
+
+- Partial Protection UX redesign
+- Navigation architecture stabilization
+- Protection activation overlays
+- Protection deactivation overlays
+- MainShell state preservation
+
+### Estimated Remaining Major Blocks
+
+- Push approval backend
+- Authentication
+- VPN/DNS engine
+- Activity Log
+- Community
+- Settings completion
+- Store readiness
