@@ -41,7 +41,10 @@ class ProtectionService {
 
   static Future<PlanState> startPushRequest({
     required PlanState plan,
+    required String requesterName,
   }) async {
-    return plan.startPushRequest();
+    return plan.startPushRequest(
+      requesterName: requesterName,
+    );
   }
 }

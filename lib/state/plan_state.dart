@@ -1,5 +1,6 @@
 import 'protection_state.dart';
 import 'unlock_request_state.dart';
+import 'support_request_state.dart';
 
 const Duration kPushRequestDuration =
     Duration(minutes: 5);
@@ -12,6 +13,8 @@ class PlanState {
 
   final UnlockRequestState unlockRequest;
 
+  final SupportRequestState supportRequest;
+
   final int xp;
   final int level;
   final int streakDays;
@@ -22,6 +25,7 @@ class PlanState {
     required this.hasSupport,
     required this.protection,
     required this.unlockRequest,
+    required this.supportRequest,
     required this.xp,
     required this.level,
     required this.streakDays,
@@ -35,6 +39,8 @@ class PlanState {
       protection: ProtectionState.active(),
       unlockRequest:
           UnlockRequestState.none(),
+      supportRequest:
+          SupportRequestState.none(),
       xp: 0,
       level: 1,
       streakDays: 0,
@@ -49,6 +55,9 @@ class PlanState {
       protection: ProtectionState.active(),
       unlockRequest:
           UnlockRequestState.none(),
+      supportRequest:
+          SupportRequestState.none(),
+      
       xp: 0,
       level: 1,
       streakDays: 0,
@@ -65,6 +74,7 @@ class PlanState {
     int? level,
     int? streakDays,
     DateTime? lastProgressAwardAt,
+    SupportRequestState? supportRequest,
   }) {
     return PlanState(
       isPro: isPro ?? this.isPro,
@@ -80,7 +90,9 @@ class PlanState {
           streakDays ?? this.streakDays,
       lastProgressAwardAt:
           lastProgressAwardAt ??
-          this.lastProgressAwardAt,    
+          this.lastProgressAwardAt, 
+      supportRequest:
+          supportRequest ?? this.supportRequest,   
       
     );
   }
@@ -238,15 +250,17 @@ class PlanState {
   );
 }
 
-  PlanState startPushRequest() {
-    return copyWith(
-      unlockRequest:
-          unlockRequest.createPending(
-        duration:
-            kPushRequestDuration,
-      ),
-    );
-  }
+PlanState startPushRequest({
+  required String requesterName,
+}) {
+  return copyWith(
+    unlockRequest:
+        unlockRequest.createPending(
+      duration: kPushRequestDuration,
+      requesterName: requesterName,
+    ),
+  );
+}
 
   PlanState cancelPushRequest() {
     return copyWith(
@@ -277,4 +291,37 @@ class PlanState {
           unlockRequest.expire(),
     );
   }
+
+PlanState startSupportRemovalRequest({
+  required String requesterName,
+}) {
+  return copyWith(
+    supportRequest:
+        supportRequest.createPending(
+      requesterName: requesterName,
+    ),
+  );
+}
+
+PlanState approveSupportRemovalRequest() {
+  return copyWith(
+    supportRequest:
+        supportRequest.approve(),
+  );
+}
+
+PlanState rejectSupportRemovalRequest() {
+  return copyWith(
+    supportRequest:
+        supportRequest.reject(),
+  );
+}
+
+PlanState clearSupportRequest() {
+  return copyWith(
+    supportRequest:
+        supportRequest.clear(),
+  );
+}
+
 }

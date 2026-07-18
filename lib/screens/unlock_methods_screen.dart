@@ -4,6 +4,7 @@ import '../state/plan_state.dart';
 import '../theme/app_colors.dart';
 
 import '../services/protection_service.dart';
+import '../services/user_profile_repository.dart';
 
 class UnlockMethodsScreen
     extends StatelessWidget {
@@ -322,9 +323,14 @@ class UnlockMethodsScreen
                         return;
                       }
 
+                      final profile =
+                          await userProfileRepository.getProfile();
+
                       final updatedPlan =
                           await ProtectionService.startPushRequest(
                         plan: plan,
+                        requesterName:
+                            profile?.fullName ?? 'CleanMind User',
                       );
 
                       onPlanChanged(
@@ -335,19 +341,34 @@ class UnlockMethodsScreen
                         return;
                       }
 
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Request sent.',
-                          ),
-                        ),
+                      await showDialog<void>(
+                        context: context,
+                        builder: (dialogContext) {
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            title: const Text(
+                              'Request Sent',
+                            ),
+                            content: const Text(
+                              'Your Support has been notified.\n\nProtection will remain active until the request is approved.',
+                            ),
+                            actions: [
+                              FilledButton(
+                                onPressed: () {
+                                  Navigator.pop(dialogContext);
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
                       );
 
-                      Navigator.pop(
-                        context,
-                      );
+                      if (!context.mounted) return;
+
+                      Navigator.pop(context);
                     },
                   ),
                 ],

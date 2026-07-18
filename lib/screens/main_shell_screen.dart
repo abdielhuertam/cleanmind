@@ -8,7 +8,7 @@ import 'home_screen.dart';
 import 'protection_screen.dart';
 import 'account_screen.dart';
 import 'pending_requests_screen.dart';
-import 'community_screen.dart';
+import 'settings_screen.dart';
 
 class MainShellScreen
     extends StatefulWidget {
@@ -72,8 +72,10 @@ class _MainShellScreenState
         plan: widget.plan,
       ),
 
-      CommunityScreen(
+      SettingsScreen(
         plan: widget.plan,
+        onPlanChanged:
+            widget.onPlanChanged,
       ),
     ];
 
@@ -132,7 +134,7 @@ class _MainShellScreenState
                         ? 'Protection'
                         : widget.selectedIndex == 2
                         ? 'Account'
-                        : 'Community',
+                        : 'Settings',
 
                     style: const TextStyle(
                       fontSize: 34,
@@ -187,12 +189,10 @@ class _MainShellScreenState
                             decoration:
                                 BoxDecoration(
                               color:
-                                  widget
-                                          .plan
-                                          .unlockRequest
-                                          .isPending
-                                      ? Colors.red
-                                      : Colors.grey,
+                                widget.plan.unlockRequest.isPending ||
+                                        widget.plan.supportRequest.isPending
+                                    ? Colors.red
+                                    : Colors.grey,
 
                               shape:
                                   BoxShape.circle,
@@ -283,9 +283,9 @@ class _MainShellScreenState
             ),
 
             _navItem(
-              icon: Icons.groups,
+              icon: Icons.settings,
 
-              label: 'Community',
+              label: 'Settings',
 
               index: 3,
             ),

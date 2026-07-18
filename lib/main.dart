@@ -4,19 +4,43 @@ import 'state/plan_state.dart';
 
 import 'services/local_storage_service.dart';
 import 'services/notification_service.dart';
+import 'services/local_user_profile_repository.dart';
+import 'services/user_profile_repository.dart';
 
 import 'screens/main_shell_screen.dart';
-
 import 'screens/copy_challenge_screen.dart';
 import 'screens/accountability_code_screen.dart';
 import 'screens/unlock_methods_screen.dart';
 import 'screens/protection_mode_selection_screen.dart';
 
+import 'theme/app_colors.dart';
+
+import 'models/user_profile.dart';
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await NotificationService.initialize();
+
+  
+  final repository =
+      userProfileRepository;
+
+  final existingProfile =
+      await repository.getProfile();
+
+  if (existingProfile == null) {
+    await repository.saveProfile(
+      const UserProfile(
+        userId: 'local-test-user',
+        firstName: 'Abdiel',
+        lastName: 'Huerta',
+        username: '@abdielhuerta',
+        email: 'abdiel.huertam@gmail.com',
+      ),
+    );
+  }
 
   PlanState loadedPlan =
       await LocalStorageService.loadPlan();
@@ -123,6 +147,34 @@ class _MyAppState
     return MaterialApp(
       debugShowCheckedModeBanner:
           false,
+
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          primary: AppColors.primary,
+        ),
+
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor:
+                AppColors.primary
+          ),
+        ),
+
+        elevatedButtonTheme:
+            ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor:
+                AppColors.primary,
+            foregroundColor:
+                Colors.white,
+          ),
+        ),
+
+        dialogTheme: DialogThemeData(
+          backgroundColor: Colors.white,
+        ),
+      ),
 
       home: MainShellScreen(
         plan: _plan,

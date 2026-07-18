@@ -74,7 +74,6 @@ Tablets, iPads, web dashboards, and desktop clients are out of scope for the MVP
 
 CleanMind differentiates between:
 
-- **Waiting Period Unlock** (Free and Pro without Support)
 - **SMS Verification Unlock**
 - **Support Approval Unlock (App-based)**
 
@@ -104,7 +103,7 @@ Includes:
 - Pornographic content blocking
 - Blocking of one social media platform
 - Copy Challenge
-- Fixed 8-hour waiting period for protection deactivation
+- Push Notification
 - XP progression
 - Basic ranking participation
 - No Support configuration
@@ -119,7 +118,7 @@ Includes everything in Free, plus:
   - 2 hours
   - 3 hours
   - Custom date and time
-- Configurable waiting period (minimum 1 hour) when no Support is configured
+- Push Notification
 - SMS-based verification codes
 - Optional Support configuration
 - Mandatory Support approval when configured
@@ -134,7 +133,6 @@ Pro users may configure a Support contact.
 
 When Support is configured:
 
-- Waiting period is disabled
 - Copy Challenge is disabled
 - Unlock requires Support approval
 

@@ -13,8 +13,25 @@ class StorageService {
       'blocked_apps';
 
   static const String
+  supportNameKey =
+      'support_name';
+
+  static const String
   supportPhoneKey =
       'support_phone';
+    
+  static const String
+  supportTypeKey =
+      'support_type';
+
+  static const String
+  supportStatusKey =
+      'support_status';
+
+
+  static const String
+  supportRemovalRequestIdKey =
+      'support_removal_request_id';
 
   static const String
   protectionEnabledKey =
@@ -107,6 +124,73 @@ class StorageService {
   }
 
   static Future<void>
+  saveSupportName(
+    String name,
+  ) async {
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    await prefs.setString(
+      supportNameKey,
+      name,
+    );
+  }
+
+  static Future<String?>
+  loadSupportName() async {
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    return prefs.getString(
+      supportNameKey,
+    );
+  }
+
+  static Future<void> saveSupportType(
+    String type,
+  ) async {
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    await prefs.setString(
+      supportTypeKey,
+      type,
+    );
+  }
+
+  static Future<String?>
+  loadSupportType() async {
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    return prefs.getString(
+      supportTypeKey,
+    );
+  }
+
+static Future<void> saveSupportStatus(
+  String status,
+) async {
+  final prefs =
+      await SharedPreferences.getInstance();
+
+  await prefs.setString(
+    supportStatusKey,
+    status,
+  );
+}
+
+static Future<String> loadSupportStatus() async {
+  final prefs =
+      await SharedPreferences.getInstance();
+
+  return prefs.getString(
+        supportStatusKey,
+      ) ??
+      'active';
+}
+
+  static Future<void>
   saveSupportPhone(
     String phone,
   ) async {
@@ -130,6 +214,62 @@ class StorageService {
       supportPhoneKey,
     );
   }
+
+  static Future<void> saveSupportRemovalRequestId(
+    String requestId,
+  ) async {
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    await prefs.setString(
+      supportRemovalRequestIdKey,
+      requestId,
+    );
+  }
+
+  static Future<String?>
+  loadSupportRemovalRequestId() async {
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    return prefs.getString(
+      supportRemovalRequestIdKey,
+    );
+  }
+
+  static Future<void>
+  clearSupportRemovalRequestId() async {
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    await prefs.remove(
+      supportRemovalRequestIdKey,
+    );
+  }
+
+  static Future<void>
+  clearSupport() async {
+
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    await prefs.remove(
+      supportNameKey,
+    );
+
+    await prefs.remove(
+      supportPhoneKey,
+    );
+
+    await prefs.remove(
+      supportTypeKey,
+    );
+
+    await prefs.remove(
+      supportStatusKey,
+    );
+  }
+
 
   static Future<void>
   saveProtectionEnabled(

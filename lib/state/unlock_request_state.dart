@@ -11,11 +11,13 @@ class UnlockRequestState {
 
   final DateTime? createdAt;
   final DateTime? expiresAt;
+  final String? requesterName;
 
   const UnlockRequestState({
     required this.status,
     this.createdAt,
     this.expiresAt,
+    this.requesterName,
   });
 
   factory UnlockRequestState.none() {
@@ -26,13 +28,15 @@ class UnlockRequestState {
 
   UnlockRequestState createPending({
     required Duration duration,
-  }) {
+    required String requesterName,
+  }){
     final now = DateTime.now();
 
     return UnlockRequestState(
       status: UnlockRequestStatus.pending,
       createdAt: now,
       expiresAt: now.add(duration),
+      requesterName: requesterName,
     );
   }
 
@@ -41,6 +45,7 @@ class UnlockRequestState {
       status: UnlockRequestStatus.approved,
       createdAt: createdAt,
       expiresAt: expiresAt,
+      requesterName: requesterName,
     );
   }
 
@@ -49,15 +54,12 @@ class UnlockRequestState {
       status: UnlockRequestStatus.rejected,
       createdAt: createdAt,
       expiresAt: expiresAt,
+      requesterName: requesterName,
     );
   }
 
   UnlockRequestState expire() {
-    return UnlockRequestState(
-      status: UnlockRequestStatus.expired,
-      createdAt: createdAt,
-      expiresAt: expiresAt,
-    );
+    return UnlockRequestState.none();
   }
 
   UnlockRequestState cancel() {

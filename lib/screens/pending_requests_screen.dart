@@ -8,6 +8,7 @@ import '../theme/app_colors.dart';
 import '../widgets/request_card.dart';
 
 import '../services/protection_service.dart';
+import '../services/storage_service.dart';
 
 class PendingRequestsScreen
     extends StatelessWidget {
@@ -54,14 +55,77 @@ class PendingRequestsScreen
             children: [
               const SizedBox(height: 12),
 
+              if (plan.supportRequest.isPending)
+                RequestCard(
+                  userName:
+                      plan.supportRequest.requesterName ??
+                          'CleanMind User',
+                  title: 'Support Removal Request',
+                  message:
+                      'This user is requesting to remove you as their Support.',
+                  icon: Icons.person_remove_outlined,
+                  onApprove: () async {
+                    final activeRequestId =
+                        await StorageService
+                            .loadSupportRemovalRequestId();
+
+                    if (activeRequestId == null ||
+                        activeRequestId !=
+                            plan.supportRequest.requestId) {
+                      return;
+                    }
+
+                    await StorageService.clearSupport();
+
+                    await StorageService
+                        .clearSupportRemovalRequestId();
+
+                    final updatedPlan =
+                        plan.clearSupportRequest();
+
+                    onPlanChanged(updatedPlan);
+                  },
+                  onReject: () async {
+                    final activeRequestId =
+                        await StorageService
+                            .loadSupportRemovalRequestId();
+
+                    if (activeRequestId == null ||
+                        activeRequestId !=
+                            plan.supportRequest.requestId) {
+                      return;
+                    }
+
+                    await StorageService.saveSupportStatus(
+                      'active',
+                    );
+
+                    await StorageService
+                        .clearSupportRemovalRequestId();
+
+                    final updatedPlan =
+                        plan.clearSupportRequest();
+
+                    onPlanChanged(updatedPlan);
+                  },
+                                  ),
+
+              if (plan.supportRequest.isPending)
+                const SizedBox(height: 18),
+
               if (request.status ==
                   UnlockRequestStatus
                       .pending)
-                RequestCard(
-                  userName:
-                      '<Usuario>',
+              RequestCard(
+                userName: request.requesterName ?? 'CleanMind User',
+                title:
+                    'Protection Unlock Request',
+                message:
+                    'This user is requesting approval to disable protection.',
+                icon:
+                    Icons.lock_open_outlined,
 
-                  onApprove: () async {
+                onApprove: () async {
                     final updatedPlan =
                         await ProtectionService.unlockSucceeded(
                       plan: plan,
@@ -146,8 +210,8 @@ class PendingRequestsScreen
                 ),
 
               if (request.status ==
-                  UnlockRequestStatus
-                      .none)
+                      UnlockRequestStatus.none &&
+                  !plan.supportRequest.isPending)
                 Container(
                   width: double.infinity,
 

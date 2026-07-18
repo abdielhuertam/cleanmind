@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
-
-import 'custom_blocked_sites_screen.dart';
-import 'waiting_period_screen.dart';
 import '../state/plan_state.dart';
-import 'waiting_period_screen.dart';
+
 import 'blocked_apps_screen.dart';
+import 'custom_blocked_sites_screen.dart';
+import 'support_screen.dart';
 
 class ProtectionSettingsScreen
     extends StatelessWidget {
-
   final PlanState plan;
+  final ValueChanged<PlanState> onPlanChanged;
 
   const ProtectionSettingsScreen({
     super.key,
     required this.plan,
+    required this.onPlanChanged,
   });
 
   @override
@@ -27,12 +27,9 @@ class ProtectionSettingsScreen
       appBar: AppBar(
         backgroundColor:
             AppColors.primary,
-
         foregroundColor:
             Colors.white,
-
         elevation: 0,
-
         title: const Text(
           'Protection Settings',
         ),
@@ -54,13 +51,10 @@ class ProtectionSettingsScreen
             _settingsTile(
               icon:
                   Icons.apps,
-
               title:
                   'Blocked Apps',
-
               subtitle:
                   'Manage protected applications and distractions.',
-
               onTap: () {
                 Navigator.push(
                   context,
@@ -78,13 +72,10 @@ class ProtectionSettingsScreen
             _settingsTile(
               icon:
                   Icons.language,
-
               title:
                   'Custom Blocked Sites',
-
               subtitle:
                   'Add websites or URLs to block manually.',
-
               onTap: () {
                 Navigator.push(
                   context,
@@ -99,49 +90,6 @@ class ProtectionSettingsScreen
               },
             ),
 
-            _settingsTile(
-              icon:
-                  Icons.schedule,
-
-              title:
-                  'Waiting Period',
-
-              subtitle:
-                  'Configure unlock delay duration.',
-
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (_) =>
-                            const WaitingPeriodScreen(),
-                  ),
-                );
-              },
-            ),
-
-            _settingsTile(
-              icon:
-                  Icons.lock_outline,
-
-              title:
-                  'Strict Mode',
-
-              subtitle:
-                  'Prevent accidental disabling of protection.',
-
-              trailing:
-                  Switch(
-                value: true,
-
-                activeColor:
-                    AppColors.primary,
-
-                onChanged: (_) {},
-              ),
-            ),
-
             const SizedBox(
               height: 18,
             ),
@@ -152,42 +100,16 @@ class ProtectionSettingsScreen
 
             _settingsTile(
               icon:
-                  Icons.notifications,
-
-              title:
-                  'Daily Reminders',
-
-              subtitle:
-                  'Receive protection and focus reminders.',
-
-              trailing:
-                  Switch(
-                value: true,
-
-                activeColor:
-                    AppColors.primary,
-
-                onChanged: (_) {},
-              ),
-            ),
-
-            _settingsTile(
-              icon:
                   Icons.local_fire_department,
-
               title:
                   'Streak Alerts',
-
               subtitle:
-                  'Celebrate focus milestones and progress.',
-
+                  'Receive notifications when you reach achievement milestones.',
               trailing:
                   Switch(
                 value: true,
-
                 activeColor:
                     AppColors.primary,
-
                 onChanged: (_) {},
               ),
             ),
@@ -197,33 +119,29 @@ class ProtectionSettingsScreen
             ),
 
             _sectionTitle(
-              'Advanced',
+              'Accountability',
             ),
 
             _settingsTile(
               icon:
-                  Icons.security,
-
+                  Icons.people_outline,
               title:
-                  'Unlock Methods',
-
+                  'Support',
               subtitle:
-                  'Manage approval and verification methods.',
-            ),
-
-            _settingsTile(
-              icon:
-                  Icons.info_outline,
-
-              title:
-                  'About CleanMind',
-
-              subtitle:
-                  'App version and protection details.',
-            ),
-
-            const SizedBox(
-              height: 18,
+                  'Manage your accountability partner and approval methods.',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) =>
+                          SupportScreen(
+                            plan: plan,
+                            onPlanChanged: onPlanChanged,
+                          ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -246,12 +164,10 @@ class ProtectionSettingsScreen
 
         child: Text(
           title,
-
           style: const TextStyle(
             fontSize: 16,
             fontWeight:
                 FontWeight.bold,
-
             color:
                 AppColors.primary,
           ),
@@ -275,12 +191,10 @@ class ProtectionSettingsScreen
 
       decoration: BoxDecoration(
         color: Colors.white,
-
         borderRadius:
             BorderRadius.circular(
           22,
         ),
-
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -299,14 +213,12 @@ class ProtectionSettingsScreen
 
         leading: Icon(
           icon,
-
           color:
               AppColors.primary,
         ),
 
         title: Text(
           title,
-
           style: const TextStyle(
             fontSize: 16,
             fontWeight:
@@ -319,10 +231,8 @@ class ProtectionSettingsScreen
               const EdgeInsets.only(
             top: 2,
           ),
-
           child: Text(
             subtitle,
-
             style: const TextStyle(
               height: 1.35,
             ),
@@ -333,9 +243,7 @@ class ProtectionSettingsScreen
             trailing ??
             const Icon(
               Icons.arrow_forward_ios,
-
               size: 18,
-
               color:
                   AppColors.primary,
             ),

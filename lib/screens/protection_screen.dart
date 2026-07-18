@@ -7,8 +7,6 @@ import '../state/protection_state.dart';
 
 import '../theme/app_colors.dart';
 
-import 'protection_settings_screen.dart';
-
 class ProtectionScreen extends StatefulWidget {
   final PlanState plan;
 
@@ -315,13 +313,6 @@ else
         const SizedBox(
           height: 16,
         ),
-
-        _buildSettingsButton(),
-
-        const SizedBox(
-          height: 16,
-        ),
-
         SizedBox(
           width: double.infinity,
 
@@ -411,13 +402,7 @@ else
         ),
 
         const SizedBox(
-          height: 16,
-        ),
-
-        _buildSettingsButton(),
-
-        const SizedBox(
-          height: 16,
+          height: 20,
         ),
 
         SizedBox(
@@ -555,88 +540,4 @@ else
     ),
   );
 }
-
-  Widget _buildSettingsButton() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (_) =>
-                    ProtectionSettingsScreen(
-                      plan: widget.plan,
-                    ),
-          ),
-        );
-      },
-
-      child: Container(
-        width: double.infinity,
-
-        padding:
-            const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 16,
-        ),
-
-        decoration: BoxDecoration(
-          color: Colors.white,
-
-          borderRadius:
-              BorderRadius.circular(
-            22,
-          ),
-
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 8,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-
-        child: Row(
-          children: const [
-            Icon(
-              Icons.settings,
-
-              size: 30,
-
-              color:
-                  AppColors.primary,
-            ),
-
-            SizedBox(width: 16),
-
-            Expanded(
-              child: Text(
-                'Protection Settings',
-
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight:
-                      FontWeight.bold,
-
-                  color:
-                      AppColors
-                          .textPrimary,
-                ),
-              ),
-            ),
-
-            Icon(
-              Icons.arrow_forward_ios,
-
-              size: 18,
-
-              color:
-                  AppColors.primary,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

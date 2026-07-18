@@ -101,6 +101,7 @@ No new code was written intentionally; instead, irreversible product decisions w
 - Home Screen behavior finalized for all states.
 - Unlock methods finalized:
   - Copy Challenge
+  - Push Notification
   - Accountability Code (support-based)
   - Time-based Unlock (Pro, manual reactivation)
 
@@ -1723,3 +1724,62 @@ Before committing:
 - Community
 - Settings completion
 - Store readiness
+
+## 2026-07-18 — Account Refactor & Partial Protection Stabilization
+
+### Completed
+
+- Removed the Subscription card from Account Settings.
+- Introduced UserProfileRepository abstraction for user profile management.
+- Implemented editable username in Account Settings.
+- Refactored Support request creation to use the logged-in user's profile.
+- Added requesterName to UnlockRequestState.
+- Pending Requests now display the requester's name.
+- Fixed NotificationService initialization regression.
+- Restored Partial Protection activation after local notification integration.
+- Verified local expiration notifications schedule correctly again.
+
+### Status
+
+Account architecture is now cleaner and prepared for Firebase Authentication.
+
+Partial Protection is once again fully functional, including scheduled expiration notifications.
+
+Current implementation remains local-only for authentication and notifications.
+
+### Next Session Focus
+
+1. "Support>Change Support" pending implementation.
+2. "Protection Settings>Streak Alerts" Pending implementation
+3. Refactor home_screen.dart.
+4. Implement Login / Authentication.
+5. Implement backend Support integration.
+6. Replace simulated Push Notifications with Firebase/APNs.
+7. Begin VPN/DNS engine integration.
+
+### Technical Debt
+
+- UI Truth Pass.
+- Refactor duplicated code.
+- Migrate local account implementation to Firebase Authentication.
+- Perform regression testing after infrastructure changes.
+
+### Technical Notes
+
+The Partial Protection flow stopped working after integrating local notifications.
+
+Root cause:
+
+NotificationService.initialize() was no longer being executed from main.dart, preventing timezone initialization.
+
+The issue was corrected by restoring NotificationService initialization before application startup.
+
+### Pre-Commit Validation Checklist
+
+- Confirm Permanent Protection activates correctly.
+- Confirm Partial Protection activates correctly.
+- Confirm expiration notification is scheduled.
+- Confirm Copy Challenge still disables protection.
+- Confirm SMS flow still works.
+- Confirm Pending Requests still work.
+- Confirm project builds successfully on iOS.

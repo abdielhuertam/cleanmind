@@ -55,7 +55,7 @@ Partial Protection durations:
 
 Unlock methods:
 
-- Configurable Waiting Period
+- Push Notification
 - Accountability Code via SMS
 - Optional Support approval
 
@@ -102,25 +102,8 @@ Characteristics:
 - Contributes to level progression.
 - Does not contribute to medal milestones.
 - Sends an expiration notification when protection ends.
+- Schedules a local notification when the focus session expires.
 
----
-
-## 4. Unlock Rules — Free Plan
-
-When a Free user requests deactivation:
-
-1. Protection remains ACTIVE.
-2. An 8-hour waiting period is scheduled.
-3. A countdown is displayed.
-4. User may cancel at any time.
-5. When the waiting period expires:
-   - Protection transitions to protectionDisabled.
-   - A local notification is delivered to the user.
-   - Current streak resets.
-   - Ranking progression may be affected.
-   - Previously earned medals remain preserved.
-
-No external notifications are sent.
 
 ---
 
@@ -128,11 +111,11 @@ No external notifications are sent.
 
 Available methods:
 
-### Waiting Period
+### Temporary Unlock
 
-- Minimum duration: 1 hour.
+- Minimum duration: 5 mins.
 - Automatically disables protection upon expiration.
-- A local notification is delivered when the waiting period finishes.
+- A local notification is delivered when the Temporary Unlock finishes.
 - No automatic reactivation.
 
 ### Accountability Code (SMS-Based)

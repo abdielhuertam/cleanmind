@@ -48,10 +48,6 @@ class AccountScreen extends StatelessWidget {
 
           const SizedBox(height: 18),
 
-          _buildSubscriptionCard(
-            isPremium,
-          ),
-
           const SizedBox(height: 24),
         ],
       ),
@@ -279,73 +275,6 @@ class AccountScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildSubscriptionCard(
-    bool isPremium,
-  ) {
-    return Container(
-      width: double.infinity,
-
-      padding:
-          const EdgeInsets.all(
-        20,
-      ),
-
-      decoration: BoxDecoration(
-        color: Colors.white,
-
-        borderRadius:
-            BorderRadius.circular(
-          30,
-        ),
-
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-
-        children: [
-          const Text(
-            'Subscription',
-
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight:
-                  FontWeight.bold,
-
-              color:
-                  AppColors.textPrimary,
-            ),
-          ),
-
-          const SizedBox(height: 14),
-
-          Text(
-            isPremium
-                ? 'You currently have access to Premium unlock methods and accountability features.'
-                : 'Upgrade to Premium to unlock SMS verification, Support approvals, and advanced protection features.',
-
-            style: const TextStyle(
-              fontSize: 15,
-              height: 1.4,
-
-              color:
-                  AppColors
-                      .textSecondary,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

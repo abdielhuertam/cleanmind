@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../state/plan_state.dart';
 import '../state/protection_state.dart';
 import '../state/unlock_request_state.dart';
+import '../state/support_request_state.dart';
 
 class LocalStorageService {
 static const _planKey = 'plan_state';
@@ -47,6 +48,15 @@ final jsonMap = {
   'unlockRequestExpiresAt':
       plan.unlockRequest.expiresAt
           ?.toIso8601String(),
+
+    'supportRequestStatus':
+        plan.supportRequest.status.name,
+
+    'supportRequestRequesterName':
+        plan.supportRequest.requesterName,
+
+    'supportRequestId':
+        plan.supportRequest.requestId,
 
     'lastProgressAwardAt':
         plan.lastProgressAwardAt
@@ -99,6 +109,15 @@ final unlockRequestStatus =
       map['unlockRequestStatus'],
   orElse: () =>
       UnlockRequestStatus.none,
+);
+
+final supportRequestStatus =
+    SupportRequestStatus.values.firstWhere(
+  (e) =>
+      e.name ==
+      map['supportRequestStatus'],
+  orElse: () =>
+      SupportRequestStatus.none,
 );
 
 return PlanState(
@@ -158,6 +177,14 @@ return PlanState(
               )
             : null,
   ),
+
+    supportRequest: SupportRequestState(
+    status: supportRequestStatus,
+    requesterName:
+        map['supportRequestRequesterName'],
+    requestId:
+        map['supportRequestId'],
+    ),
 );
 }
 }
