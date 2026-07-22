@@ -20,6 +20,11 @@ class PlanState {
   final int streakDays;
   final DateTime? lastProgressAwardAt;
 
+  final bool milestoneCelebrationsEnabled;
+  final bool levelUpNotificationsEnabled;
+  final bool recurringProgressReminderEnabled;
+  final int recurringReminderDays;
+
   const PlanState({
     required this.isPro,
     required this.hasSupport,
@@ -30,6 +35,11 @@ class PlanState {
     required this.level,
     required this.streakDays,
     required this.lastProgressAwardAt,
+
+    required this.milestoneCelebrationsEnabled,
+    required this.levelUpNotificationsEnabled,
+    required this.recurringProgressReminderEnabled,
+    required this.recurringReminderDays,
   });
 
   factory PlanState.free() {
@@ -45,6 +55,10 @@ class PlanState {
       level: 1,
       streakDays: 0,
       lastProgressAwardAt: null,
+      milestoneCelebrationsEnabled: true,
+      levelUpNotificationsEnabled: true,
+      recurringProgressReminderEnabled: false,
+      recurringReminderDays: 7,
     );
   }
 
@@ -62,6 +76,10 @@ class PlanState {
       level: 1,
       streakDays: 0,
       lastProgressAwardAt: null,
+      milestoneCelebrationsEnabled: true,
+      levelUpNotificationsEnabled: true,
+      recurringProgressReminderEnabled: false,
+      recurringReminderDays: 7,
     );
   }
 
@@ -75,6 +93,10 @@ class PlanState {
     int? streakDays,
     DateTime? lastProgressAwardAt,
     SupportRequestState? supportRequest,
+    bool? milestoneCelebrationsEnabled,
+    bool? levelUpNotificationsEnabled,
+    bool? recurringProgressReminderEnabled,
+    int? recurringReminderDays,
   }) {
     return PlanState(
       isPro: isPro ?? this.isPro,
@@ -93,7 +115,21 @@ class PlanState {
           this.lastProgressAwardAt, 
       supportRequest:
           supportRequest ?? this.supportRequest,   
-      
+      milestoneCelebrationsEnabled:
+          milestoneCelebrationsEnabled ??
+          this.milestoneCelebrationsEnabled,
+
+      levelUpNotificationsEnabled:
+          levelUpNotificationsEnabled ??
+          this.levelUpNotificationsEnabled,
+
+      recurringProgressReminderEnabled:
+          recurringProgressReminderEnabled ??
+          this.recurringProgressReminderEnabled,
+
+      recurringReminderDays:
+          recurringReminderDays ??
+          this.recurringReminderDays,
     );
   }
 

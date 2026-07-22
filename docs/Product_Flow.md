@@ -643,3 +643,17 @@ Available options:
 - Reminder Interval (PRO)
 
 Current implementation is UI-only. Preference persistence and notification scheduling will be implemented in a future development phase.
+
+Progress Notifications
+
+- Milestone Celebrations
+- Level Up Notifications
+- Recurring Progress Reminder (PRO)
+- Reminder Interval (1–30 days)
+
+Behavior
+
+- Changes are applied immediately.
+- Changes are automatically saved.
+- Preferences persist after app restart.
+- Each option is independent and does not modify other notification settings.

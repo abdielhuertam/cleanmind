@@ -2,9 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+import '../state/plan_state.dart';
+import '../services/local_storage_service.dart';
+
 class ProgressNotificationsScreen extends StatefulWidget {
+  final PlanState plan;
+  final ValueChanged<PlanState> onPlanChanged;
+
   const ProgressNotificationsScreen({
     super.key,
+    required this.plan,
+    required this.onPlanChanged,
   });
 
   @override
@@ -14,11 +22,14 @@ class ProgressNotificationsScreen extends StatefulWidget {
 
 class _ProgressNotificationsScreenState
     extends State<ProgressNotificationsScreen> {
-  bool milestoneCelebrations = true;
-  bool levelUpNotifications = true;
-  bool recurringReminder = false;
+    
+    late PlanState _plan;
 
-  int reminderDays = 7;
+    @override
+    void initState() {
+      super.initState();
+      _plan = widget.plan;
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -48,12 +59,14 @@ class _ProgressNotificationsScreenState
             subtitle:
                 'Receive notifications when you reach CleanMind milestones and unlock new badges.',
             trailing: Switch(
-              value: milestoneCelebrations,
+              value: _plan.milestoneCelebrationsEnabled,
               activeColor: AppColors.primary,
-              onChanged: (value) {
-                setState(() {
-                  milestoneCelebrations = value;
-                });
+              onChanged: (value) async {
+                final updated = _plan.copyWith(
+                  milestoneCelebrationsEnabled: value,
+                );
+
+                await _savePlan(updated);
               },
             ),
           ),
@@ -66,12 +79,14 @@ class _ProgressNotificationsScreenState
             subtitle:
                 'Receive a notification every time you gain a new level.',
             trailing: Switch(
-              value: levelUpNotifications,
+              value: _plan.levelUpNotificationsEnabled,
               activeColor: AppColors.primary,
-              onChanged: (value) {
-                setState(() {
-                  levelUpNotifications = value;
-                });
+              onChanged: (value) async {
+                final updated = _plan.copyWith(
+                  levelUpNotificationsEnabled: value,
+                );
+
+                await _savePlan(updated);
               },
             ),
           ),
@@ -89,12 +104,14 @@ class _ProgressNotificationsScreenState
             subtitle:
                 'Receive periodic reminders showing your current streak and progress.',
             trailing: Switch(
-              value: recurringReminder,
+              value: _plan.recurringProgressReminderEnabled,
               activeColor: AppColors.primary,
-              onChanged: (value) {
-                setState(() {
-                  recurringReminder = value;
-                });
+              onChanged: (value) async {
+                final updated = _plan.copyWith(
+                  recurringProgressReminderEnabled: value,
+                );
+
+                await _savePlan(updated);
               },
             ),
           ),
@@ -102,7 +119,10 @@ class _ProgressNotificationsScreenState
           const SizedBox(height: 14),
 
           Opacity(
-            opacity: recurringReminder ? 1 : .45,
+          opacity:
+              _plan.recurringProgressReminderEnabled
+                  ? 1
+                  : .45,
             child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 18,
@@ -152,18 +172,26 @@ class _ProgressNotificationsScreenState
                   const SizedBox(height: 14),
 
                   IgnorePointer(
-                    ignoring: !recurringReminder,
+                    ignoring:
+                        !_plan
+                            .recurringProgressReminderEnabled,
                     child: Slider(
-                      value: reminderDays.toDouble(),
+                    value:
+                        _plan.recurringReminderDays
+                            .toDouble(),
                       min: 1,
                       max: 30,
                       divisions: 29,
                       activeColor: AppColors.primary,
-                      label: '$reminderDays days',
-                      onChanged: (value) {
-                        setState(() {
-                          reminderDays = value.round();
-                        });
+                      label:
+                          '${_plan.recurringReminderDays} days',
+                      onChanged: (value) async {
+                        final updated = _plan.copyWith(
+                          recurringReminderDays:
+                              value.round(),
+                        );
+
+                        await _savePlan(updated);
                       },
                     ),
                   ),
@@ -171,7 +199,7 @@ class _ProgressNotificationsScreenState
                   Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      'Every $reminderDays day${reminderDays == 1 ? '' : 's'}',
+                      'Every ${_plan.recurringReminderDays} day${_plan.recurringReminderDays == 1 ? '' : 's'}',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppColors.primary,
@@ -226,6 +254,18 @@ class _ProgressNotificationsScreenState
         ],
       ),
     );
+  }
+
+  Future<void> _savePlan(
+    PlanState plan,
+  ) async {
+    setState(() {
+      _plan = plan;
+    });
+
+    widget.onPlanChanged(plan);
+
+    await LocalStorageService.savePlan(plan);
   }
 
   Widget _sectionTitle(

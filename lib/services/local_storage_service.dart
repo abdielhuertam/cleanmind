@@ -61,6 +61,18 @@ final jsonMap = {
     'lastProgressAwardAt':
         plan.lastProgressAwardAt
             ?.toIso8601String(),
+
+    'milestoneCelebrationsEnabled':
+        plan.milestoneCelebrationsEnabled,
+
+    'levelUpNotificationsEnabled':
+        plan.levelUpNotificationsEnabled,
+
+    'recurringProgressReminderEnabled':
+        plan.recurringProgressReminderEnabled,
+
+    'recurringReminderDays':
+        plan.recurringReminderDays,
 };
 
 await prefs.setString(
@@ -185,6 +197,17 @@ return PlanState(
     requestId:
         map['supportRequestId'],
     ),
+    milestoneCelebrationsEnabled:
+        map['milestoneCelebrationsEnabled'] ?? true,
+
+    levelUpNotificationsEnabled:
+        map['levelUpNotificationsEnabled'] ?? true,
+
+    recurringProgressReminderEnabled:
+        map['recurringProgressReminderEnabled'] ?? false,
+
+    recurringReminderDays:
+        map['recurringReminderDays'] ?? 7,
 );
 }
 }

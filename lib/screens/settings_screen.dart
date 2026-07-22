@@ -50,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.shield_outlined,
             title: 'Protection Settings',
             subtitle:
-                'Manage your protection preferences.',
+                'Manage your protection and accountability partner preferences.',
             onTap: () {
             Navigator.push(
                 context,
@@ -78,7 +78,10 @@ class SettingsScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (_) =>
-                      const ProgressNotificationsScreen(),
+                      ProgressNotificationsScreen(
+                        plan: plan,
+                        onPlanChanged: onPlanChanged,
+                      ),
                 ),
               );
             },

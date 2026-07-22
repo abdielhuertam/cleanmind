@@ -106,9 +106,9 @@ class ProtectionSettingsScreen
               icon:
                   Icons.people_outline,
               title:
-                  'Support',
+                  'Partner Support',
               subtitle:
-                  'Manage your accountability partner and approval methods.',
+                  'Manage your accountability partner',
               onTap: () {
                 Navigator.push(
                   context,

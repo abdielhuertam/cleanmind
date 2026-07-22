@@ -1819,3 +1819,19 @@ The issue was corrected by restoring NotificationService initialization before a
 
 ### Git
 Ready for commit.
+
+## Commit 2 - Progress Notifications Persistence
+
+### Completed
+
+- Progress Notifications preferences are now integrated into PlanState.
+- Added persistent settings:
+  - Milestone Celebrations
+  - Level Up Notifications
+  - Recurring Progress Reminder
+  - Reminder Interval
+- Preferences are automatically saved using LocalStorageService.
+- Preferences are restored automatically during app startup.
+- Progress Notifications now uses PlanState as the single source of truth.
+- Fixed immediate UI refresh when toggling notification preferences.
+- Fixed state synchronization bug where enabling one notification reset the others.

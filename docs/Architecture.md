@@ -295,6 +295,18 @@ Future architecture cleanup is still required to consolidate:
 - protection-state synchronization
 into a single authoritative state source.
 
+### Progress Notification Preferences
+
+PlanState now stores all user notification preferences.
+
+Fields:
+- milestoneCelebrationsEnabled
+- levelUpNotificationsEnabled
+- recurringProgressReminderEnabled
+- recurringReminderDays
+
+These preferences are persisted through LocalStorageService and represent the single source of truth for notification configuration.
+
 ---
 
 ---
