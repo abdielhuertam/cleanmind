@@ -84,19 +84,21 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
 
+          const SizedBox(height: 14),
+
           _settingsOption(
             icon: Icons.info_outline,
             title: 'About CleanMind',
             subtitle:
                 'Version and application information.',
             onTap: () {
-            Navigator.push(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                builder: (_) =>
-                    const AboutCleanMindScreen(),
+                  builder: (_) =>
+                      const AboutCleanMindScreen(),
                 ),
-            );
+              );
             },
           ),
         ],
