@@ -14,11 +14,13 @@ class ProtectionService {
       expiresAt,
     );
 
+  if (plan.partialProtectionNotificationsEnabled) {
     await NotificationService.schedulePartialProtection(
       duration: expiresAt.difference(
         DateTime.now(),
       ),
     );
+  }
 
     return updatedPlan;
   }

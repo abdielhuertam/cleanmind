@@ -1835,3 +1835,18 @@ Ready for commit.
 - Progress Notifications now uses PlanState as the single source of truth.
 - Fixed immediate UI refresh when toggling notification preferences.
 - Fixed state synchronization bug where enabling one notification reset the others.
+
+### Notifications Commit 3
+
+Completed the notification system.
+
+Completed:
+- Partial Protection Reminder notification.
+- Recurring Progress Reminder notification.
+- Reminder scheduling when enabled.
+- Reminder cancellation when disabled.
+- Automatic rescheduling when reminder interval changes.
+- Local notification testing completed on iOS Simulator.
+
+Status:
+✅ Complete

@@ -5,6 +5,8 @@ import '../theme/app_colors.dart';
 import '../state/plan_state.dart';
 import '../services/local_storage_service.dart';
 
+import '../services/notification_service.dart';
+
 class ProgressNotificationsScreen extends StatefulWidget {
   final PlanState plan;
   final ValueChanged<PlanState> onPlanChanged;
@@ -41,7 +43,7 @@ class _ProgressNotificationsScreenState
         foregroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          'Progress Notifications',
+          'Notifications Settings',
         ),
       ),
 
@@ -49,50 +51,34 @@ class _ProgressNotificationsScreenState
         padding: const EdgeInsets.fromLTRB(24, 18, 24, 18),
         children: [
 
-          _sectionTitle(
-            'Achievements',
-          ),
+      const SizedBox(height: 10),
 
-          _notificationCard(
-            icon: Icons.emoji_events_outlined,
-            title: 'Milestone Celebrations',
-            subtitle:
-                'Receive notifications when you reach CleanMind milestones and unlock new badges.',
-            trailing: Switch(
-              value: _plan.milestoneCelebrationsEnabled,
-              activeColor: AppColors.primary,
-              onChanged: (value) async {
-                final updated = _plan.copyWith(
-                  milestoneCelebrationsEnabled: value,
-                );
+      _sectionTitle(
+        'Protection',
+      ),
 
-                await _savePlan(updated);
-              },
-            ),
-          ),
+      _notificationCard(
+        icon: Icons.timer_outlined,
+        title: 'Partial Protection Reminder',
+        subtitle:
+            'Receive a notification when your Partial Protection session ends.',
+        trailing: Switch(
+          value:
+              _plan.partialProtectionNotificationsEnabled,
+          activeColor: AppColors.primary,
+          onChanged: (value) async {
+            final updated = _plan.copyWith(
+              partialProtectionNotificationsEnabled:
+                  value,
+            );
 
-          const SizedBox(height: 14),
+            await _savePlan(updated);
+          },
+        ),
+      ),
 
-          _notificationCard(
-            icon: Icons.trending_up,
-            title: 'Level Up Notifications',
-            subtitle:
-                'Receive a notification every time you gain a new level.',
-            trailing: Switch(
-              value: _plan.levelUpNotificationsEnabled,
-              activeColor: AppColors.primary,
-              onChanged: (value) async {
-                final updated = _plan.copyWith(
-                  levelUpNotificationsEnabled: value,
-                );
-
-                await _savePlan(updated);
-              },
-            ),
-          ),
-
-          const SizedBox(height: 18),
-
+      const SizedBox(height: 10),
+      
           _sectionTitle(
             'Recurring Reminder',
           ),
@@ -103,7 +89,12 @@ class _ProgressNotificationsScreenState
                 'Recurring Progress Reminder',
             subtitle:
                 'Receive periodic reminders showing your current streak and progress.',
-            trailing: Switch(
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const _ProBadge(),
+                const SizedBox(width: 8),
+                Switch(
               value: _plan.recurringProgressReminderEnabled,
               activeColor: AppColors.primary,
               onChanged: (value) async {
@@ -111,23 +102,33 @@ class _ProgressNotificationsScreenState
                   recurringProgressReminderEnabled: value,
                 );
 
+                if (value) {
+                  await NotificationService
+                      .scheduleRecurringProgressReminder(
+                    duration: Duration(
+                      days: updated.recurringReminderDays,
+                    ),
+                  );
+                } else {
+                  await NotificationService
+                      .cancelRecurringProgressReminder();
+                }
+
                 await _savePlan(updated);
-              },
-            ),
+                },
+                    ),
+                  ],
+                ),
           ),
 
-          const SizedBox(height: 14),
+          if (_plan.recurringProgressReminderEnabled) ...[
+            const SizedBox(height: 10),
 
-          Opacity(
-          opacity:
-              _plan.recurringProgressReminderEnabled
-                  ? 1
-                  : .45,
-            child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 18,
-              vertical: 14,
-            ),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 10,
+              ),  
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(22),
@@ -140,13 +141,10 @@ class _ProgressNotificationsScreenState
                 ],
               ),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   Row(
                     children: [
-
                       const Icon(
                         Icons.schedule_outlined,
                         color: AppColors.primary,
@@ -159,41 +157,39 @@ class _ProgressNotificationsScreenState
                           'Reminder Interval',
                           style: TextStyle(
                             fontSize: 17,
-                            fontWeight:
-                                FontWeight.w600,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-
-                      const _ProBadge(),
                     ],
                   ),
 
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
 
-                  IgnorePointer(
-                    ignoring:
-                        !_plan
-                            .recurringProgressReminderEnabled,
-                    child: Slider(
-                    value:
-                        _plan.recurringReminderDays
-                            .toDouble(),
-                      min: 1,
-                      max: 30,
-                      divisions: 29,
-                      activeColor: AppColors.primary,
-                      label:
-                          '${_plan.recurringReminderDays} days',
-                      onChanged: (value) async {
-                        final updated = _plan.copyWith(
-                          recurringReminderDays:
-                              value.round(),
+                  Slider(
+                    value: _plan.recurringReminderDays.toDouble(),
+                    min: 1,
+                    max: 30,
+                    divisions: 29,
+                    activeColor: AppColors.primary,
+                    label: '${_plan.recurringReminderDays} days',
+                    onChanged: (value) async {
+                      final updated = _plan.copyWith(
+                        recurringReminderDays: value.round(),
+                      );
+
+                      if (updated.recurringProgressReminderEnabled) {
+                        await NotificationService.cancelRecurringProgressReminder();
+
+                        await NotificationService.scheduleRecurringProgressReminder(
+                          duration: Duration(
+                            days: updated.recurringReminderDays,
+                          ),
                         );
+                      }
 
-                        await _savePlan(updated);
-                      },
-                    ),
+                      await _savePlan(updated);
+                    },
                   ),
 
                   Align(
@@ -209,10 +205,8 @@ class _ProgressNotificationsScreenState
                 ],
               ),
             ),
-          ),
-
+          ],
           const SizedBox(height: 28),
-
           Container(
             padding:
                 const EdgeInsets.all(18),
@@ -340,13 +334,13 @@ class _ProgressNotificationsScreenState
                       ),
                     ),
 
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 1),
 
                     Text(
                       subtitle,
                       style: const TextStyle(
-                        fontSize: 14,
-                        height: 1.35,
+                        fontSize: 13,
+                        height: 1.2,
                         color:
                             AppColors.textSecondary,
                       ),

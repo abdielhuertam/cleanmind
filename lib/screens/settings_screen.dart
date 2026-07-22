@@ -70,7 +70,7 @@ class SettingsScreen extends StatelessWidget {
 
           _settingsOption(
             icon: Icons.notifications_active_outlined,
-            title: 'Progress Notifications',
+            title: 'Notifications Settings',
             subtitle:
                 'Manage achievement and progress notifications.',
             onTap: () {

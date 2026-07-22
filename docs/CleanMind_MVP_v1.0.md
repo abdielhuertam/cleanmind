@@ -254,3 +254,6 @@ After successful activation, the application always returns the user to the Prot
 
 - This document version: v2.0 (Backend-Validated MVP)
 - Any product scope changes require a new version
+
+✅ Partial Protection Reminder
+✅ Recurring Progress Reminder

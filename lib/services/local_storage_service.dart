@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../state/plan_state.dart';
 import '../state/protection_state.dart';
 import '../state/unlock_request_state.dart';
+
+import '../state/celebration_state.dart';
 import '../state/support_request_state.dart';
 
 class LocalStorageService {
@@ -62,17 +64,28 @@ final jsonMap = {
         plan.lastProgressAwardAt
             ?.toIso8601String(),
 
-    'milestoneCelebrationsEnabled':
-        plan.milestoneCelebrationsEnabled,
+    'lastStreakAwardAt':
+        plan.lastStreakAwardAt
+            ?.toIso8601String(),
 
-    'levelUpNotificationsEnabled':
-        plan.levelUpNotificationsEnabled,
+    'partialProtectionNotificationsEnabled':
+        plan.partialProtectionNotificationsEnabled,
 
     'recurringProgressReminderEnabled':
         plan.recurringProgressReminderEnabled,
 
     'recurringReminderDays':
         plan.recurringReminderDays,
+
+    'celebration': {
+    'isPending': plan.celebration.isPending,
+    'type': plan.celebration.type.name,
+    'title': plan.celebration.title,
+    'message': plan.celebration.message,
+    'streakDays': plan.celebration.streakDays,
+    'level': plan.celebration.level,
+    },
+
 };
 
 await prefs.setString(
@@ -123,6 +136,30 @@ final unlockRequestStatus =
       UnlockRequestStatus.none,
 );
 
+final celebrationMap =
+    map['celebration'] as Map?;
+
+final celebration =
+    celebrationMap == null
+        ? CelebrationState.none()
+        : CelebrationState(
+            type: CelebrationType.values.firstWhere(
+              (e) =>
+                  e.name ==
+                  celebrationMap['type'],
+            ),
+            title:
+                celebrationMap['title'] ?? '',
+            message:
+                celebrationMap['message'] ?? '',
+            streakDays:
+                celebrationMap['streakDays'],
+            level:
+                celebrationMap['level'],
+            isPending:
+                celebrationMap['isPending'] ?? false,
+          );
+
 final supportRequestStatus =
     SupportRequestStatus.values.firstWhere(
   (e) =>
@@ -150,7 +187,12 @@ return PlanState(
             map['lastProgressAwardAt'],
           )
         : null,
-
+    lastStreakAwardAt:
+        map['lastStreakAwardAt'] != null
+            ? DateTime.parse(
+                map['lastStreakAwardAt'],
+            )
+            : null,
   protection: ProtectionState(
     status: protectionStatus,
 
@@ -190,6 +232,7 @@ return PlanState(
             : null,
   ),
 
+    celebration: celebration,
     supportRequest: SupportRequestState(
     status: supportRequestStatus,
     requesterName:
@@ -197,17 +240,16 @@ return PlanState(
     requestId:
         map['supportRequestId'],
     ),
-    milestoneCelebrationsEnabled:
-        map['milestoneCelebrationsEnabled'] ?? true,
 
-    levelUpNotificationsEnabled:
-        map['levelUpNotificationsEnabled'] ?? true,
+    partialProtectionNotificationsEnabled:
+        map['partialProtectionNotificationsEnabled'] ?? true,
 
     recurringProgressReminderEnabled:
         map['recurringProgressReminderEnabled'] ?? false,
 
     recurringReminderDays:
         map['recurringReminderDays'] ?? 7,
+
 );
 }
 }

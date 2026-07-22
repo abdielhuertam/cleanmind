@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'state/plan_state.dart';
 
@@ -14,6 +15,9 @@ import 'screens/unlock_methods_screen.dart';
 import 'screens/protection_mode_selection_screen.dart';
 
 import 'theme/app_colors.dart';
+
+import 'widgets/celebration_overlay.dart';
+import 'state/celebration_state.dart';
 
 import 'models/user_profile.dart';
 
@@ -42,11 +46,17 @@ void main() async {
     );
   }
 
-  PlanState loadedPlan =
-      await LocalStorageService.loadPlan();
+PlanState loadedPlan =
+    await LocalStorageService.loadPlan();
 
   loadedPlan =
       loadedPlan.refreshLifecycle();
+
+  if (kDebugMode && loadedPlan.xp < 999) {
+    loadedPlan = loadedPlan.copyWith(
+      xp: 999,
+    );
+  }
 
   await LocalStorageService.savePlan(
     loadedPlan,
@@ -75,6 +85,12 @@ class MyApp extends StatefulWidget {
 class _MyAppState
     extends State<MyApp>
     with WidgetsBindingObserver {
+
+  final GlobalKey<NavigatorState>
+      _navigatorKey =
+          GlobalKey<NavigatorState>();
+
+  bool _showingCelebration = false;
 
   late PlanState _plan;
   int _selectedIndex = 0;
@@ -122,6 +138,51 @@ class _MyAppState
     }
   }
 
+  Future<void> _showCelebrationIfNeeded() async {
+    if (_showingCelebration) return;
+
+    if (!_plan.celebration.isPending) return;
+
+    final context = _navigatorKey.currentContext;
+
+    if (context == null) return;
+
+    _showingCelebration = true;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: CelebrationOverlay(
+            celebration: _plan.celebration,
+            onContinue: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        );
+      },
+    );
+
+    _showingCelebration = false;
+
+    final clearedPlan = _plan.copyWith(
+      celebration: CelebrationState.none(),
+    );
+
+    await LocalStorageService.savePlan(
+      clearedPlan,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _plan = clearedPlan;
+    });
+  }
+
   Future<void> _onPlanChanged(
     PlanState updatedPlan,
   ) async {
@@ -135,6 +196,24 @@ class _MyAppState
     setState(() {
       _plan = updatedPlan;
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showCelebrationIfNeeded();
+    });
+  }
+
+  void _triggerDebugCelebration() {
+    final updatedPlan = _plan.copyWith(
+      celebration: const CelebrationState(
+        isPending: true,
+        type: CelebrationType.levelUp,
+        title: 'Debug Celebration',
+        message: 'This is a test celebration.',
+        level: 99,
+      ),
+    );
+
+    _onPlanChanged(updatedPlan);
   }
 
   void _onTabChanged(int index) {
@@ -145,6 +224,7 @@ class _MyAppState
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       debugShowCheckedModeBanner:
           false,
 
@@ -176,11 +256,24 @@ class _MyAppState
         ),
       ),
 
-      home: MainShellScreen(
-        plan: _plan,
-        onPlanChanged: _onPlanChanged,
-        selectedIndex: _selectedIndex,
-        onTabChanged: _onTabChanged,
+      home: Stack(
+        children: [
+          MainShellScreen(
+            plan: _plan,
+            onPlanChanged: _onPlanChanged,
+            selectedIndex: _selectedIndex,
+            onTabChanged: _onTabChanged,
+          ),
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              mini: true,
+              onPressed: _triggerDebugCelebration,
+              child: const Icon(Icons.celebration),
+            ),
+          ),
+        ],
       ),
 
       routes: {

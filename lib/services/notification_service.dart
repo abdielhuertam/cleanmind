@@ -54,7 +54,6 @@ class NotificationService {
   static FlutterLocalNotificationsPlugin
       get instance => _notifications;
 
-
     static Future<void> schedulePartialProtection({
     required Duration duration,
     }) async {
@@ -85,5 +84,63 @@ class NotificationService {
     static Future<void> cancelPartialProtection() async {
     await _notifications.cancel(101);
     }
+static Future<void> showMilestoneNotification({
+  required String title,
+  required String body,
+}) async {
+  await _notifications.show(
+    102,
+    title,
+    body,
+    const NotificationDetails(
+      iOS: DarwinNotificationDetails(),
+      android: AndroidNotificationDetails(
+        'progress_notifications',
+        'Progress Notifications',
+        channelDescription:
+            'Milestones and achievements',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+    ),
+  );
+}
 
+static Future<void> showLevelUpNotification({
+  required int level,
+}) async {
+  await showMilestoneNotification(
+    title: 'Level Up!',
+    body: 'Congratulations! You reached Level $level.',
+  );
+}
+
+static Future<void> scheduleRecurringProgressReminder({
+required Duration duration,
+}) async {
+await _notifications.zonedSchedule(
+  103,
+  'Keep Going!',
+  'Check your CleanMind progress and keep your streak alive.',
+  tz.TZDateTime.now(tz.local).add(duration),
+  const NotificationDetails(
+    iOS: DarwinNotificationDetails(),
+    android: AndroidNotificationDetails(
+      'progress_notifications',
+      'Progress Notifications',
+      channelDescription:
+          'Recurring progress reminders',
+      importance: Importance.high,
+      priority: Priority.high,
+    ),
+  ),
+  androidScheduleMode:
+      AndroidScheduleMode.exactAllowWhileIdle,
+  matchDateTimeComponents: null,
+);
+}
+
+static Future<void> cancelRecurringProgressReminder() async {
+await _notifications.cancel(103);
+}
 }

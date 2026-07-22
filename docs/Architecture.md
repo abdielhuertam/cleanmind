@@ -440,3 +440,12 @@ Planned responsibilities:
 Notification scheduling is performed locally on the device and uses the device's configured time zone.
 
 This layer is independent from future Push Notification infrastructure, which will require backend integration.
+
+NotificationService responsibilities:
+
+- Schedule Partial Protection reminders.
+- Cancel Partial Protection reminders.
+- Schedule recurring progress reminders.
+- Cancel recurring progress reminders.
+- Display milestone notifications.
+- Display level-up notifications.

@@ -657,3 +657,10 @@ Behavior
 - Changes are automatically saved.
 - Preferences persist after app restart.
 - Each option is independent and does not modify other notification settings.
+
+Recurring Progress Reminder
+
+- Available for PRO users.
+- User can enable or disable reminders.
+- User selects reminder interval.
+- Reminder is automatically rescheduled whenever the interval changes.

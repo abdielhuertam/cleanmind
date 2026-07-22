@@ -1,6 +1,7 @@
 import 'protection_state.dart';
 import 'unlock_request_state.dart';
 import 'support_request_state.dart';
+import 'celebration_state.dart';
 
 const Duration kPushRequestDuration =
     Duration(minutes: 5);
@@ -19,9 +20,9 @@ class PlanState {
   final int level;
   final int streakDays;
   final DateTime? lastProgressAwardAt;
-
-  final bool milestoneCelebrationsEnabled;
-  final bool levelUpNotificationsEnabled;
+  final DateTime? lastStreakAwardAt;
+  final CelebrationState celebration;
+  final bool partialProtectionNotificationsEnabled;
   final bool recurringProgressReminderEnabled;
   final int recurringReminderDays;
 
@@ -35,9 +36,9 @@ class PlanState {
     required this.level,
     required this.streakDays,
     required this.lastProgressAwardAt,
-
-    required this.milestoneCelebrationsEnabled,
-    required this.levelUpNotificationsEnabled,
+    required this.lastStreakAwardAt,
+    required this.celebration,
+    required this.partialProtectionNotificationsEnabled,
     required this.recurringProgressReminderEnabled,
     required this.recurringReminderDays,
   });
@@ -55,8 +56,9 @@ class PlanState {
       level: 1,
       streakDays: 0,
       lastProgressAwardAt: null,
-      milestoneCelebrationsEnabled: true,
-      levelUpNotificationsEnabled: true,
+      lastStreakAwardAt: null,
+      celebration: CelebrationState.none(),
+      partialProtectionNotificationsEnabled: true,
       recurringProgressReminderEnabled: false,
       recurringReminderDays: 7,
     );
@@ -76,8 +78,9 @@ class PlanState {
       level: 1,
       streakDays: 0,
       lastProgressAwardAt: null,
-      milestoneCelebrationsEnabled: true,
-      levelUpNotificationsEnabled: true,
+      lastStreakAwardAt: null,
+      celebration: CelebrationState.none(),
+      partialProtectionNotificationsEnabled: true,
       recurringProgressReminderEnabled: false,
       recurringReminderDays: 7,
     );
@@ -92,9 +95,10 @@ class PlanState {
     int? level,
     int? streakDays,
     DateTime? lastProgressAwardAt,
+    DateTime? lastStreakAwardAt,
+    CelebrationState? celebration,
     SupportRequestState? supportRequest,
-    bool? milestoneCelebrationsEnabled,
-    bool? levelUpNotificationsEnabled,
+    bool? partialProtectionNotificationsEnabled,
     bool? recurringProgressReminderEnabled,
     int? recurringReminderDays,
   }) {
@@ -112,16 +116,19 @@ class PlanState {
           streakDays ?? this.streakDays,
       lastProgressAwardAt:
           lastProgressAwardAt ??
-          this.lastProgressAwardAt, 
+          this.lastProgressAwardAt,
+      lastStreakAwardAt:
+          lastStreakAwardAt ??
+          this.lastStreakAwardAt,
+      celebration:
+          celebration ??
+          this.celebration,
       supportRequest:
           supportRequest ?? this.supportRequest,   
-      milestoneCelebrationsEnabled:
-          milestoneCelebrationsEnabled ??
-          this.milestoneCelebrationsEnabled,
 
-      levelUpNotificationsEnabled:
-          levelUpNotificationsEnabled ??
-          this.levelUpNotificationsEnabled,
+      partialProtectionNotificationsEnabled:
+          partialProtectionNotificationsEnabled ??
+          this.partialProtectionNotificationsEnabled,
 
       recurringProgressReminderEnabled:
           recurringProgressReminderEnabled ??
@@ -165,7 +172,6 @@ class PlanState {
   }
 
   PlanState refreshProgress() {
-
     if (protection.status !=
         ProtectionStatus.active) {
       return this;
@@ -173,10 +179,16 @@ class PlanState {
 
     final now = DateTime.now();
 
-    if (lastProgressAwardAt == null) {
+    if (lastProgressAwardAt == null ||
+        lastStreakAwardAt == null) {
+
+      final previous = protection.mode == ProtectionMode.permanent
+          ? now.subtract(const Duration(hours: 1))
+          : now.subtract(const Duration(hours: 1));
 
       return copyWith(
-        lastProgressAwardAt: now,
+        lastProgressAwardAt: previous,
+        lastStreakAwardAt: previous,
       );
     }
 
@@ -200,11 +212,28 @@ class PlanState {
       final newXp =
           xp + earnedXp;
 
+      final newLevel =
+          1 + (newXp ~/ 1000);
+
+      CelebrationState celebration =
+          this.celebration;
+
+      if (newLevel > level) {
+        celebration = CelebrationState(
+          type: CelebrationType.levelUp,
+          title: 'Level Up!',
+          message:
+              'Congratulations! You reached Level $newLevel.',
+          level: newLevel,
+        );
+      }
+
       return copyWith(
         xp: newXp,
 
-        level:
-            1 + (newXp ~/ 1000),
+        level: newLevel,
+
+        celebration: celebration,
 
         lastProgressAwardAt:
             lastProgressAwardAt!.add(
@@ -224,10 +253,16 @@ class PlanState {
               lastProgressAwardAt!,
             )
             .inHours;
-
     if (elapsedHours <= 0) {
       return this;
     }
+
+    final elapsedDays =
+        now
+            .difference(
+              lastStreakAwardAt!,
+            )
+            .inDays;
 
     final earnedXp =
         elapsedHours * 4;
@@ -235,11 +270,46 @@ class PlanState {
     final newXp =
         xp + earnedXp;
 
+    final newLevel =
+        1 + (newXp ~/ 1000);
+
+    final newStreak =
+        streakDays + elapsedDays;
+
+    CelebrationState celebration =
+        this.celebration;
+
+    if (newLevel > level) {
+      celebration = CelebrationState(
+        type: CelebrationType.levelUp,
+        title: 'Level Up!',
+        message:
+            'Congratulations! You reached Level $newLevel.',
+        level: newLevel,
+      );
+    } else {
+      switch (newStreak) {
+        case 7:
+        case 30:
+        case 90:
+        case 180:
+        case 365:
+          celebration = CelebrationState(
+            type: CelebrationType.streak,
+            title: '$newStreak Day Streak!',
+            message:
+                'Congratulations! You reached a $newStreak-day streak.',
+            streakDays: newStreak,
+          );
+          break;
+      }
+    }
+
     return copyWith(
       xp: newXp,
-
-      level:
-          1 + (newXp ~/ 1000),
+      level: newLevel,
+      celebration: celebration,
+      streakDays: newStreak,
 
       lastProgressAwardAt:
           lastProgressAwardAt!.add(
@@ -247,6 +317,15 @@ class PlanState {
           hours: elapsedHours,
         ),
       ),
+
+      lastStreakAwardAt:
+          elapsedDays > 0
+              ? lastStreakAwardAt!.add(
+                  Duration(
+                    days: elapsedDays,
+                  ),
+                )
+              : lastStreakAwardAt,
     );
   }
 
