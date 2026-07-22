@@ -37,12 +37,12 @@ class RequestPendingBanner
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(
-        bottom: 20,
+        bottom: 8,
       ),
 
       padding: const EdgeInsets.symmetric(
         horizontal: 18,
-        vertical: 16,
+        vertical: 8,
       ),
 
       decoration: BoxDecoration(
@@ -62,7 +62,7 @@ class RequestPendingBanner
             color: Colors.orange,
           ),
 
-          const SizedBox(width: 14),
+          const SizedBox(width: 10),
 
           Expanded(
             child: Column(
@@ -70,9 +70,9 @@ class RequestPendingBanner
                   CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Approval Pending',
+                  'Unlock Request Pending',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight:
                         FontWeight.bold,
                     color:

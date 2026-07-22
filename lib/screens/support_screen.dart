@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../services/storage_service.dart';
-import '../state/plan_state.dart';
 import '../services/user_profile_repository.dart';
+import '../services/local_storage_service.dart';
+import '../state/plan_state.dart';
+import '../state/protection_state.dart';
 import '../models/user_profile.dart';
 
 import 'support_cleanmind_user_screen.dart';
@@ -32,6 +34,7 @@ class _SupportScreenState
   String? _supportPhone;
   String? _supportType;
   String? _supportStatus;
+  late PlanState _currentPlan;
 
   @override
   void initState() {
@@ -40,6 +43,8 @@ class _SupportScreenState
   }
 
   Future<void> _loadSupport() async {
+    _currentPlan =
+        await LocalStorageService.loadPlan();
     final name =
         await StorageService.loadSupportName();
 
@@ -222,7 +227,7 @@ class _SupportScreenState
                     MaterialPageRoute(
                     builder: (_) =>
                         SupportScreen(
-                          plan: widget.plan,
+                          plan: _currentPlan,
                           onPlanChanged:
                               widget.onPlanChanged,
                         ),
@@ -458,7 +463,7 @@ class _SupportScreenState
                       .clearSupportRemovalRequestId();
 
                   final updatedPlan =
-                      widget.plan.clearSupportRequest();
+                      _currentPlan.clearSupportRequest();
 
                   widget.onPlanChanged(
                     updatedPlan,
@@ -476,20 +481,17 @@ class _SupportScreenState
             if (_supportStatus != 'pendingRemoval') ...[
               const SizedBox(height: 18),
 
-              _supportOption(
-              icon: Icons.swap_horiz,
-              title: 'Change Support',
-              subtitle:
-                  'Replace your current Support partner.',
-              onTap: () {
-                  // Verification flow next.
-              },
-              ),
-
-              const SizedBox(height: 12),
-
-              _supportOption(
-              icon: Icons.person_remove_outlined,
+          Opacity(
+            opacity: _currentPlan.protection.status ==
+                    ProtectionStatus.active
+                ? 0.5
+                : 1,
+            child: IgnorePointer(
+              ignoring:
+                  _currentPlan.protection.status ==
+                      ProtectionStatus.active,
+              child: _supportOption(
+                icon: Icons.person_remove_outlined,
               title: 'Remove Support',
               subtitle:
                   'Requires verification from your current Support.',
@@ -555,7 +557,7 @@ class _SupportScreenState
                   await userProfileRepository.getProfile();
 
               final updatedPlan =
-                  widget.plan.startSupportRemovalRequest(
+                  _currentPlan.startSupportRemovalRequest(
                 requesterName:
                     profile?.username ??
                     profile?.email ??
@@ -653,44 +655,82 @@ class _SupportScreenState
                   );
                 },
               );
-              },
-              ),
+
+                            },
+                          ),
+                        ),
+                      ),
 
               const SizedBox(height: 18),
 
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 13,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE5EEFC),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: const Color(0xFFB8D0F5),
-                  ),
-                ),
-                child: const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.shield_outlined,
-                      color: AppColors.primary,
-                      size: 23,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 13,
                     ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Changing or removing your Support requires verification.',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          height: 1.4,
-                          color: AppColors.textSecondary,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE5EEFC),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: const Color(0xFFB8D0F5),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.lock_outline,
+                          color: AppColors.primary,
+                          size: 23,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _currentPlan.unlockRequest.isPending
+                                ? 'Waiting for your Support partner to approve this unlock request.'
+                                : 'Support settings are locked while Protection is active. Request an unlock to make changes.',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              height: 1.4,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                    if (_currentPlan.protection.status ==
+                        ProtectionStatus.active) ...[
+                    const SizedBox(height: 16),
+
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _currentPlan.unlockRequest.isPending
+                            ? null
+                            : () async {
+                        await Navigator.pushNamed(
+                          context,
+                          '/unlock-methods',
+                        );
+
+                        if (!mounted) return;
+
+                        await _loadSupport();
+                        },
+                        child: Text(
+                          _currentPlan.unlockRequest.isPending
+                              ? 'Unlock Request Pending'
+                              : 'Request Unlock',
                         ),
                       ),
                     ),
                   ],
-                ),
+                ],
               ),
             ],
           ],

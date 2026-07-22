@@ -1783,3 +1783,39 @@ The issue was corrected by restoring NotificationService initialization before a
 - Confirm SMS flow still works.
 - Confirm Pending Requests still work.
 - Confirm project builds successfully on iOS.
+
+## 2026-07-21 — Settings & Progress Notifications UI
+
+### Completed
+- Home screen still displays focused days using `PlanState.streakDays`. The correct source of truth is `ProtectionState` (`activatedAt` / `getActiveDuration()`). Pending refactor to remove duplicated state.
+- Added the new **Progress Notifications** screen.
+- Reorganized the Settings menu to include a dedicated Progress Notifications section.
+- Removed **Streak Alerts** from Protection Settings.
+- Separated protection configuration from notification preferences.
+- Redesigned the Progress Notifications screen to match the current CleanMind design language.
+- Added UI for:
+  - Milestone Celebrations
+  - Level Up Notifications
+  - Recurring Progress Reminder (PRO)
+  - Reminder Interval selector (UI only)
+- Navigation between Settings and Progress Notifications completed.
+- No business logic or persistence implemented yet.
+
+### Status
+- Progress Notifications UI is complete.
+- Notification preferences are pending persistence in LocalStorage.
+- Firebase/local notification integration remains pending.
+- Protection Settings now contains only protection-related options.
+
+### Next Session Focus
+- Persist notification preferences.
+- Connect toggles to LocalStorage.
+- Persist Reminder Interval.
+- Prepare notification layer for future Firebase/APNs integration.
+
+### Documentation Alignment Required Before Commit
+- Product_Flow.md ✅
+- Development_Log.md ✅
+
+### Git
+Ready for commit.

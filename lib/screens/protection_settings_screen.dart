@@ -94,26 +94,6 @@ class ProtectionSettingsScreen
               height: 18,
             ),
 
-            _sectionTitle(
-              'Notifications',
-            ),
-
-            _settingsTile(
-              icon:
-                  Icons.local_fire_department,
-              title:
-                  'Streak Alerts',
-              subtitle:
-                  'Receive notifications when you reach achievement milestones.',
-              trailing:
-                  Switch(
-                value: true,
-                activeColor:
-                    AppColors.primary,
-                onChanged: (_) {},
-              ),
-            ),
-
             const SizedBox(
               height: 18,
             ),

@@ -5,6 +5,7 @@ import '../theme/app_colors.dart';
 
 import 'protection_settings_screen.dart';
 import 'account_settings_screen.dart';
+import 'progress_notifications_screen.dart';
 
 import 'about_cleanmind_screen.dart';
 
@@ -66,6 +67,22 @@ class SettingsScreen extends StatelessWidget {
           ),
 
           const SizedBox(height: 14),
+
+          _settingsOption(
+            icon: Icons.notifications_active_outlined,
+            title: 'Progress Notifications',
+            subtitle:
+                'Manage achievement and progress notifications.',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const ProgressNotificationsScreen(),
+                ),
+              );
+            },
+          ),
 
           _settingsOption(
             icon: Icons.info_outline,

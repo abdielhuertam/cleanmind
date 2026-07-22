@@ -128,7 +128,9 @@ class _HomeScreenState
         status.name != 'inactive';
 
     final focusedDays =
-        widget.plan.streakDays;
+        widget.plan.protection
+            .getActiveDuration()
+            .inDays;
 
     final hasPendingRequest =
         widget.plan.unlockRequest
@@ -288,7 +290,7 @@ class _HomeScreenState
           SizedBox(
             height: 205,
             child: StreakCircleCard(
-              streakDays: widget.plan.streakDays,
+              streakDays: focusedDays,
             ),
           ),
 
@@ -379,7 +381,9 @@ class _HomeScreenState
               ],
             ),
 
-            const SizedBox(height: 4),
+            SizedBox(
+              height: hasPendingRequest ? 0 : 18,
+            ),  
 
             Row(
               children: [

@@ -608,3 +608,38 @@ Behavior:
 ### Pending Approval
 
 Support approval requests do not display a disabled confirmation because protection remains active until approval is received.
+
+### Settings
+
+The Settings section is organized into four categories:
+
+- Account Settings
+- Protection Settings
+- About CleanMind
+- Progress Notifications
+
+### Protection Settings
+
+Protection Settings only contains protection-related configuration:
+
+Protection
+- Blocked Apps
+- Custom Blocked Sites
+
+Accountability
+- Support
+
+Notification preferences are no longer managed from this screen.
+
+### Progress Notifications
+
+Progress notifications have been moved to their own dedicated screen.
+
+Available options:
+
+- Milestone Celebrations
+- Level Up Notifications
+- Recurring Progress Reminder (PRO)
+- Reminder Interval (PRO)
+
+Current implementation is UI-only. Preference persistence and notification scheduling will be implemented in a future development phase.
